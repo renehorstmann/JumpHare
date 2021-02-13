@@ -1,27 +1,9 @@
-# some
-Sdl2 OpenGl Mini Engine.
+# JumpHare
+An SDL2 OpenGL game written in C, also working on Web and Android.
+Based on [some](https://github.com/renehorstmann/some) framework.
 
-
-## Getting started
-Fork this repo and have fun
-
-## e
-e_* is for window and environment management, like window, input, sdl stuff...
-
-## r
-r_* is dor OpenGL rendering
-
-## u
-Utilities like setting up a 2D pose
-
-## p
-Physics
-
-## mathc
-glsl like math library for C, see [Mathc](https://github.com/renehorstmann/Mathc)
-
-## utilc
-C utility functions like dynamic arrays, see [Utilc](https://github.com/renehorstmann/Utilc)
+## Warning
+In active developmemt
 
 
 ## Compiling on Windows
@@ -36,4 +18,5 @@ gcc -o some src/* -Iinclude $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_t
 René Horstmann
 
 ## Licence
-This project is licensed under the MIT License - see the LICENSE file for details
+The game ane its assets are licenced under GPLv3, see LICENCE.
+The [some](https://github.com/renehorstmann/some) framework is under MIT licence, see someLICENCE.
