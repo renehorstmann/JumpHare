@@ -4,6 +4,7 @@
 
 #include "camera.h"
 #include "hare.h"
+#include "controller.h"
 
 
 static void main_loop(float delta_time);
@@ -23,6 +24,7 @@ int main(int argc, char **argv) {
     // init systems
     camera_init();
     hare_init();
+    conttoller_init();
       
 
     e_window_main_loop(main_loop);

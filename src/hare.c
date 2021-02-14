@@ -7,6 +7,8 @@
 
 static struct {
 	rRoSingle ro;
+	float dx;
+	float looking_left;
 	
 	rRoSingle bg;
 } L;
@@ -19,10 +21,14 @@ void hare_init() {
 
 void hare_update(float dtime) {
 	static float x=0;
-	//x+=dtime * 20;
+	x+=dtime * L.dx;
 	if(x>camera_right())
 	    x = camera_left();
-	    
+	if(x<camera_left())
+	    x = camera_right();
+	float px = floorf(x);
+	
+	
 	float fps = 6;
 	int frames = 4;
 	static float time=0;
@@ -32,14 +38,34 @@ void hare_update(float dtime) {
 	float w = 1.0/4.0;
 	float h = 1.0/2.0;
 	
-	u_pose_set(&L.ro.rect.pose, x, 0, 32, 32, 0);
-	u_pose_set(&L.ro.rect.uv, frame*w, 0*h, w, h, 0);
+    if(L.dx<0)
+        L.looking_left = true;
+    if(L.dx>0)
+        L.looking_left = false;
+    
+    if(L.looking_left)
+        w = -w;
 	
-	u_pose_set(&L.bg.rect.pose, 0, -10, camera_width(), 64, 0);
+	float v = L.dx==0? 0 : 1;
+	
+	u_pose_set(&L.ro.rect.pose, px, 0, 32, 32, 0);
+	u_pose_set(&L.ro.rect.uv, frame*w, v*h, w, h, 0);
+	
+	u_pose_set(&L.bg.rect.pose, 0, -5, 128*2, 64, 0);
+	u_pose_set_w(&L.bg.rect.uv, 2);
 }
 
 void hare_render() {
 	r_ro_single_render(&L.bg);
 	r_ro_single_render(&L.ro);
+}
+
+
+void hare_set_speed(float dx) {
+	if(fabs(dx) < 10)
+        dx = 0;
+    if(fabs(dx) > 80) 
+        dx = 100 * dx/fabs(dx);
+	L.dx = dx;
 }
 
