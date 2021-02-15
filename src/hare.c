@@ -63,6 +63,9 @@ void hare_render() {
 
 
 void hare_set_speed(float dx) {
-    L.dx = sca_sign(dx) * sca_clamp(sca_abs(dx), 10, 80);
+    
+    // [0 || += 10 : +-80]
+    dx = sca_abs(dx) < 10 ? 0 : dx;
+    L.dx = sca_sign(dx) * sca_min(sca_abs(dx), 80);
 }
 

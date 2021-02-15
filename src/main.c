@@ -11,10 +11,10 @@ static void main_loop(float delta_time);
 
 
 int main(int argc, char **argv) {
-    SDL_Log("some");
+    SDL_Log("JumpHare");
 
     // init e (environment)
-    e_window_init("some");
+    e_window_init("JumpHare");
     e_input_init();
     e_gui_init();
 
