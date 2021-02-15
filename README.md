@@ -6,8 +6,6 @@ Based on [some](https://github.com/renehorstmann/some) framework.
 In active developmemt
 
 ## Todo
-- mathc sca functions
-  - sca_*, dsca_*, min, max, clamp, radians, ...
 - hare set speed takes [-1 : 1]
 - hare pause speed smoothly
 - draw high speed
