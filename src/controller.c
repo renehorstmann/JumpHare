@@ -23,8 +23,8 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     }
     
     float dx = (c_pointer.pos.x - L.start_pos.x);
-    if(fabsf(dx)>80) {
-    	float diff = (fabsf(dx) - 80) * dx/fabsf(dx);
+    if(sca_abs(dx)>80) {
+    	float diff = sca_sign(dx) * (sca_abs(dx) - 80);
     	L.start_pos.x += diff;
     }
     hare_set_speed(dx);
