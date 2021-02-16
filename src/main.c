@@ -23,8 +23,8 @@ int main(int argc, char **argv) {
 
     // init systems
     camera_init();
+    controller_init();
     hare_init();
-    conttoller_init();
       
 
     e_window_main_loop(main_loop);
@@ -43,6 +43,7 @@ static void main_loop(float delta_time) {
 
     // simulate
     camera_update();
+    controller_update(delta_time);
     hare_update(delta_time);
     
 
@@ -50,6 +51,7 @@ static void main_loop(float delta_time) {
     r_render_begin_frame(e_window.size.x, e_window.size.y);
 
 
+    controller_render();
     hare_render();
     
 

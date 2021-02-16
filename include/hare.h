@@ -9,4 +9,6 @@ void hare_render();
 
 void hare_set_speed(float dx);
 
+void hare_jump();
+
 #endif //JUMPHARE_HARE_H

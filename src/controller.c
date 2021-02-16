@@ -6,10 +6,13 @@
 
 static struct {
 	vec4 start_pos;
-	
+	vec4 actual_pos;
+	vec4 last_pos;
 } L;
 
 static void pointer_event(ePointer_s pointer, void *ud) {
+	L.actual_pos = pointer.pos;
+	
 	if(pointer.action == E_POINTER_UP) {
 		hare_set_speed(0);
 		return;
@@ -30,14 +33,21 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     hare_set_speed(dx);
 }
 
-void conttoller_init() {
+void controller_init() {
 	e_input_register_pointer_event(pointer_event, NULL);
 }
 
-void conttoller_update(float dtime) {
+void controller_update(float dtime) {
+	float dy = L.actual_pos.y - L.last_pos.y;
+	float speed = dy / dtime;
+	if(speed>2)
+	    hare_jump();
 	
+	
+	
+	L.last_pos = L.actual_pos;
 }
 
-void conttoller_render() {
+void controller_render() {
 	
 }
