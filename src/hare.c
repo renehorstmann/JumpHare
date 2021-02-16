@@ -37,7 +37,7 @@ void hare_update(float dtime) {
     int frame = time * fps;
 
     float w = 1.0 / 4.0;
-    float h = 1.0 / 2.0;
+    float h = 1.0 / 3.0;
 
     if (L.dx < 0)
         L.looking_left = true;
@@ -48,6 +48,8 @@ void hare_update(float dtime) {
         w = -w;
 
     float v = L.dx == 0 ? 0 : 1;
+    if(sca_abs(L.dx)>40)
+        v++;
 
     u_pose_set(&L.ro.rect.pose, px, 0, 32, 32, 0);
     u_pose_set(&L.ro.rect.uv, frame * w, v * h, w, h, 0);
