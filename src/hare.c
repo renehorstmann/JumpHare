@@ -93,8 +93,7 @@ void hare_update(float dtime) {
 	    u_pose_set(&L.ro.rect.uv, (1+frame) * w, v * h, -w, h, 0);
 	
 
-	u_pose_set(&L.bg.rect.pose, 0, -5, 128 * 2, 64, 0);
-	u_pose_set_w(&L.bg.rect.uv, 2);
+	u_pose_set(&L.bg.rect.pose, 0, -5, 180, 180, 0);
 }
 
 void hare_render() {
