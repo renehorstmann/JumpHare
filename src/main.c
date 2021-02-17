@@ -7,6 +7,7 @@
 #include "level.h"
 #include "hare.h"
 #include "controller.h"
+#include "camera_control.h"
 
 
 static void main_loop(float delta_time);
@@ -29,6 +30,7 @@ int main(int argc, char **argv) {
     level_init();
     controller_init();
     hare_init();
+    camera_control_init();
       
 
     e_window_main_loop(main_loop);
@@ -51,6 +53,7 @@ static void main_loop(float delta_time) {
     level_update(delta_time);
     controller_update(delta_time);
     hare_update(delta_time);
+    camera_control_update(delta_time);
     
 
     // render

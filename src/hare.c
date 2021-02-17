@@ -7,6 +7,9 @@
 
 static struct {
 	rRoSingle ro;
+	
+	float x, y;
+	
 	float dx;
 	float looking_left;
 
@@ -22,26 +25,20 @@ void hare_init() {
 }
 
 void hare_update(float dtime) {
-	static float x = 0;
-	x += dtime * L.dx;
-	if (x > camera_right())
-		x = camera_left();
-	if (x < camera_left())
-		x = camera_right();
-
-	static float y = 0;
+	L.x += dtime * L.dx;
+	
 	static float G = -180;
 	
 	if(L.jump_time >= 0.15) {
 	    if(L.jump_time < 0.5 && L.speed_y<=0)
 	        L.speed_y = 125;
-	    y += L.speed_y * dtime;
+	    L.y += L.speed_y * dtime;
 	    L.speed_y += G * dtime;
 
-	    if (y < 0) {
+	    if (L.y < 0) {
 	    	L.jump_time = -1;
     		L.speed_y = 0;
-    		y = 0;
+    		L.y = 0;
     	}
 	}
 
@@ -80,8 +77,8 @@ void hare_update(float dtime) {
     if(L.jump_time >= 0) 
         v = 3;
 
-    float px = floorf(x);
-    float py = floorf(y);
+    float px = floorf(L.x);
+    float py = floorf(L.y);
 	u_pose_set(&L.ro.rect.pose, px, py-9, 32, 32, 0);
 	
 	if(!L.looking_left)
@@ -93,6 +90,10 @@ void hare_update(float dtime) {
 
 void hare_render() {
 	r_ro_single_render(&L.ro);
+}
+
+vec2 hare_position() {
+	return (vec2) {{L.x, L.y}};
 }
 
 void hare_set_speed(float dx) {

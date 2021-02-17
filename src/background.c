@@ -11,11 +11,11 @@ static struct {
 
 void background_init() {
 	r_ro_single_init(&L.ro, camera.gl, r_texture_init_file("res/grass.png", NULL));
-	u_pose_set(&L.ro.rect.pose, 0, 0, 180, 180, 0);
+	
 }
 
 void background_update(float dtime) {
-	
+	L.ro.rect.pose = u_pose_new(0, 0, camera_width(), camera_height());
 }
 
 void background_render() {
