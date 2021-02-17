@@ -79,7 +79,7 @@ void hare_update(float dtime) {
 
     float px = floorf(L.x);
     float py = floorf(L.y);
-	u_pose_set(&L.ro.rect.pose, px, py-9, 32, 32, 0);
+	u_pose_set(&L.ro.rect.pose, L.x, L.y-9, 32, 32, 0);
 	
 	if(!L.looking_left)
 	    u_pose_set(&L.ro.rect.uv, frame * w, v * h, w, h, 0);

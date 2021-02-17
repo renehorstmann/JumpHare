@@ -28,6 +28,8 @@ void camera_control_update(float dtime) {
 	// pos += norm(delta) * (diff - MAX_DIFF)
 	L.pos = vec2_add_vec(L.pos, vec2_scale(delta, diff));
 	
+	//L.pos = vec2_floor(L.pos);
+	
 	camera_set_pos(L.pos.x, L.pos.y);
 }
 

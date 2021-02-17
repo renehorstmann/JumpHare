@@ -55,6 +55,7 @@ static void main_loop(float delta_time) {
     hare_update(delta_time);
     camera_control_update(delta_time);
     
+    
 
     // render
     r_render_begin_frame(e_window.size.x, e_window.size.y);
