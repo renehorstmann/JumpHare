@@ -1,23 +1,25 @@
 #include <float.h>
+#include "mathc/float.h"
+#include "utilc/assume.h"
 #include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "camera.h"
+#include "io.h"
 #include "level.h"
 
 
-static const char lvl[11][11] = {
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	{0, 0, 1, 2, 3, 0, 0, 0, 1, 3, 0},
-	{0, 0, 4, 5, 6, 0, 0, 1, 7, 6, 0},
-	{0, 1, 7, 5, 9, 2, 2, 7, 5, 6, 0},
-	{2, 7, 5, 5, 5, 5, 5, 5, 5, 9, 2},
-	{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
-	{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}
+enum tile_modes {
+	TILE_NONE,
+	TILE_FULL,
+	TILE_TOP,
+	TILE_LEFT,
+	TILE_RIGHT,
+	TILE_TOP_LEFT,
+	TILE_TOP_RIGHT,
+	TILE_BOTTOM_LEFT,
+	TILE_BOTTOM_RIGHT,
+	NUM_TILE_MODES
 };
 
 
@@ -27,35 +29,65 @@ static struct {
 } L;
 
 
+static mat4 tile_pose(int c, int r) {
+	return u_pose_new_aa(-90+c*16, 90-r*16, 16, 16);
+}
+
+static mat4 tile_uv(enum tile_modes mode) {
+	float w = 1.0/4.0;
+	float h = 1.0/4.0;
+	switch(mode) {
+		case TILE_NONE:
+		    return u_pose_new(3*w, 0, w, h);
+		case TILE_FULL:
+		    return u_pose_new(1*w, 1*h, w, h);
+		case TILE_TOP:
+		    return u_pose_new(1*w, 0, w, h);
+		case TILE_LEFT:
+		    return u_pose_new(0, 1*h, w, h);
+		case TILE_RIGHT:
+		    return u_pose_new(2*w, 1*h, w, h);
+		case TILE_TOP_LEFT:
+		    return u_pose_new(0, 0, w, h);
+		case TILE_TOP_RIGHT:
+		    return u_pose_new(2*w, 0, w, h);
+		case TILE_BOTTOM_LEFT:
+		    return u_pose_new(0, 2*h, w, h);
+		case TILE_BOTTOM_RIGHT:
+		    return u_pose_new(2*w, 2*h, w, h);
+		
+		default:
+		    assume(false, "invalid tilemode");
+	};
+	return (mat4) {{0}};
+}
+
+static bool is_block(Color_s c) {
+	return c.r > 128;
+}
+
+static enum tile_modes get_mode(Image *lvl, int c, int r) {
+    if(is_block(*image_pixel(lvl, 0, c, r)))
+        return TILE_FULL;
+    return TILE_NONE;
+}
+
 void level_init() {
-	r_ro_batch_init(&L.ro, 256, camera.gl, r_texture_init_file("res/tile_leafes.png", NULL));
+	Image *lvl = io_load_image("res/level_001.png");
+	assume(lvl, "level not found");
 	
-	for(int r=0;r<11;r++) {
-        for(int c=0; c<11; c++) {
-        	rRect_s *rect = &L.ro.rects[r*11+c];
-        	int tile = lvl[r][c];
-        	
-        	if(tile == 0) {
-        		u_pose_set(&rect->pose, FLT_MAX, FLT_MAX, 0, 0, 0);
-        		continue;
-        	}
-        	tile--;
-        	
-        	printf("tile %d @ rc %d %d \n", tile, r, c);
-        	u_pose_aa_set(&rect->pose, -90+c*16, 90-r*16, 16, 16);
-        	
-        	
-        	float w = 1.0/4.0;
-        	float h = 1.0/4.0;
-        	float u = tile % 3;
-        	float v = tile / 3;
-        	u_pose_set(&rect->uv, u * w, v * h, w, h, 0);
-        }		
+	r_ro_batch_init(&L.ro, lvl->rows * lvl->cols, camera.gl, r_texture_init_file("res/tile_leafes.png", NULL));
+	
+	for(int r=0; r<lvl->rows; r++) {
+	    for(int c=0; c<lvl->cols; c++) {
+		    rRect_s *rect = &L.ro.rects[r*lvl->cols + c];
+		    rect->pose = tile_pose(c, r);
+		    rect->uv = tile_uv(get_mode(lvl, c, r));
+		}
 	}
 	
-	for(int i=11*11; i<L.ro.num; i++) {
-		u_pose_set(&L.ro.rects[i].pose, FLT_MAX, FLT_MAX, 0, 0, 0);
-	}
+	
+	image_delete(lvl);
 	
 	r_ro_batch_update(&L.ro);
 }
