@@ -62,14 +62,36 @@ static mat4 tile_uv(enum tile_modes mode) {
 	return (mat4) {{0}};
 }
 
-static bool is_block(Color_s c) {
-	return c.r > 128;
+static bool is_block(Image *lvl, int c, int r) {
+	if(!image_contains(lvl, c, r))
+	    return false;
+	return image_pixel(lvl, 0, c, r)->r > 128;
 }
 
+
 static enum tile_modes get_mode(Image *lvl, int c, int r) {
-    if(is_block(*image_pixel(lvl, 0, c, r)))
-        return TILE_FULL;
-    return TILE_NONE;
+    if(!is_block(lvl, c, r))
+        return TILE_NONE;
+    if(!is_block(lvl, c, r-1)) {
+        if(!is_block(lvl, c-1, r))
+            return TILE_TOP_LEFT;
+        if(!is_block(lvl, c+1, r))
+            return TILE_TOP_RIGHT;
+        return TILE_TOP;
+    }
+    
+    if(!is_block(lvl, c-1, r))
+        return TILE_LEFT;
+    if(!is_block(lvl, c+1, r))
+        return TILE_RIGHT;
+        
+    if(!is_block(lvl, c-1, r-1))
+        return TILE_BOTTOM_LEFT;
+           
+    if(!is_block(lvl, c+1, r-1))
+        return TILE_BOTTOM_RIGHT;
+        
+    return TILE_FULL;
 }
 
 void level_init() {
