@@ -3,6 +3,8 @@
 #include "u/u.h"
 
 #include "camera.h"
+#include "background.h"
+#include "level.h"
 #include "hare.h"
 #include "controller.h"
 
@@ -23,6 +25,8 @@ int main(int argc, char **argv) {
 
     // init systems
     camera_init();
+    background_init();
+    level_init();
     controller_init();
     hare_init();
       
@@ -43,6 +47,8 @@ static void main_loop(float delta_time) {
 
     // simulate
     camera_update();
+    background_update(delta_time);
+    level_update(delta_time);
     controller_update(delta_time);
     hare_update(delta_time);
     
@@ -52,6 +58,8 @@ static void main_loop(float delta_time) {
 
 
     controller_render();
+    background_render();
+    level_render();
     hare_render();
     
 

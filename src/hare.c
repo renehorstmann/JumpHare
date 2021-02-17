@@ -12,8 +12,6 @@ static struct {
 
 	float jump_time;
 	float speed_y;
-
-	rRoSingle bg;
 } L;
 
 void hare_init() {
@@ -21,7 +19,6 @@ void hare_init() {
 	
 	r_ro_single_init(&L.ro, camera.gl, r_texture_init_file("res/hare.png", NULL));
 
-	r_ro_single_init(&L.bg, camera.gl, r_texture_init_file("res/grass.png", NULL));
 }
 
 void hare_update(float dtime) {
@@ -85,19 +82,16 @@ void hare_update(float dtime) {
 
     float px = floorf(x);
     float py = floorf(y);
-	u_pose_set(&L.ro.rect.pose, px, py, 32, 32, 0);
+	u_pose_set(&L.ro.rect.pose, px, py-9, 32, 32, 0);
 	
 	if(!L.looking_left)
 	    u_pose_set(&L.ro.rect.uv, frame * w, v * h, w, h, 0);
 	else
 	    u_pose_set(&L.ro.rect.uv, (1+frame) * w, v * h, -w, h, 0);
 	
-
-	u_pose_set(&L.bg.rect.pose, 0, -5, 180, 180, 0);
 }
 
 void hare_render() {
-	r_ro_single_render(&L.bg);
 	r_ro_single_render(&L.ro);
 }
 
