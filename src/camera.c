@@ -32,7 +32,7 @@ void camera_update() {
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     L.real_pixel_per_pixel = floorf(smaller_size / CAMERA_SIZE);
-
+    
     float width_2 = wnd_width / (2 * L.real_pixel_per_pixel);
     float height_2 = wnd_height / (2 * L.real_pixel_per_pixel);
 
@@ -71,6 +71,8 @@ float camera_top() {
 }
 
 void camera_set_pos(float x, float y) {
+    x = floorf(x * L.real_pixel_per_pixel)/L.real_pixel_per_pixel;
+    y = floorf(y * L.real_pixel_per_pixel)/L.real_pixel_per_pixel;
     u_pose_set_xy(&camera.matrices.v, x, y);
 }
 

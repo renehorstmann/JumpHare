@@ -5,31 +5,34 @@
 
 #define MAX_DIFF 50
 
-static struct {
-	vec2 pos;
-	
-} L;
+struct CameraControlGlobals_s camera_control;
+
 
 void camera_control_init() {
-	L.pos = hare_position();
-	camera_set_pos(L.pos.x, L.pos.y);
+	camera_control.pos = hare_position();
+	camera_set_pos(camera_control.pos.x, camera_control.pos.y);
 }
 
 void camera_control_update(float dtime) {
+//	vec2_println(camera_control.pos);
 	vec2 h = hare_position();
-	vec2 delta = vec2_sub_vec(h, L.pos);
+	vec2 delta = vec2_sub_vec(h, camera_control.pos);
 	float diff = vec2_norm(delta);
-	if(diff < MAX_DIFF)
-	    return;
-	    
 	diff -= MAX_DIFF;
-	delta = vec2_normalize(delta);
 	
-	// pos += norm(delta) * (diff - MAX_DIFF)
-	L.pos = vec2_add_vec(L.pos, vec2_scale(delta, diff));
+	if(diff>0) {
+	    delta = vec2_normalize(delta);
 	
-	//L.pos = vec2_floor(L.pos);
+	     // pos += norm(delta) * (diff - MAX_DIFF)
+	    camera_control.pos = vec2_add_vec(camera_control.pos, vec2_scale(delta, diff));
+	}
 	
-	camera_set_pos(L.pos.x, L.pos.y);
+	//camera_control.pos = vec2_scale(vec2_floor(vec2_scale(camera_control.pos, 4)), 0.25);
+	
+	camera_set_pos(camera_control.pos.x, camera_control.pos.y);
+	
+	static float t;
+	t+=dtime;
+	//camera_set_angle(t*M_PI/4);
 }
 

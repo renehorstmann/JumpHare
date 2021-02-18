@@ -13,12 +13,22 @@ enum tile_modes {
 	TILE_NONE,
 	TILE_FULL,
 	TILE_TOP,
+	TILE_BOTTOM,
 	TILE_LEFT,
 	TILE_RIGHT,
 	TILE_TOP_LEFT,
 	TILE_TOP_RIGHT,
 	TILE_BOTTOM_LEFT,
 	TILE_BOTTOM_RIGHT,
+	TILE_EDGE_BOTTOM_RIGHT,
+	TILE_EDGE_BOTTOM_LEFT,
+	TILE_EDGE_TOP_RIGHT,
+	TILE_EDGE_TOP_LEFT,
+	TILE_SINGLE,
+	TILE_SINGLE_TOP,
+	TILE_SINGLE_BOTTOM,
+	TILE_SINGLE_LEFT,
+	TILE_SINGLE_RIGHT,
 	NUM_TILE_MODES
 };
 
@@ -34,15 +44,17 @@ static mat4 tile_pose(int c, int r) {
 }
 
 static mat4 tile_uv(enum tile_modes mode) {
-	float w = 1.0/4.0;
-	float h = 1.0/4.0;
+	float w = 1.0/6.0;
+	float h = 1.0/6.0;
 	switch(mode) {
 		case TILE_NONE:
-		    return u_pose_new(3*w, 0, w, h);
+		    return u_pose_new(5*w, 5*h, w, h);
 		case TILE_FULL:
 		    return u_pose_new(1*w, 1*h, w, h);
 		case TILE_TOP:
 		    return u_pose_new(1*w, 0, w, h);
+		case TILE_BOTTOM:
+		    return u_pose_new(1*w, 2*h, w, h);
 		case TILE_LEFT:
 		    return u_pose_new(0, 1*h, w, h);
 		case TILE_RIGHT:
@@ -55,6 +67,26 @@ static mat4 tile_uv(enum tile_modes mode) {
 		    return u_pose_new(0, 2*h, w, h);
 		case TILE_BOTTOM_RIGHT:
 		    return u_pose_new(2*w, 2*h, w, h);
+		case TILE_EDGE_BOTTOM_RIGHT:
+		    return u_pose_new(3*w, 0, w, h);
+		case TILE_EDGE_BOTTOM_LEFT:
+		    return u_pose_new(4*w, 0, w, h);
+		case TILE_EDGE_TOP_RIGHT:
+		    return u_pose_new(3*w, 1*h, w, h);
+		case TILE_EDGE_TOP_LEFT:
+		    return u_pose_new(4*w, 1*h, w, h);
+		case TILE_SINGLE:
+		    return u_pose_new(5*w, 2*h, w, h);
+		case TILE_SINGLE_TOP:
+		    return u_pose_new(5*w, 0, w, h);
+		case TILE_SINGLE_BOTTOM:
+		    return u_pose_new(5*w, 1*h, w, h);
+		case TILE_SINGLE_LEFT:
+		    return u_pose_new(3*w, 2*h, w, h);
+		case TILE_SINGLE_RIGHT:
+		    return u_pose_new(4*w, 2*h, w, h);
+		
+		
 		
 		default:
 		    assume(false, "invalid tilemode");
@@ -69,27 +101,70 @@ static bool is_block(Image *lvl, int c, int r) {
 }
 
 
-static enum tile_modes get_mode(Image *lvl, int c, int r) {
-    if(!is_block(lvl, c, r))
+static enum tile_modes get_mode(Image *lvl, int col, int row) {
+    if(!is_block(lvl, col, row))
         return TILE_NONE;
-    if(!is_block(lvl, c, r-1)) {
-        if(!is_block(lvl, c-1, r))
+        
+    bool l = is_block(lvl, col-1, row);
+    bool r = is_block(lvl, col+1, row);
+    bool t = is_block(lvl, col, row-1);
+    bool b = is_block(lvl, col, row+1);
+    
+    bool lt = is_block(lvl, col-1, row-1);
+    bool rt = is_block(lvl, col+1, row-1);
+    bool lb = is_block(lvl, col-1, row+1);
+    bool rb = is_block(lvl, col+1, row+1);
+    
+    
+    if(!l && !r && !t && !b)
+        return TILE_SINGLE;
+        
+    if(!l) {
+        if(!t) {
+            if(!b)
+                return TILE_SINGLE_LEFT;
             return TILE_TOP_LEFT;
-        if(!is_block(lvl, c+1, r))
+        }
+        if(!b)
+            return TILE_BOTTOM_LEFT;
+        return TILE_LEFT;
+    }
+        
+    if(!r) {
+        if(!t) {
+            if(!b)
+                return TILE_SINGLE_RIGHT;
             return TILE_TOP_RIGHT;
+        }
+        if(!b)
+            return TILE_BOTTOM_RIGHT;
+        return TILE_RIGHT;
+    }
+          
+        
+    if(!t) {
+        if(!l && !r)
+            return TILE_SINGLE_TOP;
         return TILE_TOP;
     }
     
-    if(!is_block(lvl, c-1, r))
-        return TILE_LEFT;
-    if(!is_block(lvl, c+1, r))
-        return TILE_RIGHT;
-        
-    if(!is_block(lvl, c-1, r-1))
-        return TILE_BOTTOM_LEFT;
+    if(!b) {
+        if(!l && !r)
+            return TILE_SINGLE_BOTTOM;
+        return TILE_BOTTOM;
+    }
+    
+      
+      
+    if(!lt)
+        return TILE_EDGE_TOP_LEFT;  
+    if(!rt)
+        return TILE_EDGE_TOP_RIGHT;
+    if(!lb)
+        return TILE_EDGE_BOTTOM_LEFT;  
+    if(!rb)
+        return TILE_EDGE_BOTTOM_RIGHT;
            
-    if(!is_block(lvl, c+1, r-1))
-        return TILE_BOTTOM_RIGHT;
         
     return TILE_FULL;
 }

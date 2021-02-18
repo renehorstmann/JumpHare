@@ -31,7 +31,10 @@ int main(int argc, char **argv) {
     controller_init();
     hare_init();
     camera_control_init();
-      
+    
+    //camera_control.pos = (vec2) {{1.92440, 3.56896}};
+    camera_control.pos = (vec2) {{12.49/8, 0}};
+
 
     e_window_main_loop(main_loop);
 
