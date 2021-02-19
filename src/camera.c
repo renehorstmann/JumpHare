@@ -71,6 +71,8 @@ float camera_top() {
 }
 
 void camera_set_pos(float x, float y) {
+    x = floorf(x * L.real_pixel_per_pixel) / L.real_pixel_per_pixel;
+    y = floorf(y * L.real_pixel_per_pixel) / L.real_pixel_per_pixel;
     u_pose_set_xy(&camera.matrices.v, x, y);
 }
 
