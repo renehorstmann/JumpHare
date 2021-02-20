@@ -6,14 +6,17 @@ Based on [some](https://github.com/renehorstmann/some) framework.
 In active developmemt
 
 ## Todo
+- basic tiled level physics
+    - ray distance checks
+- hare physics 
+    - set speed takes [-1 : 1]
+    - pause speed smoothly
+- control optimization
+- Project Tilec as fork of Pixelc
 - draw forest background
 - layered background + foreground
     - render_back
     - render_front
-- level loaded by imh?
-- collision detection
-- hare set speed takes [-1 : 1]
-- hare pause speed smoothly
 
 ## Compiling on Windows
 Compiling with Mingw (msys2).
