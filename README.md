@@ -2,6 +2,12 @@
 An SDL2 OpenGL game written in C, also working on Web and Android.
 Based on [some](https://github.com/renehorstmann/some) framework.
 
+## Art
+Pixelart was made with my [Pixelc](https://github.com/renehorstmann/pixelc) App.
+Tile maps are designed with [Tilec](https://github.com/renehorstmann/tilec).
+Both Apps arr also based on [some](https://github.com/renehorstmann/some) framework.
+
+
 ## Warning
 In active developmemt
 
