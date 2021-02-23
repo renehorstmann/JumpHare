@@ -170,7 +170,7 @@ static enum tile_modes get_mode(Image *lvl, int col, int row) {
 }
 
 void level_init() {
-	Image *lvl = io_load_image("res/level_001.png");
+	Image *lvl = io_load_image("res/level_001.png", 1);
 	assume(lvl, "level not found");
 	
 	r_ro_batch_init(&L.ro, lvl->rows * lvl->cols, camera.gl, r_texture_init_file("res/tile_leafes.png", NULL));

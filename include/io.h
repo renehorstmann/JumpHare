@@ -5,8 +5,8 @@
 #include "image.h"
 
 
-Image *io_load_image(const char *file);
+Image *io_load_image(const char *file, int layers);
 
-bool io_save_image(const Image *image, const char *file);
+bool io_save_image(const char *file, const Image *image);
 
 #endif //JUMPHARE_IO_H
