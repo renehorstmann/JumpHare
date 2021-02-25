@@ -10,7 +10,7 @@ static struct {
 } L;
 
 void background_init() {
-	r_ro_single_init(&L.ro, camera.gl, r_texture_init_file("res/grass.png", NULL));
+	r_ro_single_init(&L.ro, camera.gl_background[0], r_texture_init_file("res/grass.png", NULL));
 	
 }
 

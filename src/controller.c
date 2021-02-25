@@ -18,7 +18,7 @@ static void pointer_event(ePointer_s pointer, void *ud) {
 		return;
 	}
 	ePointer_s c_pointer = pointer;
-    c_pointer.pos = mat4_mul_vec(camera.matrices.v_p_inv, pointer.pos);
+    c_pointer.pos = mat4_mul_vec(camera.matrices_hud_v_p_inv, pointer.pos);
     
     if(pointer.action == E_POINTER_DOWN) {
     	L.start_pos = c_pointer.pos;

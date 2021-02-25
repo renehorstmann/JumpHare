@@ -11,19 +11,27 @@
 
 
 #define CAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
+#define CAMERA_BACKGROUNDS 6
 
 typedef struct {
     mat4 v;
     mat4 v_inv;
-    mat4 p;
-    mat4 p_inv;
     mat4 vp;
-    mat4 v_p_inv;   // v @ p_inv
+//    mat4 v_p_inv;   // v @ p_inv
 } CameraMatrices_s;
 
 struct CameraGlobals_s {
-    CameraMatrices_s matrices;
-    const float *gl;
+    mat4 matrices_p;
+    mat4 matrices_p_inv;
+    mat4 matrices_hud_v_p_inv;
+    CameraMatrices_s matrices_hud;
+    CameraMatrices_s matrices_background[CAMERA_BACKGROUNDS];
+    CameraMatrices_s matrices_main;
+    CameraMatrices_s matrices_foreground;
+    const float *gl_hud;
+    const float *gl_background[CAMERA_BACKGROUNDS];
+    const float *gl_main;
+    const float *gl_foreground;
 };
 extern struct CameraGlobals_s camera;
 

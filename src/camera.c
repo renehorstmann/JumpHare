@@ -6,6 +6,9 @@
 #include "camera.h"
 
 
+#define BACKGROUND_SPEED_FACTOR 0.2
+#define FOREGROUND_SPEED_FACTOR 1.5
+
 struct CameraGlobals_s camera;
 
 static struct {
@@ -13,16 +16,36 @@ static struct {
     float left, right, bottom, top;
 } L;
 
+static void camera_matrices_init(CameraMatrices_s *self) {
+    self->v = mat4_eye();
+    self->v_inv = mat4_eye();
+    self->vp = mat4_eye();
+}
+
+static void camera_matrices_update(CameraMatrices_s *self) {
+    self->v_inv = mat4_inv(self->v);
+    self->vp = mat4_mul_mat(camera.matrices_p, self->v_inv);
+//    camera.matrices.v_p_inv = mat4_mul_mat(camera.matrices.v, camera.matrices.p_inv);
+}
 
 void camera_init() {
-    camera.gl = &camera.matrices.vp.m00;
-    camera.matrices.v = mat4_eye();
-    camera.matrices.v_inv = mat4_eye();
-    camera.matrices.p = mat4_eye();
-    camera.matrices.p_inv = mat4_eye();
-    camera.matrices.vp = mat4_eye();
-    camera.matrices.v_p_inv = mat4_eye();
-    
+    camera.gl_hud = &camera.matrices_hud.vp.m00;
+    for(int i=0; i<CAMERA_BACKGROUNDS; i++)
+        camera.gl_background[i] = &camera.matrices_background[i].vp.m00;
+    camera.gl_main = &camera.matrices_main.vp.m00;
+    camera.gl_foreground = &camera.matrices_foreground.vp.m00;
+
+    camera_matrices_init(&camera.matrices_hud);
+    for(int i=0; i<CAMERA_BACKGROUNDS; i++)
+        camera_matrices_init(&camera.matrices_background[i]);
+    camera_matrices_init(&camera.matrices_main);
+    camera_matrices_init(&camera.matrices_foreground);
+
+    camera.matrices_p = mat4_eye();
+    camera.matrices_p_inv = mat4_eye();
+
+    camera.matrices_hud_v_p_inv = mat4_eye();
+
     camera_update();
 }
 
@@ -43,14 +66,16 @@ void camera_update() {
     L.right = width_2 + (width_2 - floorf(width_2));
     L.bottom = -height_2 - (height_2 - floorf(height_2));
 
-    camera.matrices.p = mat4_camera_ortho(L.left, L.right, L.bottom, L.top, -1, 1);
+    camera.matrices_p = mat4_camera_ortho(L.left, L.right, L.bottom, L.top, -1, 1);
+    camera.matrices_p_inv = mat4_inv(camera.matrices_p);
 
-    camera.matrices.v_inv = mat4_inv(camera.matrices.v);
-    camera.matrices.p_inv = mat4_inv(camera.matrices.p);
+    camera_matrices_update(&camera.matrices_hud);
+    for(int i=0; i<CAMERA_BACKGROUNDS; i++)
+        camera_matrices_update(&camera.matrices_background[i]);
+    camera_matrices_update(&camera.matrices_main);
+    camera_matrices_update(&camera.matrices_foreground);
 
-    camera.matrices.vp = mat4_mul_mat(camera.matrices.p, camera.matrices.v_inv);
-
-    camera.matrices.v_p_inv = mat4_mul_mat(camera.matrices.v, camera.matrices.p_inv);
+    camera.matrices_hud_v_p_inv = mat4_mul_mat(camera.matrices_hud.v, camera.matrices_p_inv);
 }
 
 float camera_real_pixel_per_pixel() {
@@ -73,13 +98,23 @@ float camera_top() {
 void camera_set_pos(float x, float y) {
     x = floorf(x * L.real_pixel_per_pixel) / L.real_pixel_per_pixel;
     y = floorf(y * L.real_pixel_per_pixel) / L.real_pixel_per_pixel;
-    u_pose_set_xy(&camera.matrices.v, x, y);
+
+    for(int i=0; i<CAMERA_BACKGROUNDS; i++) {
+        float t = (float) i / CAMERA_BACKGROUNDS;
+        float scale = sca_mix(BACKGROUND_SPEED_FACTOR, 1, t);
+        u_pose_set_xy(&camera.matrices_background[i].v,
+                      scale * x, scale * y);
+    }
+    u_pose_set_xy(&camera.matrices_main.v, x, y);
+    u_pose_set_xy(&camera.matrices_foreground.v,
+                  FOREGROUND_SPEED_FACTOR * x,
+                  FOREGROUND_SPEED_FACTOR * y);
 }
 
 void camera_set_size(float size) {
-	u_pose_set_size(&camera.matrices.v, size, size);
+	u_pose_set_size(&camera.matrices_main.v, size, size);
 }
 
 void camera_set_angle(float alpha) {
-    u_pose_set_angle(&camera.matrices.v, alpha);
+    u_pose_set_angle(&camera.matrices_main.v, alpha);
 }

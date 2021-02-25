@@ -173,7 +173,7 @@ void level_init() {
 	Image *lvl = io_load_image("res/level_001.png", 1);
 	assume(lvl, "level not found");
 	
-	r_ro_batch_init(&L.ro, lvl->rows * lvl->cols, camera.gl, r_texture_init_file("res/tile_leafes.png", NULL));
+	r_ro_batch_init(&L.ro, lvl->rows * lvl->cols, camera.gl_main, r_texture_init_file("res/tile_leafes.png", NULL));
 	
 	for(int r=0; r<lvl->rows; r++) {
 	    for(int c=0; c<lvl->cols; c++) {

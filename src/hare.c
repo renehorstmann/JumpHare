@@ -20,7 +20,7 @@ static struct {
 void hare_init() {
 	L.jump_time = -1;
 	
-	r_ro_single_init(&L.ro, camera.gl, r_texture_init_file("res/hare.png", NULL));
+	r_ro_single_init(&L.ro, camera.gl_main, r_texture_init_file("res/hare.png", NULL));
 
 }
 
