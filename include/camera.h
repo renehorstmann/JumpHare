@@ -28,6 +28,9 @@ struct CameraGlobals_s {
     CameraMatrices_s matrices_background[CAMERA_BACKGROUNDS];
     CameraMatrices_s matrices_main;
     CameraMatrices_s matrices_foreground;
+    
+    vec2 offset;
+    
     const float *gl_hud;
     const float *gl_background[CAMERA_BACKGROUNDS];
     const float *gl_main;

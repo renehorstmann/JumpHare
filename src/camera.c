@@ -76,6 +76,14 @@ void camera_update() {
     camera_matrices_update(&camera.matrices_foreground);
 
     camera.matrices_hud_v_p_inv = mat4_mul_mat(camera.matrices_hud.v, camera.matrices_p_inv);
+    
+    if(camera_is_portrait_mode()) {
+    	camera.offset.x = 0;
+    	camera.offset.y = - L.top / 2;
+    } else {
+    	camera.offset.x = - L.left / 2;
+    	camera.offset.y = 0;
+    }
 }
 
 float camera_real_pixel_per_pixel() {
@@ -106,12 +114,15 @@ void camera_set_pos(float x, float y) {
         float t = (float) i / CAMERA_BACKGROUNDS;
         float scale = sca_mix(BACKGROUND_SPEED_FACTOR, 1, t);
         u_pose_set_xy(&camera.matrices_background[i].v,
-                      scale * x, scale * y);
+                      camera.offset.x + scale * x,
+                      camera.offset.y + scale * y);
     }
-    u_pose_set_xy(&camera.matrices_main.v, x, y);
+    u_pose_set_xy(&camera.matrices_main.v, 
+        camera.offset.x + x, 
+        camera.offset.y + y);
     u_pose_set_xy(&camera.matrices_foreground.v,
-                  FOREGROUND_SPEED_FACTOR * x,
-                  FOREGROUND_SPEED_FACTOR * y);
+                  camera.offset.x + FOREGROUND_SPEED_FACTOR * x,
+                  camera.offset.y + FOREGROUND_SPEED_FACTOR * y);
 }
 
 void camera_set_size(float size) {
