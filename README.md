@@ -12,6 +12,7 @@ Both Apps are also based on [some](https://github.com/renehorstmann/some) framew
 In active developmemt
 
 ## Todo
+- draw foreground
 - Tiles have a second layer for collisions
 - basic tiled level physics
     - ray distance checks
@@ -19,11 +20,6 @@ In active developmemt
     - set speed takes [-1 : 1]
     - pause speed smoothly
 - control optimization
-- Project Tilec as fork of Pixelc
-- draw forest background
-- layered background + foreground
-    - render_back
-    - render_front
 
 ## Compiling on Windows
 Compiling with Mingw (msys2).
