@@ -11,7 +11,7 @@ static struct {
 	
 	float x, y;
 	
-	float dx;
+	float dx, dy;
 	float looking_left;
 
 	float jump_time;
@@ -27,7 +27,9 @@ void hare_init() {
 
 void hare_update(float dtime) {
 	L.x += dtime * L.dx;
+	L.y += dtime * L.dy;
 	
+	if(0){
 	static float G = -180;
 	
 	float ground = tilemap_ground(L.x, L.y);
@@ -48,10 +50,11 @@ void hare_update(float dtime) {
 	    	
 	    }
 	}
+	}
 
 	int frame;
 
-	if (L.jump_time >= 0) {
+	if (0 && L.jump_time >= 0) {
 		if(L.jump_time < 0.15)
 		    frame = 0;
 		else if(L.jump_time < 0.3)
@@ -86,6 +89,8 @@ void hare_update(float dtime) {
 
     float px = floorf(L.x);
     float py = floorf(L.y);
+    
+	
 	u_pose_set(&L.ro.rect.pose, L.x, L.y, 32, 32, 0);
 	
 	if(!L.looking_left)
@@ -103,10 +108,11 @@ vec2 hare_position() {
 	return (vec2) {{L.x, L.y}};
 }
 
-void hare_set_speed(float dx) {
+void hare_set_speed(float dx, float dy) {
 	// [0 || += 10 : +-80]
 	dx = sca_abs(dx) < 10 ? 0 : dx;
 	L.dx = sca_sign(dx) * sca_min(sca_abs(dx), 80);
+	L.dy = dy;
 }
 
 void hare_jump() {

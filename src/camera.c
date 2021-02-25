@@ -79,9 +79,9 @@ void camera_update() {
     
     if(camera_is_portrait_mode()) {
     	camera.offset.x = 0;
-    	camera.offset.y = - L.top / 2;
+    	camera.offset.y = -camera_height()/5;
     } else {
-    	camera.offset.x = - L.left / 2;
+    	camera.offset.x = camera_width()/5;
     	camera.offset.y = 0;
     }
 }

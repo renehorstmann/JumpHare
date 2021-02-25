@@ -21,7 +21,7 @@ static int tile_c(float x) {
 }
 
 static int tile_r(float y) {
-	return L.map->rows - (y+90) / TILES_SIZE;
+	return L.map->rows/2 - y / TILES_SIZE;
 }
 
 static float tile_x(int c) {
@@ -29,7 +29,7 @@ static float tile_x(int c) {
 }
 
 static float tile_y(int r) {
-	return -90 + (L.map->rows - r) * TILES_SIZE;
+	return (L.map->rows/2 - r) * TILES_SIZE;
 }
 
 static mat4 tile_pose(int c, int r) {
@@ -115,6 +115,20 @@ void tilemap_load_level(const char *file) {
         r_ro_batch_update(&L.ro_back[i]);
 //        r_ro_batch_update(&L.ro_front[i]);
     }
+}
+
+
+float tilemap_left() {
+	return 0;
+}
+float tilemap_right() {
+	return L.map->cols * TILES_SIZE;
+}
+float tilemap_top() {
+	return floor(L.map->rows/2.0) * TILES_SIZE;
+}
+float tilemap_bottom() {
+	return -ceilf(L.map->rows/2.0) * TILES_SIZE;
 }
 
 

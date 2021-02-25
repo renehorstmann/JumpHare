@@ -67,13 +67,13 @@ static void main_loop(float delta_time) {
     r_render_begin_frame(e_window.size.x, e_window.size.y);
 
 
-    controller_render();
+    
     background_render();
     tilemap_render_back();
     level_render();
     hare_render();
     tilemap_render_front();
-    
+    controller_render();
 
 
     e_gui_render();
