@@ -16,10 +16,27 @@ static struct {
     Image *map;
 } L;
 
+static int tile_c(float x) {
+	return x/TILES_SIZE;
+}
+
+static int tile_r(float y) {
+	return L.map->rows - (y+90) / TILES_SIZE;
+}
+
+static float tile_x(int c) {
+	return c * TILES_SIZE;
+}
+
+static float tile_y(int r) {
+	return -90 + (L.map->rows - r) * TILES_SIZE;
+}
 
 static mat4 tile_pose(int c, int r) {
-    return u_pose_new_aa(c * TILES_SIZE, -90 + (L.map->rows-r) * TILES_SIZE, TILES_SIZE, TILES_SIZE);
+    return u_pose_new_aa(tile_x(c), tile_y(r), TILES_SIZE, TILES_SIZE);
 }
+
+
 
 static mat4 tile_uv(int id) {
     float w = 1.0/TILES_COLS;
@@ -102,17 +119,81 @@ void tilemap_load_level(const char *file) {
 
 
 float tilemap_ground(float x, float y) {
-    return 0;
+    int c = tile_c(x);
+    int r = tile_r(y);
+    Color_s code = {0};
+    while(c>=0 && c<L.map->cols 
+        && r>=0 && r<L.map->rows) {
+        code = *image_pixel(L.map, 0, c, r);
+        if(!color_equals(code, (Color_s) {0})) {
+        	int tile_palette = code.b;
+        	int tile_id = code.a;
+        	// todo check palette?
+        	
+        	// todo check pixel ground
+        	return tile_y(r); // test
+        }
+        r++;
+    }
+    return tile_y(L.map->rows);
 }
 
 float tilemap_ceiling(float x, float y) {
-    return 0;
+    int c = tile_c(x);
+    int r = tile_r(y);
+    Color_s code = {0};
+    while(c>=0 && c<L.map->cols 
+        && r>=0 && r<L.map->rows) {
+        code = *image_pixel(L.map, 0, c, r);
+        if(!color_equals(code, (Color_s) {0})) {
+        	int tile_palette = code.b;
+        	int tile_id = code.a;
+        	// todo check palette?
+        	
+        	// todo check pixel ground
+        	return tile_y(r); // test
+        }
+        r--;
+    }
+    return tile_y(0);
 }
 
 float tilemap_wall_left(float x, float y) {
-    return 0;
+    int c = tile_c(x);
+    int r = tile_r(y);
+    Color_s code = {0};
+    while(c>=0 && c<L.map->cols 
+        && r>=0 && r<L.map->rows) {
+        code = *image_pixel(L.map, 0, c, r);
+        if(!color_equals(code, (Color_s) {0})) {
+        	int tile_palette = code.b;
+        	int tile_id = code.a;
+        	// todo check palette?
+        	
+        	// todo check pixel ground
+        	return tile_x(c); // test
+        }
+        c--;
+    }
+    return tile_x(0);
 }
 
 float tilemap_wall_right(float x, float y) {
-    return 0;
+    int c = tile_c(x);
+    int r = tile_r(y);
+    Color_s code = {0};
+    while(c>=0 && c<L.map->cols 
+        && r>=0 && r<L.map->rows) {
+        code = *image_pixel(L.map, 0, c, r);
+        if(!color_equals(code, (Color_s) {0})) {
+        	int tile_palette = code.b;
+        	int tile_id = code.a;
+        	// todo check palette?
+        	
+        	// todo check pixel ground
+        	return tile_x(c); // test
+        }
+        c++;
+    }
+    return tile_x(L.map->cols);
 }

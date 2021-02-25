@@ -3,6 +3,7 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "camera.h"
+#include "tilemap.h"
 #include "hare.h"
 
 static struct {
