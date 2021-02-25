@@ -2,8 +2,10 @@
 #include "r/r.h"
 #include "u/u.h"
 
+#include "tiles.h"
 #include "camera.h"
 #include "background.h"
+#include "tilemap.h"
 #include "level.h"
 #include "hare.h"
 #include "controller.h"
@@ -25,9 +27,12 @@ int main(int argc, char **argv) {
     r_render_init(e_window.window);
 
     // init systems
+    tiles_init();
     camera_init();
     background_init();
     level_init();
+    tilemap_init();
+    tilemap_load_level("res/levels/level_01.png");
     controller_init();
     hare_init();
     camera_control_init();
@@ -50,6 +55,7 @@ static void main_loop(float delta_time) {
     // simulate
     camera_update();
     background_update(delta_time);
+    tilemap_update(delta_time);
     level_update(delta_time);
     controller_update(delta_time);
     hare_update(delta_time);
@@ -63,8 +69,10 @@ static void main_loop(float delta_time) {
 
     controller_render();
     background_render();
+    tilemap_render_back();
     level_render();
     hare_render();
+    tilemap_render_front();
     
 
 

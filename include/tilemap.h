@@ -1,13 +1,18 @@
 #ifndef JUMPHARE_TILEMAP_H
 #define JUMPHARE_TILEMAP_H
 
-#include "tile.h"
+void tilemap_init();
 
+void tilemap_update(float dtime);
 
-float tilemap_ground(float x, float y, float w);
-float tilemap_ceiling(float x, float y, float w);
-float tilemap_wall_left(float x, float y, float h);
-float tilemap_wall_right(float x, float y, float h);
+void tilemap_render_back();
+void tilemap_render_front();
 
+void tilemap_load_level(const char *file);
+
+float tilemap_ground(float x, float y);
+float tilemap_ceiling(float x, float y);
+float tilemap_wall_left(float x, float y);
+float tilemap_wall_right(float x, float y);
 
 #endif //JUMPHARE_TILEMAP_H
