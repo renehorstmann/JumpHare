@@ -30,13 +30,13 @@ static void camera_matrices_update(CameraMatrices_s *self) {
 
 void camera_init() {
     camera.gl_hud = &camera.matrices_hud.vp.m00;
-    for(int i=0; i<CAMERA_BACKGROUNDS; i++)
+    for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera.gl_background[i] = &camera.matrices_background[i].vp.m00;
     camera.gl_main = &camera.matrices_main.vp.m00;
     camera.gl_foreground = &camera.matrices_foreground.vp.m00;
 
     camera_matrices_init(&camera.matrices_hud);
-    for(int i=0; i<CAMERA_BACKGROUNDS; i++)
+    for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera_matrices_init(&camera.matrices_background[i]);
     camera_matrices_init(&camera.matrices_main);
     camera_matrices_init(&camera.matrices_foreground);
@@ -55,7 +55,7 @@ void camera_update() {
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     L.real_pixel_per_pixel = floorf(smaller_size / CAMERA_SIZE);
-    
+
     float width_2 = wnd_width / (2 * L.real_pixel_per_pixel);
     float height_2 = wnd_height / (2 * L.real_pixel_per_pixel);
 
@@ -70,7 +70,7 @@ void camera_update() {
     camera.matrices_p_inv = mat4_inv(camera.matrices_p);
 
     camera_matrices_update(&camera.matrices_hud);
-    for(int i=0; i<CAMERA_BACKGROUNDS; i++)
+    for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera_matrices_update(&camera.matrices_background[i]);
     camera_matrices_update(&camera.matrices_main);
     camera_matrices_update(&camera.matrices_foreground);
@@ -85,12 +85,15 @@ float camera_real_pixel_per_pixel() {
 float camera_left() {
     return L.left;
 }
+
 float camera_right() {
     return L.right;
 }
+
 float camera_bottom() {
     return L.bottom;
 }
+
 float camera_top() {
     return L.top;
 }
@@ -99,7 +102,7 @@ void camera_set_pos(float x, float y) {
     x = floorf(x * L.real_pixel_per_pixel) / L.real_pixel_per_pixel;
     y = floorf(y * L.real_pixel_per_pixel) / L.real_pixel_per_pixel;
 
-    for(int i=0; i<CAMERA_BACKGROUNDS; i++) {
+    for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
         float t = (float) i / CAMERA_BACKGROUNDS;
         float scale = sca_mix(BACKGROUND_SPEED_FACTOR, 1, t);
         u_pose_set_xy(&camera.matrices_background[i].v,
@@ -112,9 +115,15 @@ void camera_set_pos(float x, float y) {
 }
 
 void camera_set_size(float size) {
-	u_pose_set_size(&camera.matrices_main.v, size, size);
+    for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
+        u_pose_set_size(&camera.matrices_background[i].v, size, size);
+    u_pose_set_size(&camera.matrices_main.v, size, size);
+    u_pose_set_size(&camera.matrices_foreground.v, size, size);
 }
 
 void camera_set_angle(float alpha) {
+    for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
+        u_pose_set_angle(&camera.matrices_background[i].v, alpha);
     u_pose_set_angle(&camera.matrices_main.v, alpha);
+    u_pose_set_angle(&camera.matrices_foreground.v, alpha);
 }
