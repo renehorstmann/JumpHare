@@ -22,7 +22,7 @@ void background_init() {
         r_ro_batch_init(&L.ro[i], size, camera.gl_background[i], tex);
 
         for(int j=0; j<size; j++) {
-            L.ro[i].rects[j].pose = u_pose_new(BACKGROUND_COLS*j, 0, 360, 180);
+            L.ro[i].rects[j].pose = u_pose_new(360*j, 0, 360, 180);
         }
         r_ro_batch_update(&L.ro[i]);
     }
