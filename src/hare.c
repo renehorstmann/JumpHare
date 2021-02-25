@@ -30,17 +30,23 @@ void hare_update(float dtime) {
 	
 	static float G = -180;
 	
+	float ground = tilemap_ground(L.x, L.y);
+	printf("y/g: %f/%f\n", L.y, ground);
+	
+	if(L.y - ground <= 9) {
+		L.y = ground + 9;
+	}
 	if(L.jump_time >= 0.15) {
 	    if(L.jump_time < 0.5 && L.speed_y<=0)
 	        L.speed_y = 125;
 	    L.y += L.speed_y * dtime;
 	    L.speed_y += G * dtime;
-
-	    if (L.y < 0) {
+	    
+	    if(L.y - ground <= 3) {
 	    	L.jump_time = -1;
-    		L.speed_y = 0;
-    		L.y = 0;
-    	}
+		    L.speed_y = 0;
+	    	
+	    }
 	}
 
 	int frame;
@@ -80,7 +86,7 @@ void hare_update(float dtime) {
 
     float px = floorf(L.x);
     float py = floorf(L.y);
-	u_pose_set(&L.ro.rect.pose, L.x, L.y-9, 32, 32, 0);
+	u_pose_set(&L.ro.rect.pose, L.x, L.y, 32, 32, 0);
 	
 	if(!L.looking_left)
 	    u_pose_set(&L.ro.rect.uv, frame * w, v * h, w, h, 0);

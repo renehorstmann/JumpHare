@@ -12,6 +12,7 @@ Both Apps are also based on [some](https://github.com/renehorstmann/some) framew
 In active developmemt
 
 ## Todo
+- Tiles have a second layer for collisions
 - basic tiled level physics
     - ray distance checks
 - hare physics 
