@@ -9,9 +9,10 @@
 static struct {
 	rRoSingle ro;
 	
-	rRoSingle coll[4];
+	rRoSingle coll[8];
 	
-	float x, y;
+	vec2 pos;
+	vec2 last_pos;
 	
 	float dx, dy;
 	float looking_left;
@@ -20,48 +21,69 @@ static struct {
 	float speed_y;
 } L;
 
+
+static void check_collision() {
+	float a, b;
+	
+	a = tilemap_ceiling(L.pos.x-4, L.pos.y+4);
+	b = tilemap_ceiling(L.pos.x+4, L.pos.y+4);
+	L.coll[0].rect.pose=u_pose_new(L.pos.x-4, a, 3, 3);
+	L.coll[1].rect.pose=u_pose_new(L.pos.x+4, b, 3, 3);
+	
+	if(L.pos.y > a-8 || L.pos.y > b-8) {
+		// jump collision?
+		L.pos.y = sca_min(a, b) - 8;
+	}
+
+	a = tilemap_wall_left(L.pos.x-4, L.pos.y-4);
+	b = tilemap_wall_left(L.pos.x-4, L.pos.y+4);
+	L.coll[2].rect.pose=u_pose_new(a, L.pos.y-4, 3, 3);
+	L.coll[3].rect.pose=u_pose_new(b, L.pos.y+4, 3, 3);
+	
+	if(L.pos.x < a+7 || L.pos.x < b+7) {
+		// collision?
+		printf("%f - %f %f\n", L.pos.x, a, b);
+		L.pos.x = sca_max(a, b) + 7;
+	}
+	
+	
+	a = tilemap_wall_right(L.pos.x+4, L.pos.y-4);
+	b = tilemap_wall_right(L.pos.x+4, L.pos.y+4);
+	L.coll[4].rect.pose=u_pose_new(a, L.pos.y-4, 3, 3);
+	L.coll[5].rect.pose=u_pose_new(b, L.pos.y+4, 3, 3);
+	
+	if(L.pos.x > a-7 || L.pos.x > b-7) {
+		// collision?
+		L.pos.x = sca_min(a, b) - 7;
+	}
+	
+	a = tilemap_ground(L.pos.x-4, L.pos.y-4);
+	b = tilemap_ground(L.pos.x+4, L.pos.y-4);
+	L.coll[6].rect.pose=u_pose_new(L.pos.x-4, a, 3, 3);
+	L.coll[7].rect.pose=u_pose_new(L.pos.x+4, b, 3, 3);
+	
+	if(L.pos.y < a+14 || L.pos.y < b+14) {
+		// grounded
+		L.pos.y = sca_max(a, b) + 14;
+	}
+	
+}
+
+
 void hare_init() {
 	L.jump_time = -1;
 	
 	r_ro_single_init(&L.ro, camera.gl_main, r_texture_init_file("res/hare.png", NULL));
 
-    for(int i=0; i<4; i++)
+    for(int i=0; i<8; i++)
         r_ro_single_init(&L.coll[i], camera.gl_main, 0);
 }
 
 void hare_update(float dtime) {
-	L.x += dtime * L.dx;
-	L.y += dtime * L.dy;
+	L.pos.x += dtime * L.dx;
+	L.pos.y += dtime * L.dy;
 
-	float ground = tilemap_ground(L.x, L.y-4);
-	L.coll[0].rect.pose = u_pose_new(L.x, ground, 4, 4);
-	
-	if(L.y < ground + 8) {
-	    L.y = ground + 8;
-	    // grounded
-	}
-	
-	float wleft = tilemap_wall_left(L.x-4, L.y);
-	L.coll[1].rect.pose = u_pose_new(wleft, L.y, 4, 4);
-	
-	
-	if(L.x < wleft + 8)
-	    L.x = wleft + 8;
-	
-	float wright = tilemap_wall_right(L.x+4, L.y);
-	L.coll[2].rect.pose = u_pose_new(wright, L.y, 4, 4);
-	
-	if(L.x > wright - 8)
-	    L.x = wright - 8;
-	
-	    
-	
-	float ceiling = tilemap_ceiling(L.x, L.y+4);
-	L.coll[3].rect.pose = u_pose_new(L.x, ceiling, 4, 4);
-	
-	if(L.y > ceiling - 8)
-	    L.y = ceiling - 8;
-	
+	check_collision();
 	
 	int frame;
 
@@ -85,24 +107,27 @@ void hare_update(float dtime) {
 	if (sca_abs(L.dx) > 40)
 		v++;
 		
+		
+    vec2 p = vec2_mix(L.pos, L.last_pos, 0.5);
 	
-	u_pose_set(&L.ro.rect.pose, L.x, L.y, 32, 32, 0);
-	
+	u_pose_set(&L.ro.rect.pose, p.x, p.y, 32, 32, 0);	
 	if(!L.looking_left)
 	    u_pose_set(&L.ro.rect.uv, frame * w, v * h, w, h, 0);
 	else
 	    u_pose_set(&L.ro.rect.uv, (1+frame) * w, v * h, -w, h, 0);
 	
+	
+	L.last_pos = L.pos;
 }
 
 void hare_render() {
 	r_ro_single_render(&L.ro);
-	for(int i=0; i<4;i++)
+	for(int i=0; i<8;i++)
 	    r_ro_single_render(&L.coll[i]);
 }
 
 vec2 hare_position() {
-	return (vec2) {{L.x, L.y}};
+	return (vec2) {{L.pos.x, L.pos.y}};
 }
 
 void hare_set_speed(float dx, float dy) {
