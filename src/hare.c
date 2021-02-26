@@ -84,7 +84,7 @@ void hare_update(float dtime) {
 	if (sca_abs(L.dx) > 40)
 		v++;
 		
-    if(L.jump_time >= 0) 
+    if(0 && L.jump_time >= 0) 
         v = 3;
 
     float px = floorf(L.x);

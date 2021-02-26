@@ -2,8 +2,9 @@
 #include "r/r.h"
 #include "u/u.h"
 
-#include "tiles.h"
 #include "camera.h"
+#include "hud_camera.h"
+#include "tiles.h"
 #include "background.h"
 #include "tilemap.h"
 #include "level.h"
@@ -27,8 +28,9 @@ int main(int argc, char **argv) {
     r_render_init(e_window.window);
 
     // init systems
-    tiles_init();
     camera_init();
+    hud_camera_init();
+    tiles_init();
     background_init();
     level_init();
     tilemap_init();
@@ -54,6 +56,7 @@ static void main_loop(float delta_time) {
 
     // simulate
     camera_update();
+    hud_camera_update();
     background_update(delta_time);
     tilemap_update(delta_time);
     level_update(delta_time);

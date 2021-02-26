@@ -16,26 +16,26 @@ static struct {
     float left, right, bottom, top;
 } L;
 
-static void camera_matrices_init(CameraMatrices_s *self) {
+static void camera_matrices_init(struct CameraMatrices_s *self) {
     self->v = mat4_eye();
     self->v_inv = mat4_eye();
     self->vp = mat4_eye();
 }
 
-static void camera_matrices_update(CameraMatrices_s *self) {
+static void camera_matrices_update(struct CameraMatrices_s *self) {
     self->v_inv = mat4_inv(self->v);
     self->vp = mat4_mul_mat(camera.matrices_p, self->v_inv);
 //    camera.matrices.v_p_inv = mat4_mul_mat(camera.matrices.v, camera.matrices.p_inv);
 }
 
 void camera_init() {
-    camera.gl_hud = &camera.matrices_hud.vp.m00;
+    assert(CAMERA_SIZE % 2 == 0 && "CAMERA_SIZE must be even");
+    
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera.gl_background[i] = &camera.matrices_background[i].vp.m00;
     camera.gl_main = &camera.matrices_main.vp.m00;
     camera.gl_foreground = &camera.matrices_foreground.vp.m00;
 
-    camera_matrices_init(&camera.matrices_hud);
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera_matrices_init(&camera.matrices_background[i]);
     camera_matrices_init(&camera.matrices_main);
@@ -43,8 +43,6 @@ void camera_init() {
 
     camera.matrices_p = mat4_eye();
     camera.matrices_p_inv = mat4_eye();
-
-    camera.matrices_hud_v_p_inv = mat4_eye();
 
     camera_update();
 }
@@ -56,34 +54,35 @@ void camera_update() {
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     L.real_pixel_per_pixel = floorf(smaller_size / CAMERA_SIZE);
 
-    float width_2 = wnd_width / (2 * L.real_pixel_per_pixel);
-    float height_2 = wnd_height / (2 * L.real_pixel_per_pixel);
+    float width = (float) wnd_width / L.real_pixel_per_pixel;
+    float height = (float) wnd_height / L.real_pixel_per_pixel;
 
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
-    L.left = -floorf(width_2);
-    L.top = floorf(height_2);
-    L.right = width_2 + (width_2 - floorf(width_2));
-    L.bottom = -height_2 - (height_2 - floorf(height_2));
+    float left = -CAMERA_SIZE/2;
+    float top = CAMERA_SIZE/2;
+    float right = left + width;;
+    float bottom = top - height;
+    
 
-    camera.matrices_p = mat4_camera_ortho(L.left, L.right, L.bottom, L.top, -1, 1);
+    camera.matrices_p = mat4_camera_ortho(left, right, bottom, top, -1, 1);
     camera.matrices_p_inv = mat4_inv(camera.matrices_p);
 
-    camera_matrices_update(&camera.matrices_hud);
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera_matrices_update(&camera.matrices_background[i]);
     camera_matrices_update(&camera.matrices_main);
     camera_matrices_update(&camera.matrices_foreground);
 
-    camera.matrices_hud_v_p_inv = mat4_mul_mat(camera.matrices_hud.v, camera.matrices_p_inv);
-    
     if(camera_is_portrait_mode()) {
-    	camera.offset.x = 0;
-    	camera.offset.y = -camera_height()/5;
+    	bottom = top - height*CAMERA_SCREEN_WEIGHT;
     } else {
-    	camera.offset.x = camera_width()/5;
-    	camera.offset.y = 0;
+    	right = left + width*CAMERA_SCREEN_WEIGHT;
     }
+    
+    L.left = left;
+    L.right = right;
+    L.top = top;
+    L.bottom = bottom;
 }
 
 float camera_real_pixel_per_pixel() {
@@ -114,15 +113,12 @@ void camera_set_pos(float x, float y) {
         float t = (float) i / CAMERA_BACKGROUNDS;
         float scale = sca_mix(BACKGROUND_SPEED_FACTOR, 1, t);
         u_pose_set_xy(&camera.matrices_background[i].v,
-                      camera.offset.x + scale * x,
-                      camera.offset.y + scale * y);
+                      scale * x, scale * y);
     }
-    u_pose_set_xy(&camera.matrices_main.v, 
-        camera.offset.x + x, 
-        camera.offset.y + y);
+    u_pose_set_xy(&camera.matrices_main.v, x, y);
     u_pose_set_xy(&camera.matrices_foreground.v,
-                  camera.offset.x + FOREGROUND_SPEED_FACTOR * x,
-                  camera.offset.y + FOREGROUND_SPEED_FACTOR * y);
+                  FOREGROUND_SPEED_FACTOR * x,
+                  FOREGROUND_SPEED_FACTOR * y);
 }
 
 void camera_set_size(float size) {
