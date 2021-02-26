@@ -42,7 +42,6 @@ static void check_collision() {
 	
 	if(L.pos.x < a+7 || L.pos.x < b+7) {
 		// collision?
-		printf("%f - %f %f\n", L.pos.x, a, b);
 		L.pos.x = sca_max(a, b) + 7;
 	}
 	

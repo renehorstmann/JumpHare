@@ -73,7 +73,7 @@ void camera_update() {
     camera_matrices_update(&camera.matrices_main);
     camera_matrices_update(&camera.matrices_foreground);
 
-    if(camera_is_portrait_mode()) {
+    if(wnd_width < wnd_height) {
     	bottom = top - height*CAMERA_SCREEN_WEIGHT;
     } else {
     	right = left + width*CAMERA_SCREEN_WEIGHT;

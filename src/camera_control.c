@@ -18,8 +18,15 @@ static void check_limits() {
 	
 	min = vec2_ceil(min);
 	max = vec2_floor(max);
-	
-	camera_control.pos = vec2_clamp_vec(camera_control.pos, min, max);
+
+	if(min.x > max.x) {
+	    min.x = max.x = (min.x + max.x)/2;
+	}
+	if(min.y > max.y) {
+	    min.y = max.y = (min.y + max.y)/2;
+	}
+
+    camera_control.pos = vec2_clamp_vec(camera_control.pos, min, max);
 }
 
 
@@ -41,16 +48,9 @@ void camera_control_update(float dtime) {
 	     // pos += norm(delta) * (diff - MAX_DIFF)
 	    camera_control.pos = vec2_add_vec(camera_control.pos, vec2_scale(delta, diff));
 	}
-	
-	//camera_control.pos = vec2_scale(vec2_floor(vec2_scale(camera_control.pos, 4)), 0.25);
-	
-	
+
 	check_limits();
 	
 	camera_set_pos(camera_control.pos.x, camera_control.pos.y);
-	
-	static float t;
-	t+=dtime;
-	//camera_set_angle(t*M_PI/4);
 }
 
