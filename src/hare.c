@@ -9,6 +9,8 @@
 static struct {
 	rRoSingle ro;
 	
+	rRoSingle coll[4];
+	
 	float x, y;
 	
 	float dx, dy;
@@ -23,48 +25,47 @@ void hare_init() {
 	
 	r_ro_single_init(&L.ro, camera.gl_main, r_texture_init_file("res/hare.png", NULL));
 
+    for(int i=0; i<4; i++)
+        r_ro_single_init(&L.coll[i], camera.gl_main, NULL);
 }
 
 void hare_update(float dtime) {
 	L.x += dtime * L.dx;
 	L.y += dtime * L.dy;
-	
-	if(0){
-	static float G = -180;
-	
-	float ground = tilemap_ground(L.x, L.y);
-	printf("y/g: %f/%f\n", L.y, ground);
-	
-	if(L.y - ground <= 9) {
-		L.y = ground + 9;
-	}
-	if(L.jump_time >= 0.15) {
-	    if(L.jump_time < 0.5 && L.speed_y<=0)
-	        L.speed_y = 125;
-	    L.y += L.speed_y * dtime;
-	    L.speed_y += G * dtime;
-	    
-	    if(L.y - ground <= 3) {
-	    	L.jump_time = -1;
-		    L.speed_y = 0;
-	    	
-	    }
-	}
-	}
 
+	float ground = tilemap_ground(L.x, L.y-4);
+	L.coll[0].rect.pose = u_pose_new(L.x, ground, 4, 4);
+	
+	if(L.y < ground + 8) {
+	    L.y = ground + 8;
+	    // grounded
+	}
+	
+	float wleft = tilemap_wall_left(L.x-4, L.y);
+	L.coll[1].rect.pose = u_pose_new(wleft, L.y, 4, 4);
+	
+	printf("%f - %f\n", L.x, wleft);
+	if(L.x < wleft + 8)
+	    L.x = wleft + 8;
+	
+	float wright = tilemap_wall_right(L.x+4, L.y);
+	L.coll[2].rect.pose = u_pose_new(wright, L.y, 4, 4);
+	
+	if(L.x > wright - 8)
+	    L.x = wright - 8;
+	
+	    
+	
+	float ceiling = tilemap_ceiling(L.x, L.y+4);
+	L.coll[3].rect.pose = u_pose_new(L.x, ceiling, 4, 4);
+	
+	if(L.y > ceiling - 8)
+	    L.y = ceiling - 8;
+	
+	
 	int frame;
 
-	if (0 && L.jump_time >= 0) {
-		if(L.jump_time < 0.15)
-		    frame = 0;
-		else if(L.jump_time < 0.3)
-		    frame = 1;
-		else if(L.jump_time < 0.5)
-		    frame = 2;
-		else
-		    frame = 3;
-		L.jump_time += dtime;
-	} else {
+	{
 		float fps = 6;
 		int frames = 4;
 		static float time = 0;
@@ -84,12 +85,6 @@ void hare_update(float dtime) {
 	if (sca_abs(L.dx) > 40)
 		v++;
 		
-    if(0 && L.jump_time >= 0) 
-        v = 3;
-
-    float px = floorf(L.x);
-    float py = floorf(L.y);
-    
 	
 	u_pose_set(&L.ro.rect.pose, L.x, L.y, 32, 32, 0);
 	
@@ -102,6 +97,8 @@ void hare_update(float dtime) {
 
 void hare_render() {
 	r_ro_single_render(&L.ro);
+	for(int i=0; i<4;i++)
+	    r_ro_single_render(&L.coll[i]);
 }
 
 vec2 hare_position() {

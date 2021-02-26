@@ -165,7 +165,7 @@ float tilemap_ceiling(float x, float y) {
         	// todo check palette?
         	
         	// todo check pixel ground
-        	return tile_y(r); // test
+        	return tile_y(r+1); // test
         }
         r--;
     }
@@ -185,7 +185,7 @@ float tilemap_wall_left(float x, float y) {
         	// todo check palette?
         	
         	// todo check pixel ground
-        	return tile_x(c); // test
+        	return tile_x(c+1); // test
         }
         c--;
     }
