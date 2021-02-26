@@ -30,7 +30,7 @@ static int tile_pixel_c(float x) {
 }
 
 static int tile_pixel_r(float y) {
-	return (int) -y%TILES_SIZE;
+	return (int) (L.map->rows/2*TILES_SIZE-y)%TILES_SIZE;
 }
 
 static float tile_x(int c) {
@@ -38,7 +38,7 @@ static float tile_x(int c) {
 }
 
 static float tile_y(int r) {
-	return (L.map->rows/2 - r) * TILES_SIZE;
+	return (L.map->rows/2- r) * TILES_SIZE;
 }
 
 static mat4 tile_pose(int c, int r) {
