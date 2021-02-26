@@ -1,4 +1,5 @@
 #include "mathc/sca/int.h"
+#include "mathc/sca/float.h"
 #include "r/ro_batch.h"
 #include "u/pose.h"
 
@@ -24,6 +25,14 @@ static int tile_r(float y) {
 	return L.map->rows/2 - y / TILES_SIZE;
 }
 
+static int tile_pixel_c(float x) {
+    return (int) x%TILES_SIZE;
+}
+
+static int tile_pixel_r(float y) {
+	return (int) -y%TILES_SIZE;
+}
+
 static float tile_x(int c) {
 	return c * TILES_SIZE;
 }
@@ -36,8 +45,6 @@ static mat4 tile_pose(int c, int r) {
     return u_pose_new_aa(tile_x(c), tile_y(r), TILES_SIZE, TILES_SIZE);
 }
 
-
-
 static mat4 tile_uv(int id) {
     float w = 1.0/TILES_COLS;
     float h = 1.0/TILES_ROWS;
@@ -45,6 +52,13 @@ static mat4 tile_uv(int id) {
     float v = h * (id/TILES_COLS);
     return u_pose_new(u, v, w, h);
 }
+
+
+static bool pixel_collision(Color_s code, int pixel_c, int pixel_r) {
+	return !color_equals(tiles_pixel(code, 1, pixel_c, pixel_r), 
+	    COLOR_TRANSPARENT);
+}
+
 
 void tilemap_init() {
 
@@ -99,15 +113,15 @@ void tilemap_load_level(const char *file) {
     for (int r = 0; r < L.map->rows; r++) {
         for (int c = 0; c < L.map->cols; c++) {
             Color_s code = *image_pixel(L.map, 0, c, r);
-            if(color_equals(code, (Color_s){0})) {
+            if(color_equals(code, COLOR_TRANSPARENT)) {
                 continue;
             }
-            int tile_palette = code.b-1;
-            int tile_id = code.a;
-            rRect_s *rect = &L.ro_back[tile_palette].rects[tile_nums[tile_palette]];
+            int tile_id = code.b-1;
+            int tile = code.a;
+            rRect_s *rect = &L.ro_back[tile_id].rects[tile_nums[tile_id]];
             rect->pose = tile_pose(c, r);
-            rect->uv = tile_uv(tile_id);
-            tile_nums[tile_palette]++;
+            rect->uv = tile_uv(tile);
+            tile_nums[tile_id]++;
         }
     }
 
@@ -135,17 +149,16 @@ float tilemap_bottom() {
 float tilemap_ground(float x, float y) {
     int c = tile_c(x);
     int r = tile_r(y);
-    Color_s code = {0};
+    Color_s code = COLOR_TRANSPARENT;
     while(c>=0 && c<L.map->cols 
         && r>=0 && r<L.map->rows) {
         code = *image_pixel(L.map, 0, c, r);
-        if(!color_equals(code, (Color_s) {0})) {
-        	int tile_palette = code.b;
-        	int tile_id = code.a;
-        	// todo check palette?
-        	
-        	// todo check pixel ground
-        	return tile_y(r); // test
+        if(!color_equals(code, COLOR_TRANSPARENT)) {
+            int pc = tile_pixel_c(x);
+            for(int pr=0; pr<TILES_SIZE; pr++) {
+        	    if(pixel_collision(code, pc, pr))
+        		    return sca_min(tile_y(r) - pr, y);
+            }
         }
         r++;
     }
@@ -155,17 +168,16 @@ float tilemap_ground(float x, float y) {
 float tilemap_ceiling(float x, float y) {
     int c = tile_c(x);
     int r = tile_r(y);
-    Color_s code = {0};
+    Color_s code = COLOR_TRANSPARENT;
     while(c>=0 && c<L.map->cols 
         && r>=0 && r<L.map->rows) {
         code = *image_pixel(L.map, 0, c, r);
-        if(!color_equals(code, (Color_s) {0})) {
-        	int tile_palette = code.b;
-        	int tile_id = code.a;
-        	// todo check palette?
-        	
-        	// todo check pixel ground
-        	return tile_y(r+1); // test
+        if(!color_equals(code, COLOR_TRANSPARENT)) {
+            int pc = tile_pixel_c(x);
+            for(int pr=TILES_SIZE-1; pr>=0; pr--) {
+        	    if(pixel_collision(code, pc, pr))
+        		    return sca_max(tile_y(r) - pr - 1, y);
+            }
         }
         r--;
     }
@@ -175,17 +187,16 @@ float tilemap_ceiling(float x, float y) {
 float tilemap_wall_left(float x, float y) {
     int c = tile_c(x);
     int r = tile_r(y);
-    Color_s code = {0};
+    Color_s code = COLOR_TRANSPARENT;
     while(c>=0 && c<L.map->cols 
         && r>=0 && r<L.map->rows) {
         code = *image_pixel(L.map, 0, c, r);
-        if(!color_equals(code, (Color_s) {0})) {
-        	int tile_palette = code.b;
-        	int tile_id = code.a;
-        	// todo check palette?
-        	
-        	// todo check pixel ground
-        	return tile_x(c+1); // test
+        if(!color_equals(code, COLOR_TRANSPARENT)) {
+            int pr = tile_pixel_r(y);
+            for(int pc=TILES_SIZE-1; pc>=0; pc--) {
+        	    if(pixel_collision(code, pc, pr))
+        		    return sca_min(tile_x(c) + pc + 1, x);
+            }
         }
         c--;
     }
@@ -195,17 +206,16 @@ float tilemap_wall_left(float x, float y) {
 float tilemap_wall_right(float x, float y) {
     int c = tile_c(x);
     int r = tile_r(y);
-    Color_s code = {0};
+    Color_s code = COLOR_TRANSPARENT;
     while(c>=0 && c<L.map->cols 
         && r>=0 && r<L.map->rows) {
         code = *image_pixel(L.map, 0, c, r);
-        if(!color_equals(code, (Color_s) {0})) {
-        	int tile_palette = code.b;
-        	int tile_id = code.a;
-        	// todo check palette?
-        	
-        	// todo check pixel ground
-        	return tile_x(c); // test
+        if(!color_equals(code, COLOR_TRANSPARENT)) {
+            int pr = tile_pixel_r(y);
+            for(int pc=0; pc<TILES_SIZE; pc++) {
+        	    if(pixel_collision(code, pc, pr))
+        		    return sca_max(tile_x(c) + pc, x);
+            }
         }
         c++;
     }

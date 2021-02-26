@@ -34,3 +34,20 @@ void tiles_init() {
     if(tiles.size == 0)
         SDL_Log("WARNING: 0 tiles loaded! Put some into tiles/tile_xx.png, starting with xx=01");
 }
+
+Color_s tiles_pixel(Color_s code, int layer, int pixel_c, int pixel_r) {
+	int tile_id = code.b;
+	int tile = code.a;
+	
+	if(tile_id == 0)
+	    return COLOR_TRANSPARENT;
+	
+	Image *img = tiles.imgs[tile_id-1];
+	
+	int tile_col = tile % TILES_COLS;
+	int tile_row = tile / TILES_COLS;
+	
+	return *image_pixel(img, layer, 
+	    pixel_c + tile_col * TILES_SIZE,
+	    pixel_r + tile_row * TILES_SIZE);
+}

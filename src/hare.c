@@ -26,7 +26,7 @@ void hare_init() {
 	r_ro_single_init(&L.ro, camera.gl_main, r_texture_init_file("res/hare.png", NULL));
 
     for(int i=0; i<4; i++)
-        r_ro_single_init(&L.coll[i], camera.gl_main, NULL);
+        r_ro_single_init(&L.coll[i], camera.gl_main, 0);
 }
 
 void hare_update(float dtime) {
@@ -44,7 +44,7 @@ void hare_update(float dtime) {
 	float wleft = tilemap_wall_left(L.x-4, L.y);
 	L.coll[1].rect.pose = u_pose_new(wleft, L.y, 4, 4);
 	
-	printf("%f - %f\n", L.x, wleft);
+	
 	if(L.x < wleft + 8)
 	    L.x = wleft + 8;
 	
