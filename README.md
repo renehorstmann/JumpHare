@@ -16,9 +16,12 @@ In active developmemt
 
 ## Todo
 - draw foreground
-- Tiles have a second layer for collisions
-- basic tiled level physics
-    - ray distance checks
+- Mathc:
+  - cvec*: type char
+  - ucvec*: type unsigned char aka uint8_t
+    - cast functions
+    - normilzed cast -> to color vec
+    - Color_s replacement or typedef
 - hare physics 
     - set speed takes [-1 : 1]
     - pause speed smoothly
