@@ -10,10 +10,10 @@
 
 #define MIN_SPEED_X 10
 #define MAX_SPEED_X 80
-#define MAX_SPEED_Y 160
-#define ACC 2
-#define DEACC 4
-#define GRAVITY -5
+#define MAX_SPEED_Y 200
+#define ACC 160
+#define DEACC 240
+#define GRAVITY -400
 
 static struct {
 	rRoSingle ro;
@@ -45,18 +45,16 @@ static void apply_speed_x(float dtime) {
     	        - (L.speed.x > 0 ? DEACC : ACC)
     	        * dtime, L.set_speed_x);
         }
-    float actual_speed_x = L.speed.x * MAX_SPEED_X;
-    actual_speed_x = sca_abs(actual_speed_x) < MIN_SPEED_X? 0 : actual_speed_x;
+    float actual_speed = sca_abs(L.speed.x) < MIN_SPEED_X? 0 : L.speed.x;
     
     
-    L.pos.x += actual_speed_x * dtime;
+    L.pos.x += actual_speed * dtime;
 }
 
 static void apply_speed_y(float dtime) {
 	L.speed.y += GRAVITY * dtime;
-	L.speed.y = sca_clamp(L.speed.y, -1, 1);
-	float actual_speed = L.speed.y * MAX_SPEED_Y;
-	L.pos.y += actual_speed * dtime;
+	L.speed.y = sca_clamp(L.speed.y, -MAX_SPEED_Y, MAX_SPEED_Y);
+	L.pos.y += L.speed.y * dtime;
 }
 
 
@@ -94,14 +92,21 @@ static void check_collision() {
 		L.pos.x = sca_min(a, b) - 7;
 	}
 	
+	
+	if(L.jump_time>0.4 && L.jump_time<0.8)
+	    return;
+	
 	a = tilemap_ground(L.pos.x-4, L.pos.y-4);
 	b = tilemap_ground(L.pos.x+4, L.pos.y-4);
 	L.coll[6].rect.pose=u_pose_new(L.pos.x-4, a, 3, 3);
 	L.coll[7].rect.pose=u_pose_new(L.pos.x+4, b, 3, 3);
 	
-	if(L.pos.y < a+20 || L.pos.y < b+20) {
+	if(L.pos.y <= a+16 || L.pos.y <= b+16) {
 		L.grounded = true;
 		L.pos.y = sca_max(a, b) + 14;
+		L.speed.y = 0;
+		if(L.jump_time >0.8)
+		    L.jump_time = -1;
 	} else {
 		L.grounded = false;
 	}
@@ -125,19 +130,27 @@ void hare_init() {
 
 void hare_update(float dtime) {
     char text[64];
-    sprintf(text, "%+6.3f %i", L.set_speed_x, L.set_jump);
+    sprintf(text, "%+07.3f %i", L.set_speed_x, L.set_jump);
     
     
-    if(L.grounded && L.set_jump) {
-    	// jump
+    if(L.grounded && L.set_jump && L.jump_time <0) {
+    	L.jump_time = 0;
     }
     L.set_jump = false;
+    
+    if(L.jump_time>=0)
+        L.jump_time+=dtime;
+        
+    if(L.jump_time>=0.2 && L.grounded) {
+    	L.grounded = false;
+    	L.speed.y = MAX_SPEED_Y;
+    }
     
     apply_speed_x(dtime);
     if(!L.grounded)
         apply_speed_y(dtime);
     
-    sprintf(text + strlen(text), " %+6.3f %+6.3f", 
+    sprintf(text + strlen(text), " %+07.3f %+08.3f", 
                 L.speed.x, L.speed.y);
     
 	check_collision();
@@ -145,26 +158,40 @@ void hare_update(float dtime) {
 	
 	
 	int frame;
-	{
+	if(L.grounded && L.jump_time<0) {
 		float fps = 6;
 		int frames = 4;
 		static float time = 0;
 		time = fmodf(time + dtime, frames / fps);
 		frame = time * fps;
+	} else {
+		frame = 3;
+		if(L.jump_time>=0) {
+		    if(L.jump_time<0.2)
+		        frame = 0;
+		    else if(L.jump_time<0.5)
+		        frame = 1;
+		    else if(L.jump_time<0.8)
+		        frame = 2;
+		}
 	}
 
 	float w = 1.0 / 4.0;
 	float h = 1.0 / 4.0;
 
-	if (L.speed.x < 0)
+	if (L.speed.x < -MIN_SPEED_X)
 		L.looking_left = true;
-	if (L.speed.x > 0)
+	if (L.speed.x > MIN_SPEED_X)
 		L.looking_left = false;
 
-	float v = L.speed.x == 0 ? 0 : 1;
-	if (sca_abs(L.speed.x) > 0.8)
-		v++;
-		
+	float v;
+	if(L.grounded && L.jump_time<0) {
+	    v = L.speed.x == 0 ? 0 : 1;
+	    if (sca_abs(L.speed.x) > 60)
+		    v++;
+	} else {
+		v = 3;
+	}
 		
     vec2 p = vec2_mix(L.pos, L.last_pos, 0.5);
 	
@@ -194,7 +221,7 @@ vec2 hare_position() {
 
 // [-1 : 1]
 void hare_set_speed(float dx) {
-	L.set_speed_x = sca_clamp(dx, -1, 1);
+	L.set_speed_x = sca_clamp(dx, -1, 1) * MAX_SPEED_X;
 }
 
 void hare_jump() {
