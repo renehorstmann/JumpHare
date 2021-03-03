@@ -210,8 +210,8 @@ void hare_update(float dtime) {
 
 void hare_render() {
 	r_ro_single_render(&L.ro);
-	for(int i=0; i<8;i++)
-	    r_ro_single_render(&L.coll[i]);
+	//for(int i=0; i<8;i++)
+	//    r_ro_single_render(&L.coll[i]);
 	r_ro_text_render(&L.input_text);
 }
 
