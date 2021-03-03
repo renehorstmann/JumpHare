@@ -29,7 +29,7 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     }
     
     if(pointer.action == E_POINTER_UP) {
-		hare_set_speed(0, 0);
+		hare_set_speed(0);
 		return;
 	}
     
@@ -39,13 +39,12 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     }
     
     float dx = pointer.pos.x - L.start_pos.x;
-    if(sca_abs(dx)>80) {
-    	float diff = sca_sign(dx) * (sca_abs(dx) - 80);
+    if(sca_abs(dx)>50) {
+    	float diff = sca_sign(dx) * (sca_abs(dx) - 50);
     	L.start_pos.x += diff;
     }
     
-    float dy = pointer.pos.y - L.start_pos.y;
-    hare_set_speed(dx, dy);
+    hare_set_speed(dx/50);
 }
 
 void controller_init() {

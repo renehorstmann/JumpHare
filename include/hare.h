@@ -11,7 +11,8 @@ void hare_render();
 
 vec2 hare_position();
 
-void hare_set_speed(float dx, float dy);
+// [-1 : 1]
+void hare_set_speed(float dx);
 
 void hare_jump();
 
