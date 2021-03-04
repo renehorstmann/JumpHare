@@ -7,6 +7,9 @@
 #include "hud_camera.h"
 #include "controller.h"
 
+#define DISTANCE 20
+#define PULL_DISTANCE 40
+
 static struct {
 	rRoSingle background_ro;
 	vec4 start_pos;
@@ -39,12 +42,12 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     }
     
     float dx = pointer.pos.x - L.start_pos.x;
-    if(sca_abs(dx)>50) {
-    	float diff = sca_sign(dx) * (sca_abs(dx) - 50);
+    if(sca_abs(dx)>PULL_DISTANCE) {
+    	float diff = sca_sign(dx) * (sca_abs(dx) - PULL_DISTANCE);
     	L.start_pos.x += diff;
     }
     
-    hare_set_speed(dx/50);
+    hare_set_speed(dx/DISTANCE);
 }
 
 void controller_init() {

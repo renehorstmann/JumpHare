@@ -186,8 +186,8 @@ void hare_update(float dtime) {
 
 	float v;
 	if(L.grounded && L.jump_time<0) {
-	    v = L.speed.x == 0 ? 0 : 1;
-	    if (sca_abs(L.speed.x) > 60)
+	    v = sca_abs(L.speed.x) < MIN_SPEED_X? 0 : 1;
+	    if (sca_abs(L.speed.x) >=MAX_SPEED_X)
 		    v++;
 	} else {
 		v = 3;
