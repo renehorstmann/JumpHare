@@ -17,8 +17,13 @@ In active developmemt
 ## Todo
 - draw foreground
 - hare physics 
-    - set speed takes [-1 : 1]
-    - pause speed smoothly
+  - aabb structs for sizes
+  - state struct
+    - grounded, jumping, ...
+  - state of previos frame
+    - for sound effects, etc. 
+      !prev.grounded && grounded
+  - interpolate positions
 - control optimization
 
 ## Compiling on Windows
