@@ -26,6 +26,8 @@ In active developmemt
   - interpolate positions
   - jump should work if nearly grounded (0.5 seconds or so)
 - control optimization
+  - screen mid is 0
+  - double tap to jump (without losing momentum)
 
 ## Compiling on Windows
 Compiling with Mingw (msys2).
