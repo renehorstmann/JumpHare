@@ -93,7 +93,7 @@ static void check_collision() {
 	}
 	
 	
-	if(L.jump_time>0.4 && L.jump_time<0.8)
+	if(L.jump_time>0.2 && L.jump_time<0.8)
 	    return;
 	
 	a = tilemap_ground(L.pos.x-4, L.pos.y-4);
@@ -141,7 +141,7 @@ void hare_update(float dtime) {
     if(L.jump_time>=0)
         L.jump_time+=dtime;
         
-    if(L.jump_time>=0.2 && L.grounded) {
+    if(L.jump_time>=0.1 && L.grounded) {
     	L.grounded = false;
     	L.speed.y = MAX_SPEED_Y;
     }
@@ -167,11 +167,11 @@ void hare_update(float dtime) {
 	} else {
 		frame = 3;
 		if(L.jump_time>=0) {
-		    if(L.jump_time<0.2)
+		    if(L.jump_time<0.1)
 		        frame = 0;
-		    else if(L.jump_time<0.5)
+		    else if(L.jump_time<0.3)
 		        frame = 1;
-		    else if(L.jump_time<0.8)
+		    else if(L.jump_time<0.5)
 		        frame = 2;
 		}
 	}

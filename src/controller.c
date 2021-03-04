@@ -50,18 +50,41 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     hare_set_speed(dx/DISTANCE);
 }
 
+static void key_ctrl() {
+    static bool jumped = false;
+
+    float speed_x = 0;
+    if(e_input.keys.right && ! e_input.keys.left)
+        speed_x = 1;
+    if(e_input.keys.left && ! e_input.keys.right)
+        speed_x = -1;
+    hare_set_speed(speed_x);
+
+    if(e_input.keys.space && !jumped) {
+        jumped = true;
+        hare_jump();
+    }
+    if(!e_input.keys.space)
+        jumped = false;
+}
+
 void controller_init() {
+#ifdef GLES
 	e_input_register_pointer_event(pointer_event, NULL);
+	#endif
 	
 	r_ro_single_init(&L.background_ro, hud_camera.gl, r_texture_init_file("res/hud_background.png", NULL));
 }
 
 void controller_update(float dtime) {
-	float dy = L.actual_pos.y - L.last_pos.y;
+#ifdef GLES
+    float dy = L.actual_pos.y - L.last_pos.y;
 	float speed = dy / dtime;
 	if(speed>2)
 	    hare_jump();
-	
+#else
+    key_ctrl();
+#endif
 	
 	
 	L.last_pos = L.actual_pos;
