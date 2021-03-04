@@ -24,6 +24,7 @@ In active developmemt
     - for sound effects, etc. 
       !prev.grounded && grounded
   - interpolate positions
+  - jump should work if nearly grounded (0.5 seconds or so)
 - control optimization
 
 ## Compiling on Windows
