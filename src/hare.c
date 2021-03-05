@@ -71,9 +71,9 @@ static void check_collision() {
 		L.pos.y = sca_min(a, b) - 8;
 	}
 
-	a = tilemap_wall_left(L.pos.x-4, L.pos.y-4);
+	a = tilemap_wall_left(L.pos.x-4, L.pos.y-8);
 	b = tilemap_wall_left(L.pos.x-4, L.pos.y+4);
-	L.coll[2].rect.pose=u_pose_new(a, L.pos.y-4, 3, 3);
+	L.coll[2].rect.pose=u_pose_new(a, L.pos.y-8, 3, 3);
 	L.coll[3].rect.pose=u_pose_new(b, L.pos.y+4, 3, 3);
 	
 	if(L.pos.x < a+7 || L.pos.x < b+7) {
@@ -82,9 +82,9 @@ static void check_collision() {
 	}
 	
 	
-	a = tilemap_wall_right(L.pos.x+4, L.pos.y-4);
+	a = tilemap_wall_right(L.pos.x+4, L.pos.y-8);
 	b = tilemap_wall_right(L.pos.x+4, L.pos.y+4);
-	L.coll[4].rect.pose=u_pose_new(a, L.pos.y-4, 3, 3);
+	L.coll[4].rect.pose=u_pose_new(a, L.pos.y-8, 3, 3);
 	L.coll[5].rect.pose=u_pose_new(b, L.pos.y+4, 3, 3);
 	
 	if(L.pos.x > a-7 || L.pos.x > b-7) {
@@ -210,8 +210,8 @@ void hare_update(float dtime) {
 
 void hare_render() {
 	r_ro_single_render(&L.ro);
-	//for(int i=0; i<8;i++)
-	//    r_ro_single_render(&L.coll[i]);
+	for(int i=0; i<8;i++)
+	    r_ro_single_render(&L.coll[i]);
 	r_ro_text_render(&L.input_text);
 }
 
