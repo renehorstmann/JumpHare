@@ -17,9 +17,10 @@ In active developmemt
 ## Todo
 - draw foreground
 - hare physics 
-  - aabb structs for sizes
+  - aabb structs for sizes?
   - state struct
     - grounded, jumping, ...
+  - collision for grounded is different from falling
   - state of previos frame
     - for sound effects, etc. 
       !prev.grounded && grounded
