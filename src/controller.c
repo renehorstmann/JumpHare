@@ -7,14 +7,13 @@
 #include "hud_camera.h"
 #include "controller.h"
 
-#define DISTANCE 20
-#define PULL_DISTANCE 40
+#define UP_TIME 0.125
+#define JUMP_TIME 0.25
+#define DISTANCE 30
 
 static struct {
     rRoSingle background_ro;
-    vec4 start_pos;
-    vec4 actual_pos;
-    vec4 last_pos;
+    ePointer_s pointer;
 } L;
 
 static bool in_control_area(vec2 pos) {
@@ -22,32 +21,16 @@ static bool in_control_area(vec2 pos) {
 }
 
 static void pointer_event(ePointer_s pointer, void *ud) {
-    L.actual_pos = pointer.pos;
-
+    if(pointer.id != 0)
+        return;
+        
     pointer.pos = mat4_mul_vec(hud_camera.matrices.p_inv, pointer.pos);
-
 
     if (!in_control_area(pointer.pos.xy)) {
         pointer.action = E_POINTER_UP;
     }
-
-    if (pointer.action == E_POINTER_UP) {
-        hare_set_speed(0);
-        return;
-    }
-
-    if (pointer.action == E_POINTER_DOWN) {
-        L.start_pos = pointer.pos;
-        return;
-    }
-
-    float dx = pointer.pos.x - L.start_pos.x;
-    if (sca_abs(dx) > PULL_DISTANCE) {
-        float diff = sca_sign(dx) * (sca_abs(dx) - PULL_DISTANCE);
-        L.start_pos.x += diff;
-    }
-
-    hare_set_speed(dx / DISTANCE);
+    
+    L.pointer = pointer;
 }
 
 static void key_ctrl() {
@@ -68,27 +51,45 @@ static void key_ctrl() {
         jumped = false;
 }
 
+static void pointer_ctrl(float dtime) {
+	static float up_time = FLT_MAX;
+	
+	// stopping?
+	if(L.pointer.action == E_POINTER_UP) {
+		up_time += dtime;
+		if(up_time>=UP_TIME) {
+			hare_set_speed(0);
+		}
+		return;
+	}
+	
+	// jump tap
+	if(up_time>0 && up_time<=JUMP_TIME) {
+		hare_jump();
+	}
+	
+	// reset up_time, cause we are moving
+	up_time = 0;
+	
+	float speed = L.pointer.pos.x / DISTANCE;
+	speed = sca_clamp(speed, -1, 1);
+	hare_set_speed(speed);
+}
+
 void controller_init() {
-#ifdef GLES
+    L.pointer.action = E_POINTER_UP;
     e_input_register_pointer_event(pointer_event, NULL);
-#endif
 
     r_ro_single_init(&L.background_ro, hud_camera.gl, r_texture_init_file("res/hud_background.png", NULL));
 }
 
 void controller_update(float dtime) {
 #ifdef GLES
-    float dy = L.actual_pos.y - L.last_pos.y;
-    float speed = dy / dtime;
-    if(speed>2)
-        hare_jump();
+    pointer_ctrl(dtime);
 #else
     key_ctrl();
 #endif
-
-
-    L.last_pos = L.actual_pos;
-
+    
     if (hud_camera_is_portrait_mode()) {
         float w = hud_camera_width();
         float h = hud_camera_height() * HUD_CAMERA_SCREEN_WEIGHT;
