@@ -13,8 +13,16 @@
 #include "camera_control.h"
 
 
-static void main_loop(float delta_time);
+#define UPDATES_PER_SECOND 200
 
+#define TRACK_WORKLOAD
+
+
+static float current_time() {
+	return SDL_GetTicks() / 1000.0f;
+}
+
+static void main_loop(float delta_time);
 
 int main(int argc, char **argv) {
     SDL_Log("JumpHare");
@@ -49,27 +57,39 @@ int main(int argc, char **argv) {
 
 
 static void main_loop(float delta_time) {
-    // e updates
-    e_window_update();
-    e_input_update();
+    static float u_time = 0;
+    
+    
+    r_render_begin_frame(e_window.size.x, e_window.size.y);
+    
+#ifdef TRACK_WORKLOAD
+    float start_time = current_time();
+#endif
+    
+    u_time += delta_time;
+
+    // fixed update ps
+    while(u_time > 0) {
+        const float udt = 1.0 / UPDATES_PER_SECOND;
+        u_time -= udt;
+        
+        // e updates
+        e_input_update();
     
 
-    // simulate
-    camera_update();
-    hud_camera_update();
-    background_update(delta_time);
-    tilemap_update(delta_time);
-    level_update(delta_time);
-    controller_update(delta_time);
-    hare_update(delta_time);
-    camera_control_update(delta_time);
+        // simulate
+        camera_update();
+        hud_camera_update();
+        background_update(udt);
+        tilemap_update(udt);
+        level_update(udt);
+        controller_update(udt);
+        hare_update(udt);
+        camera_control_update(udt);
     
-    
+    }
 
     // render
-    r_render_begin_frame(e_window.size.x, e_window.size.y);
-
-
     
     background_render();
     tilemap_render_back();
@@ -80,6 +100,12 @@ static void main_loop(float delta_time) {
 
 
     e_gui_render();
+    
+#ifdef TRACK_WORKLOAD
+    float frame_time = current_time() - start_time;
+    float load = frame_time / delta_time;
+    printf("load: %.4f\n", load);
+#endif
 
     // swap buffers
     r_render_end_frame();
