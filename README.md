@@ -16,6 +16,16 @@ In active developmemt
 
 ## Todo
 - draw foreground
+- update fixed 200 hz
+  - ```c
+    u_time += delta_time;
+    while(u_time>0) {
+      u_time -= 1.0/200.0;
+      *_update(1.0/200.0);
+      // ...
+    }
+    ```
+    
 - hare physics 
   - aabb structs for sizes?
   - state struct
