@@ -15,7 +15,7 @@
 
 #define UPDATES_PER_SECOND 200
 
-#define TRACK_WORKLOAD
+// #define TRACK_WORKLOAD
 
 
 static float current_time() {
