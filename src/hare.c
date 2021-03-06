@@ -9,7 +9,7 @@
 #include "hare.h"
 
 #define MIN_SPEED_X 10
-#define MAX_SPEED_X 80
+#define MAX_SPEED_X 100
 #define MAX_SPEED_Y 200
 #define ACC 160
 #define DEACC 240
