@@ -187,7 +187,7 @@ static void animate(float dtime) {
 	}
 
 	float w = 1.0 / 4.0;
-	float h = 1.0 / 4.0;
+	float h = 1.0 / 5.0;
 
 	if (L.speed.x < -MIN_SPEED_X)
 		looking_left = true;
@@ -199,6 +199,8 @@ static void animate(float dtime) {
 	    v = sca_abs(L.speed.x) < MIN_SPEED_X? 0 : 1;
 	    if (sca_abs(L.speed.x) >=MAX_SPEED_X)
 		    v++;
+	} else if(L.state == HARE_DOUBLE_JUMP){
+		v = 4;
 	} else {
 		v = 3;
 	}
