@@ -8,7 +8,7 @@
 #include "tilemap.h"
 #include "hare.h"
 
-#define MIN_SPEED_X 10
+#define MIN_SPEED_X 20
 #define MAX_SPEED_X 100
 #define MAX_SPEED_Y 200
 #define ACC 160
