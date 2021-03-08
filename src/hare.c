@@ -10,7 +10,7 @@
 
 #define MIN_SPEED_X 20
 #define MAX_SPEED_X 100
-#define MAX_SPEED_Y 200
+#define MAX_SPEED_Y 250
 #define JUMP_SPEED 200
 #define DOUBLE_JUMP_SPEED_Y 175
 #define DOUBLE_JUMP_SPEED_X_FACTOR 0.5
@@ -78,7 +78,7 @@ static vec2 apply_speed(float dtime) {
 static void check_collision_grounded() {
 	float a, b;
 
-	a = tilemap_wall_left(L.pos.x, L.pos.y+4);
+	a = tilemap_wall_left(L.pos.x, L.pos.y+3);
 	
 	if(L.pos.x < a+7) {
 		// collision?
@@ -86,7 +86,7 @@ static void check_collision_grounded() {
 	}
 	
 	
-	a = tilemap_wall_right(L.pos.x, L.pos.y+4);
+	a = tilemap_wall_right(L.pos.x, L.pos.y+3);
 	
 	if(L.pos.x > a-7) {
 		// collision?
@@ -94,50 +94,23 @@ static void check_collision_grounded() {
 	}
 	
 	
-	a = tilemap_ground(L.pos.x-4, L.pos.y);
-	b = tilemap_ground(L.pos.x+4, L.pos.y);
+	a = tilemap_ground(L.pos.x-3, L.pos.y);
+	b = tilemap_ground(L.pos.x+3, L.pos.y);
 	
 	if(L.pos.y <= a+20 || L.pos.y <= b+20) {
 		L.pos.y = sca_max(a, b) + 14;
 	} else {
 		L.state = HARE_FALLING;
 		L.speed.y = 0;
+		puts("falling");
 	}
 }
 
 static void check_collision_jumping() {
 	float a, b;
 
-	a = tilemap_wall_left(L.pos.x, L.pos.y+4);
-	
-	if(L.pos.x < a+7) {
-		// collision?
-		L.pos.x = a + 7;
-	}
-	
-	
-	a = tilemap_wall_right(L.pos.x, L.pos.y+4);
-	
-	if(L.pos.x > a-7) {
-		// collision?
-		L.pos.x = a - 7;
-	}
-}
-
-
-static void check_collision_falling() {
-	float a, b;
-	
-	a = tilemap_ceiling(L.pos.x-4, L.pos.y);
-	b = tilemap_ceiling(L.pos.x+4, L.pos.y);
-	
-	if(L.pos.y > a-8 || L.pos.y > b-8) {
-		// jump collision?
-		L.pos.y = sca_min(a, b) - 8;
-	}
-
-	a = tilemap_wall_left(L.pos.x, L.pos.y-10);
-	b = tilemap_wall_left(L.pos.x, L.pos.y+4);
+	a = tilemap_wall_left(L.pos.x, L.pos.y-13);
+	b = tilemap_wall_left(L.pos.x, L.pos.y+3);
 	
 	if(L.pos.x < a+7 || L.pos.x < b+7) {
 		// collision?
@@ -145,21 +118,53 @@ static void check_collision_falling() {
 	}
 	
 	
-	a = tilemap_wall_right(L.pos.x, L.pos.y-10);
-	b = tilemap_wall_right(L.pos.x, L.pos.y+4);
+	a = tilemap_wall_right(L.pos.x, L.pos.y-13);
+	b = tilemap_wall_right(L.pos.x, L.pos.y+3);
+	
+	if(L.pos.x > a-7 || L.pos.x > b-7) {
+		// collision?
+		L.pos.x = sca_min(a, b) - 7;
+	}
+}
+
+
+static void check_collision_falling() {
+	float a, b;
+	
+	a = tilemap_ceiling(L.pos.x-3, L.pos.y);
+	b = tilemap_ceiling(L.pos.x+3, L.pos.y);
+	
+	if(L.pos.y > a-8 || L.pos.y > b-8) {
+		// jump collision?
+		L.pos.y = sca_min(a, b) - 8;
+		puts("jump collision");
+	}
+
+	a = tilemap_wall_left(L.pos.x, L.pos.y-13);
+	b = tilemap_wall_left(L.pos.x, L.pos.y+3);
+	
+	if(L.pos.x < a+7 || L.pos.x < b+7) {
+		// collision?
+		L.pos.x = sca_max(a, b) + 7;
+	}
+	
+	
+	a = tilemap_wall_right(L.pos.x, L.pos.y-13);
+	b = tilemap_wall_right(L.pos.x, L.pos.y+3);
 	
 	if(L.pos.x > a-7 || L.pos.x > b-7) {
 		// collision?
 		L.pos.x = sca_min(a, b) - 7;
 	}
 	
-	a = tilemap_ground(L.pos.x-4, L.pos.y);
-	b = tilemap_ground(L.pos.x+4, L.pos.y);
+	a = tilemap_ground(L.pos.x-3, L.pos.y);
+	b = tilemap_ground(L.pos.x+3, L.pos.y);
 	
-	if(L.pos.y < a+19 || L.pos.y < b+19) {
+	if(L.pos.y < a+14 || L.pos.y < b+14) {
 		L.pos.y = sca_max(a, b) + 14;
 		L.state = HARE_GROUNDED;
 		L.speed.y = 0;
+		puts("grounded");
 	}
 	
 }
@@ -251,7 +256,7 @@ void hare_update(float dtime) {
         if(L.jump_time>=JUMP_START_TIME && L.speed.y <= 0) {
         	L.speed.y = JUMP_SPEED;
         }
-        if(L.jump_time>=0.5) {
+        if(L.jump_time>=0.2) {
         	L.state = HARE_FALLING;
         }
     }

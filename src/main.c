@@ -59,6 +59,7 @@ int main(int argc, char **argv) {
 static void main_loop(float delta_time) {
     static float u_time = 0;
     
+    //delta_time /= 5;
     
     r_render_begin_frame(e_window.size.x, e_window.size.y);
     
