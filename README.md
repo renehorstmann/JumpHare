@@ -16,16 +16,8 @@ In active developmemt
 
 ## Todo
 - draw foreground
-- hare physics 
-  - aabb structs for sizes?
-  - state struct
-    - grounded, jumping, ...
-  - collision for grounded is different from falling
-  - state of previos frame
-    - for sound effects, etc. 
-      !prev.grounded && grounded
-  - interpolate positions
-  - jump should work if nearly grounded (0.5 seconds or so)
+- hare double jump animation
+  - air stroke
 - control optimization
   - visualization
 
