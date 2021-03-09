@@ -8,9 +8,9 @@
 
 #define MAX_STROKES 8
 
-#define SPEED -200
+#define SPEED -300
 #define FRAMES 4
-#define FPS 12
+#define FPS 16
 
 typedef struct {
 	rRect_s *rect;
@@ -22,6 +22,10 @@ static struct {
 	rRoBatch ro;
 	Stroke strokes[MAX_STROKES];
 } L;
+
+static float rand_range(float a, float b) {
+	return a + (b-a) * rand() / RAND_MAX;
+}
 
 void airstroke_init() {
 	r_ro_batch_init(&L.ro, MAX_STROKES, camera.gl_main, r_texture_init_file("res/airstroke.png", NULL));
@@ -48,10 +52,10 @@ void airstroke_update(float dtime) {
 		    float ground = tilemap_ground(x, y);
 		
 		    y += SPEED * dtime;
-		    if(y <= ground + 16) {
+		    if(y <= ground + 12) {
 			    s->hit = true;
 			    s->time = 0;
-			    y = ground + 16;
+			    y = ground + 12;
 		    }
 		    
 		    u_pose_set_y(&s->rect->pose, y);
@@ -84,6 +88,12 @@ void airstroke_add(float x, float y) {
 	Stroke *s = &L.strokes[next];
 	s->rect->pose = u_pose_new(x, y, 32, 32);
 	s->rect->uv = u_pose_new(0, 0, 1.0/FRAMES, 1.0/2.0);
+	s->rect->color = (vec4) {{
+		rand_range(0.9, 1.0),
+		rand_range(0.9, 1.0),
+		rand_range(0.9, 1.0),
+		rand_range(0.9, 1.0)
+		}};
 	s->time = 0;
 	s->hit = 0;
 	
