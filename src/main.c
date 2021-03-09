@@ -9,6 +9,7 @@
 #include "tilemap.h"
 #include "level.h"
 #include "hare.h"
+#include "airstroke.h"
 #include "controller.h"
 #include "camera_control.h"
 
@@ -45,6 +46,7 @@ int main(int argc, char **argv) {
     tilemap_load_level("res/levels/level_01.png");
     controller_init();
     hare_init();
+    airstroke_init();
     camera_control_init();
     
 
@@ -71,8 +73,8 @@ static void main_loop(float delta_time) {
 
     // fixed update ps
     while(u_time > 0) {
-        const float udt = 1.0 / UPDATES_PER_SECOND;
-        u_time -= udt;
+        const float fixed_time = 1.0 / UPDATES_PER_SECOND;
+        u_time -= fixed_time;
         
         // e updates
         e_input_update();
@@ -81,12 +83,13 @@ static void main_loop(float delta_time) {
         // simulate
         camera_update();
         hud_camera_update();
-        background_update(udt);
-        tilemap_update(udt);
-        level_update(udt);
-        controller_update(udt);
-        hare_update(udt);
-        camera_control_update(udt);
+        background_update(fixed_time);
+        tilemap_update(fixed_time);
+        level_update(fixed_time);
+        controller_update(fixed_time);
+        hare_update(fixed_time);
+        airstroke_update(fixed_time);
+        camera_control_update(fixed_time);
     
     }
 
@@ -95,6 +98,7 @@ static void main_loop(float delta_time) {
     background_render();
     tilemap_render_back();
     level_render();
+    airstroke_render();
     hare_render();
     tilemap_render_front();
     controller_render();

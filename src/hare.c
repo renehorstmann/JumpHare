@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "hud_camera.h"
 #include "tilemap.h"
+#include "airstroke.h"
 #include "hare.h"
 
 #define MIN_SPEED_X 20
@@ -42,6 +43,12 @@ static struct {
 	float set_jump_time;
 } L;
 
+
+static void check_state_change() {
+    if(L.state == HARE_DOUBLE_JUMP && L.prev_state != HARE_DOUBLE_JUMP) {
+    	airstroke_add(L.pos.x, L.pos.y);
+    }
+}
 
 static vec2 apply_speed(float dtime) {
 	vec2 pos = L.pos;
@@ -191,7 +198,7 @@ static void animate(float dtime) {
 	if(L.state == HARE_GROUNDED) {
 		float fps = ANIMATION_GROUNDED_FPS;
 		int frames = 4;
-		time = fmodf(time + dtime, frames / fps);
+		time = sca_mod(time + dtime, frames / fps);
 		frame = time * fps;
 	} else {
 		frame = 3;
@@ -303,6 +310,8 @@ void hare_update(float dtime) {
     u_pose_set_xy(&L.ro.rect.pose, L.pos.x, L.pos.y);	
 	
 	animate(dtime);
+	
+	check_state_change();
 	
 	// debug
 	char text[64];
