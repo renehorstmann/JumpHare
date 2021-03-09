@@ -8,9 +8,9 @@
 
 #define MAX_STROKES 8
 
-#define SPEED -400
+#define SPEED -350
 #define FRAMES 4
-#define FPS 20
+#define FPS 18
 
 typedef struct {
 	rRect_s *rect;
