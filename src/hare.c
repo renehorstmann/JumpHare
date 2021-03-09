@@ -105,50 +105,22 @@ static void check_collision_grounded() {
 		L.pos.x = a - 7;
 		L.speed.x = 0;
 	}
-	
+
+    if(L.speed.y > 0) {
+        return; // To jump
+    }
 	
 	a = tilemap_ground(L.pos.x-3, L.pos.y);
 	b = tilemap_ground(L.pos.x+3, L.pos.y);
 	
 	if(L.pos.y < a+17 || L.pos.y < b+17) {
 		L.pos.y = sca_max(a, b) + 14;
-	} else {
+	} else if(L.state == HARE_GROUNDED){
 		L.state = HARE_FALLING;
 		L.speed.y = 0;
 		puts("falling");
 	}
 }
-
-static void check_collision_jumping() {
-	float a, b;
-
-	a = tilemap_wall_left(L.pos.x, L.pos.y-10);
-	b = tilemap_wall_left(L.pos.x, L.pos.y+3);
-	
-	if(L.pos.x < a+7 || L.pos.x < b+7) {
-		// collision?
-		L.pos.x = sca_max(a, b) + 7;
-		L.speed.x = 0;
-	}
-	
-	
-	a = tilemap_wall_right(L.pos.x, L.pos.y-10);
-	b = tilemap_wall_right(L.pos.x, L.pos.y+3);
-	
-	if(L.pos.x > a-7 || L.pos.x > b-7) {
-		// collision?
-		L.pos.x = sca_min(a, b) - 7;
-		L.speed.x = 0;
-	}
-	
-	a = tilemap_ground(L.pos.x-3, L.pos.y);
-	b = tilemap_ground(L.pos.x+3, L.pos.y);
-	
-	if(L.pos.y < a+14 || L.pos.y < b+14) {
-		L.pos.y = sca_max(a, b) + 14;
-	}
-}
-
 
 static void check_collision_falling() {
 	float a, b;
@@ -297,14 +269,12 @@ void hare_update(float dtime) {
     	
     	switch(L.state) {
     	case HARE_GROUNDED:
+        case HARE_JUMPING:
     	    check_collision_grounded();
     	    break;
     	case HARE_FALLING:
     	case HARE_DOUBLE_JUMP:
     	    check_collision_falling();
-    	    break;
-    	case HARE_JUMPING:
-    	    check_collision_jumping();
     	    break;
     	default:
     	    assert(0 && "invalid hare state");
