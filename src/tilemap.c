@@ -132,16 +132,16 @@ void tilemap_load_level(const char *file) {
 }
 
 
-float tilemap_left() {
+float tilemap_border_left() {
 	return 0;
 }
-float tilemap_right() {
+float tilemap_border_right() {
 	return L.map->cols * TILES_SIZE;
 }
-float tilemap_top() {
+float tilemap_border_top() {
 	return floor(L.map->rows/2.0) * TILES_SIZE;
 }
-float tilemap_bottom() {
+float tilemap_border_bottom() {
 	return -ceilf(L.map->rows/2.0) * TILES_SIZE;
 }
 

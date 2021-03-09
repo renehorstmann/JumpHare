@@ -53,9 +53,13 @@ static void check_state_change() {
 static vec2 apply_speed(float dtime) {
 	vec2 pos = L.pos;
 	
-	float set_speed_x = L.state == HARE_DOUBLE_JUMP?             L.set_speed_x * DOUBLE_JUMP_SPEED_X_FACTOR 
+	float set_speed_x = L.state == HARE_DOUBLE_JUMP?
+	        L.set_speed_x * DOUBLE_JUMP_SPEED_X_FACTOR
 	        : L.set_speed_x;
 	// x
+	if(sca_sign(set_speed_x) * sca_sign(L.speed.x) == -1) {
+	    L.speed.x = 0;
+	}
 	float diff = set_speed_x - L.speed.x;
     if(diff>0) {
     	L.speed.x = sca_min(L.speed.x

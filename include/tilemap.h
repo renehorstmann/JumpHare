@@ -10,10 +10,10 @@ void tilemap_render_front();
 
 void tilemap_load_level(const char *file);
 
-float tilemap_left();
-float tilemap_right();
-float tilemap_top();
-float tilemap_bottom();
+float tilemap_border_left();
+float tilemap_border_right();
+float tilemap_border_top();
+float tilemap_border_bottom();
 
 float tilemap_ground(float x, float y);
 float tilemap_ceiling(float x, float y);

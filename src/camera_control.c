@@ -11,10 +11,10 @@ struct CameraControlGlobals_s camera_control;
 
 static void check_limits() {
 	vec2 min, max;	
-	min.x = tilemap_left()-camera_left();
-	max.x = tilemap_right()-camera_right();
-	min.y = tilemap_bottom()-camera_bottom();
-	max.y = tilemap_top()-camera_top();
+	min.x = tilemap_border_left() - camera_left();
+	max.x = tilemap_border_right() - camera_right();
+	min.y = tilemap_border_bottom() - camera_bottom();
+	max.y = tilemap_border_top() - camera_top();
 	
 	min = vec2_ceil(min);
 	max = vec2_floor(max);
