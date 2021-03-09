@@ -17,7 +17,6 @@ In active developmemt
 ## Todo
 - draw foreground
 - hare double jump animation
-  - air stroke
 - control optimization
   - visualization
 
