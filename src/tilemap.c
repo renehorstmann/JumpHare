@@ -166,7 +166,7 @@ float tilemap_ground(float x, float y, Color_s *opt_id) {
     }
     if(opt_id)
     	*opt_id = id;
-    return tile_y(L.map->rows);
+    return -FLT_MAX;
 }
 
 float tilemap_ceiling(float x, float y, Color_s *opt_id) {
@@ -189,7 +189,7 @@ float tilemap_ceiling(float x, float y, Color_s *opt_id) {
     }
     if(opt_id)
     	*opt_id = id;
-    return tile_y(0);
+    return FLT_MAX;
 }
 
 float tilemap_wall_left(float x, float y, Color_s *opt_id) {
