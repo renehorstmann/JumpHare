@@ -10,6 +10,7 @@
 #include "level.h"
 #include "hare.h"
 #include "airstroke.h"
+#include "dead.h"
 #include "controller.h"
 #include "camera_control.h"
 
@@ -47,6 +48,7 @@ int main(int argc, char **argv) {
     controller_init();
     hare_init();
     airstroke_init();
+    dead_init();
     camera_control_init();
     
 
@@ -73,8 +75,11 @@ static void main_loop(float delta_time) {
 
     // fixed update ps
     while(u_time > 0) {
-        const float fixed_time = 1.0 / UPDATES_PER_SECOND;
+        float fixed_time = 1.0 / UPDATES_PER_SECOND;
         u_time -= fixed_time;
+        
+        if(dead_is_dead())
+            fixed_time = 0;  // stop while dead
         
         // e updates
         e_input_update();
@@ -92,7 +97,9 @@ static void main_loop(float delta_time) {
         camera_control_update(fixed_time);
     
     }
-
+    dead_update(delta_time);
+    
+    
     // render
     
     background_render();
@@ -101,6 +108,7 @@ static void main_loop(float delta_time) {
     airstroke_render();
     hare_render();
     tilemap_render_front();
+    dead_render();
     controller_render();
 
 

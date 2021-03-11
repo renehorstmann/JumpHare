@@ -7,6 +7,7 @@
 #include "hud_camera.h"
 #include "tilemap.h"
 #include "airstroke.h"
+#include "dead.h"
 #include "hare.h"
 
 #define MIN_SPEED_X 20
@@ -229,6 +230,9 @@ void hare_init() {
 }
 
 void hare_update(float dtime) {
+	if(dead_is_dead())
+	    return;
+	    
 	L.prev_state = L.state;
     vec2 prev_pos = L.pos;
     
@@ -279,6 +283,10 @@ void hare_update(float dtime) {
     	default:
     	    assert(0 && "invalid hare state");
         }
+    }
+    
+    if(L.pos.y < tilemap_border_bottom()) {
+    	dead_set_dead(L.pos.x, L.pos.y);
     }
     
     u_pose_set_xy(&L.ro.rect.pose, L.pos.x, L.pos.y);	
