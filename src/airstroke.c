@@ -49,7 +49,7 @@ void airstroke_update(float dtime) {
 		if(!s->hit) {
 		    float x = u_pose_get_x(s->rect->pose);
 	    	float y = u_pose_get_y(s->rect->pose);
-		    float ground = tilemap_ground(x, y);
+		    float ground = tilemap_ground(x, y, NULL);
 		
 		    y += SPEED * dtime;
 		    if(y <= ground + 12) {
