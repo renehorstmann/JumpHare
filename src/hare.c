@@ -42,6 +42,9 @@ static struct {
 	
 	float set_speed_x;
 	float set_jump_time;
+	
+	float animate_time;
+	bool animate_looking_left;
 } L;
 
 
@@ -168,15 +171,12 @@ static void check_collision_falling() {
 }
 
 static void animate(float dtime) {
-	static float time = 0;
-	static bool looking_left = false;
-	
 	int frame;
 	if(L.state == HARE_GROUNDED) {
 		float fps = ANIMATION_GROUNDED_FPS;
 		int frames = 4;
-		time = sca_mod(time + dtime, frames / fps);
-		frame = time * fps;
+		L.animate_time = sca_mod(L.animate_time + dtime, frames / fps);
+		frame = L.animate_time * fps;
 	} else {
 		frame = 3;
 		if(L.jump_time>=0) {
@@ -193,9 +193,9 @@ static void animate(float dtime) {
 	float h = 1.0 / 5.0;
 
 	if (L.speed.x < -MIN_SPEED_X)
-		looking_left = true;
+		L.animate_looking_left = true;
 	if (L.speed.x > MIN_SPEED_X)
-		looking_left = false;
+		L.animate_looking_left = false;
 
 	float v;
 	if(L.state == HARE_GROUNDED) {
@@ -208,7 +208,7 @@ static void animate(float dtime) {
 		v = 3;
 	}
 	
-	if(!looking_left)
+	if(!L.animate_looking_left)
 	    L.ro.rect.uv = u_pose_new(frame * w, v * h, w, h);
 	else
 	    L.ro.rect.uv = u_pose_new((1+frame) * w, v * h, -w, h);
@@ -227,6 +227,12 @@ void hare_init() {
     for(int i=0; i<64; i++) {
     	L.input_text.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
     }
+}
+
+void hare_kill() {
+	r_ro_single_kill(&L.ro);
+	r_ro_text_kill(&L.input_text);
+	memset(&L, 0, sizeof(L));
 }
 
 void hare_update(float dtime) {

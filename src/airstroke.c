@@ -37,6 +37,11 @@ void airstroke_init() {
 	r_ro_batch_update(&L.ro);
 }
 
+void airstroke_kill() {
+	r_ro_batch_kill(&L.ro);
+	memset(&L, 0, sizeof(L));
+}
+
 void airstroke_update(float dtime) {
 	for(int i=0; i<MAX_STROKES; i++) {
 		Stroke *s = &L.strokes[i];

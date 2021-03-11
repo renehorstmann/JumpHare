@@ -41,10 +41,9 @@ int main(int argc, char **argv) {
     camera_init();
     hud_camera_init();
     tiles_init();
-    background_init();
+    background_init("res/backgrounds/greenhills.png");
     level_init();
-    tilemap_init();
-    tilemap_load_level("res/levels/level_01.png");
+    tilemap_init("res/levels/level_01.png");
     controller_init();
     hare_init();
     airstroke_init();

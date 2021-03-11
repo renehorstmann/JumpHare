@@ -15,7 +15,18 @@ static struct {
 	rRoBatch ro[CAMERA_BACKGROUNDS];
 } L;
 
-void background_init() {
+static void set_image(const char *file) {
+    Image *img = io_load_image(file, CAMERA_BACKGROUNDS);
+    assume(img->cols == BACKGROUND_COLS && img->rows == BACKGROUND_ROWS, "wrong background format");
+    
+    for(int i=0; i<CAMERA_BACKGROUNDS; i++) {
+        r_texture_update(L.ro[i].tex, img->cols, img->rows, image_layer(img, i));
+    }
+}
+
+
+
+void background_init(const char *file) {
     int size = (int) ceilf( (float) MAX_LEVEL_SIZE / BACKGROUND_COLS);
     
     float w = 512;
@@ -31,8 +42,17 @@ void background_init() {
         }
         r_ro_batch_update(&L.ro[i]);
     }
-	background_set_image("res/backgrounds/greenhills.png");
+	set_image("res/backgrounds/greenhills.png");
 }
+
+
+void background_kill() {
+	for(int i=0; i<CAMERA_BACKGROUNDS; i++) {
+		r_ro_batch_kill(&L.ro[i]);
+	}
+	memset(&L, 0, sizeof(L));
+}
+
 
 void background_update(float dtime) {
 
@@ -41,14 +61,5 @@ void background_update(float dtime) {
 void background_render() {
     for(int i=0; i<CAMERA_BACKGROUNDS; i++)
 	    r_ro_batch_render(&L.ro[i]);
-}
-
-void background_set_image(const char *file) {
-    Image *img = io_load_image(file, CAMERA_BACKGROUNDS);
-    assume(img->cols == BACKGROUND_COLS && img->rows == BACKGROUND_ROWS, "wrong background format");
-    
-    for(int i=0; i<CAMERA_BACKGROUNDS; i++) {
-        r_texture_update(L.ro[i].tex, img->cols, img->rows, image_layer(img, i));
-    }
 }
 

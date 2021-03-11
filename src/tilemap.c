@@ -60,34 +60,7 @@ static bool pixel_collision(Color_s code, int pixel_c, int pixel_r) {
 }
 
 
-void tilemap_init() {
-
-}
-
-void tilemap_update(float dtime) {
-
-}
-
-void tilemap_render_back() {
-    for (int i = 0; i < tiles.size; i++) {
-        r_ro_batch_render(&L.ro_back[i]);
-    }
-}
-
-void tilemap_render_front() {
-    for (int i = 0; i < tiles.size; i++) {
-//        r_ro_batch_render(&L.ro_front[i]);
-    }
-}
-
-void tilemap_load_level(const char *file) {
-    if (L.map) {
-        image_delete(L.map);
-        for (int i = 0; i < tiles.size; i++) {
-            r_ro_batch_kill(&L.ro_back[i]);
-//            r_ro_batch_kill(&L.ro_front[i]);
-        }
-    }
+void tilemap_init(const char *file) {
     L.map = io_load_image(file, MAP_LAYERS);
 
     int tile_nums[MAX_TILES] = {0};
@@ -131,6 +104,30 @@ void tilemap_load_level(const char *file) {
     }
 }
 
+void tilemap_kill() {
+    image_delete(L.map);
+    for (int i = 0; i < tiles.size; i++) {
+        r_ro_batch_kill(&L.ro_back[i]);
+//        r_ro_batch_kill(&L.ro_front[i]);
+    }
+    memset(&L, 0, sizeof(L));
+}
+
+void tilemap_update(float dtime) {
+
+}
+
+void tilemap_render_back() {
+    for (int i = 0; i < tiles.size; i++) {
+        r_ro_batch_render(&L.ro_back[i]);
+    }
+}
+
+void tilemap_render_front() {
+    for (int i = 0; i < tiles.size; i++) {
+//        r_ro_batch_render(&L.ro_front[i]);
+    }
+}
 
 float tilemap_border_left() {
 	return 0;

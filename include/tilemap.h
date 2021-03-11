@@ -3,14 +3,14 @@
 
 #include "color.h"
 
-void tilemap_init();
+void tilemap_init(const char *file);
+
+void tilemap_kill();
 
 void tilemap_update(float dtime);
 
 void tilemap_render_back();
 void tilemap_render_front();
-
-void tilemap_load_level(const char *file);
 
 float tilemap_border_left();
 float tilemap_border_right();

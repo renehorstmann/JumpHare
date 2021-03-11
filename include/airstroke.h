@@ -3,6 +3,8 @@
 
 void airstroke_init();
 
+void airstroke_kill();
+
 void airstroke_update(float dtime);
 
 void airstroke_render();

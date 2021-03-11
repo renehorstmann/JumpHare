@@ -13,6 +13,8 @@ enum hare_state {
 
 void hare_init();
 
+void hare_kill();
+
 void hare_update(float dtime);
 
 void hare_render();
