@@ -89,7 +89,7 @@ static vec2 apply_speed(float dtime) {
 static void check_collision_grounded() {
 	float a, b;
 
-	a = tilemap_wall_left(L.pos.x, L.pos.y+3, NULL);
+	a = tilemap_wall_left(L.pos.x, L.pos.y, NULL);
 	
 	if(L.pos.x < a+7) {
 		// collision?
@@ -98,7 +98,7 @@ static void check_collision_grounded() {
 	}
 	
 	
-	a = tilemap_wall_right(L.pos.x, L.pos.y+3, NULL);
+	a = tilemap_wall_right(L.pos.x, L.pos.y, NULL);
 	
 	if(L.pos.x > a-7) {
 		// collision?
