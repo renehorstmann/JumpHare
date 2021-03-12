@@ -2,6 +2,7 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/sca/float.h"
+#include "mathc/utils/random.h"
 #include "camera.h"
 #include "dead.h"
 
@@ -55,9 +56,7 @@ void dead_set_dead(float x, float y) {
 	L.time = 0;
 	L.callback_called = false;
 	L.ro.rect.pose = u_pose_new(x, y, START_SIZE, START_SIZE);
-	L.ro.rect.color.r = 1.0*rand()/RAND_MAX;
-	L.ro.rect.color.g = 1.0*rand()/RAND_MAX;
-	L.ro.rect.color.b = 1.0*rand()/RAND_MAX;
+	L.ro.rect.color.rgb = vec3_random();
 	L.ro.rect.color.a = 0;
 }
 

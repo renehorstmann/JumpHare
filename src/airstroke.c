@@ -2,6 +2,7 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
+#include "mathc/utils/random.h"
 #include "camera.h"
 #include "tilemap.h"
 #include "airstroke.h"
@@ -22,10 +23,6 @@ static struct {
 	rRoBatch ro;
 	Stroke strokes[MAX_STROKES];
 } L;
-
-static float rand_range(float a, float b) {
-	return a + (b-a) * rand() / RAND_MAX;
-}
 
 void airstroke_init() {
 	r_ro_batch_init(&L.ro, MAX_STROKES, camera.gl_main, r_texture_init_file("res/airstroke.png", NULL));
@@ -93,12 +90,7 @@ void airstroke_add(float x, float y) {
 	Stroke *s = &L.strokes[next];
 	s->rect->pose = u_pose_new(x, y, 32, 32);
 	s->rect->uv = u_pose_new(0, 0, 1.0/FRAMES, 1.0/2.0);
-	s->rect->color = (vec4) {{
-		rand_range(0.9, 1.0),
-		rand_range(0.9, 1.0),
-		rand_range(0.9, 1.0),
-		rand_range(0.9, 1.0)
-		}};
+	s->rect->color = vec4_random_range(0.9, 1.0);
 	s->time = 0;
 	s->hit = 0;
 	
