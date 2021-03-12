@@ -25,6 +25,8 @@ In active developmemt
 - non final sound effects?
 - enemies
 - control optimization
+  - multi touch
+    - l + r = middle
   - visualization
 
 ## Compiling on Windows
