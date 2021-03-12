@@ -1,7 +1,7 @@
-#include "mathc/sca/int.h"
-#include "mathc/sca/float.h"
 #include "r/ro_batch.h"
 #include "u/pose.h"
+#include "mathc/sca/int.h"
+#include "mathc/sca/float.h"
 
 #include "tiles.h"
 #include "io.h"

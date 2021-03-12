@@ -1,7 +1,7 @@
-#include "mathc/sca/float.h"
 #include "r/ro_single.h"
 #include "r/texture.h"
 #include "u/pose.h"
+#include "mathc/sca/float.h"
 #include "camera.h"
 #include "dead.h"
 

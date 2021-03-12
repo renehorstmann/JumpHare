@@ -1,7 +1,7 @@
-#include "mathc/float.h"
 #include "r/ro_single.h"
 #include "r/texture.h"
 #include "u/pose.h"
+#include "mathc/float.h"
 #include "camera.h"
 #include "tilemap.h"
 #include "airstroke.h"

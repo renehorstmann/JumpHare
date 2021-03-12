@@ -1,9 +1,7 @@
-#include "utilc/assume.h"
 #include "r/texture.h"
+#include "utilc/assume.h"
 #include "io.h"
 #include "tiles.h"
-
-#include "mathc/uchar.h"
 
 struct TilesGlobals_s tiles;
 
