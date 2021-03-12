@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "tilemap.h"
 #include "airstroke.h"
+#include "dirt_particles.h"
 #include "dead.h"
 #include "tiles.h"
 #include "hare.h"
@@ -48,6 +49,8 @@ static struct {
 	
 	float animate_time;
 	bool animate_looking_left;
+	
+	float particle_add;
 } L;
 
 
@@ -305,6 +308,16 @@ void hare_update(float dtime) {
 	animate(dtime);
 	
 	check_state_change();
+	
+	if(L.state == HARE_GROUNDED && sca_abs(L.speed.x) > 10) {
+	    L.particle_add += sca_abs(L.speed.x)/2 * dtime;
+	    int add = L.particle_add;
+	    L.particle_add-=add;
+	    vec2 particle_pos = L.pos;
+	    particle_pos.y -= 7;
+	    vec2 particle_dir = {{-L.speed.x/10, 10}};
+	    dirt_particles_add(particle_pos, particle_dir, (Color_s){{100, 50, 50, 255}}, add);
+	}
 	
 	// debug
 	char text[64];

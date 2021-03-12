@@ -3,6 +3,7 @@
 #include "tilemap.h"
 #include "hare.h"
 #include "airstroke.h"
+#include "dirt_particles.h"
 #include "dead.h"
 #include "controller.h"
 #include "camera_control.h"
@@ -34,6 +35,7 @@ void level_init(int lvl) {
     tilemap_init("res/levels/level_01.png");
     hare_init();
     airstroke_init();
+    dirt_particles_init();
     dead_init(dead_callback, NULL);
     controller_init();
     camera_control_init();
@@ -44,6 +46,7 @@ void level_kill() {
     tilemap_kill();
     hare_kill();
     airstroke_kill();
+    dirt_particles_kill();
     dead_kill();
     controller_kill();
     camera_control_kill();
@@ -55,6 +58,7 @@ void level_update(float dtime) {
         tilemap_update(dtime);
         hare_update(dtime);
         airstroke_update(dtime);
+        dirt_particles_update(dtime);
         controller_update(dtime);
     }
     dead_update(dtime);
@@ -64,6 +68,7 @@ void level_update(float dtime) {
 void level_render() {
     background_render();
     tilemap_render_back();
+    dirt_particles_render();
     airstroke_render();
     hare_render();
     tilemap_render_front();
