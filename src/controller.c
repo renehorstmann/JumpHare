@@ -83,6 +83,11 @@ void controller_init() {
     r_ro_single_init(&L.background_ro, hud_camera.gl, r_texture_init_file("res/hud_background.png", NULL));
 }
 
+void controller_kill() {
+    e_input_unregister_pointer_event(pointer_event);
+    r_ro_single_kill(&L.background_ro);
+}
+
 void controller_update(float dtime) {
 #ifdef GLES
     pointer_ctrl(dtime);

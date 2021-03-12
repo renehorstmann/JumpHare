@@ -122,7 +122,6 @@ static void check_collision_grounded() {
 	} else if(L.state == HARE_GROUNDED){
 		L.state = HARE_FALLING;
 		L.speed.y = 0;
-		puts("falling");
 	}
 }
 
@@ -136,7 +135,6 @@ static void check_collision_falling() {
 		// jump collision?
 		L.pos.y = sca_min(a, b) - 8;
 		L.speed.y = 0;
-		puts("jump collision");
 	}
 
 	a = tilemap_wall_left(L.pos.x, L.pos.y-10, NULL);
@@ -165,7 +163,6 @@ static void check_collision_falling() {
 		L.pos.y = sca_max(a, b) + 14;
 		L.state = HARE_GROUNDED;
 		L.speed.y = 0;
-		puts("grounded");
 	}
 	
 }
@@ -236,9 +233,6 @@ void hare_kill() {
 }
 
 void hare_update(float dtime) {
-	if(dead_is_dead())
-	    return;
-	    
 	L.prev_state = L.state;
     vec2 prev_pos = L.pos;
     

@@ -10,6 +10,8 @@ extern struct CameraControlGlobals_s camera_control;
 
 void camera_control_init();
 
+void camera_control_kill();
+
 void camera_control_update(float dtime);
 
 #endif //JUMPHARE_CAMERA_CONTROL_H

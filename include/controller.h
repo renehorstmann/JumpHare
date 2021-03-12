@@ -3,6 +3,8 @@
 
 void controller_init();
 
+void controller_kill();
+
 void controller_update(float dtime);
 
 void controller_render();

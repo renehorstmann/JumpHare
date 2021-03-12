@@ -35,6 +35,10 @@ void camera_control_init() {
 	camera_set_pos(camera_control.pos.x, camera_control.pos.y);
 }
 
+void camera_control_kill() {
+
+}
+
 void camera_control_update(float dtime) {
 //	vec2_println(camera_control.pos);
 	vec2 h = hare_position();
