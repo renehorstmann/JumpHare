@@ -16,6 +16,7 @@ In active developmemt
 
 ## Todo
 - draw foreground
+- run particles
 - hare double jump animation
 - draw tiles
 - non final sound effects?
