@@ -17,6 +17,9 @@ In active developmemt
 ## Todo
 - draw foreground
 - hare double jump animation
+- draw tiles
+- non final sound effects?
+- enemies
 - control optimization
   - visualization
 
