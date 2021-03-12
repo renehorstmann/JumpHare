@@ -146,91 +146,95 @@ float tilemap_border_bottom() {
 float tilemap_ground(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
-    Color_s tile = COLOR_TRANSPARENT;
-    Color_s id = COLOR_TRANSPARENT;
-    while(c>=0 && c<L.map->cols 
+    while(c>=0 && c<L.map->cols
         && r>=0 && r<L.map->rows) {
-        tile = *image_pixel(L.map, 0, c, r);
+        Color_s tile = *image_pixel(L.map, 0, c, r);
         if(!color_equals(tile, COLOR_TRANSPARENT)) {
             int pc = tile_pixel_c(x);
             for(int pr=0; pr<TILES_SIZE; pr++) {
-                id = tiles_pixel(tile, 1, pc, pr); 
-        	    if(!color_equals(id, COLOR_TRANSPARENT))
-        		    return sca_min(tile_y(r) - pr, y);
+                Color_s id = tiles_pixel(tile, 1, pc, pr);
+        	    if(!color_equals(id, COLOR_TRANSPARENT)) {
+        	        if(opt_id)
+        	            *opt_id = id;
+                    return sca_min(tile_y(r) - pr, y);
+                }
             }
         }
         r++;
     }
     if(opt_id)
-    	*opt_id = id;
+    	*opt_id = COLOR_TRANSPARENT;
     return -FLT_MAX;
 }
 
 float tilemap_ceiling(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
-    Color_s tile = COLOR_TRANSPARENT;
-    Color_s id = COLOR_TRANSPARENT;
     while(c>=0 && c<L.map->cols 
         && r>=0 && r<L.map->rows) {
-        tile = *image_pixel(L.map, 0, c, r);
+        Color_s tile = *image_pixel(L.map, 0, c, r);
         if(!color_equals(tile, COLOR_TRANSPARENT)) {
             int pc = tile_pixel_c(x);
             for(int pr=TILES_SIZE-1; pr>=0; pr--) {
-        	    id = tiles_pixel(tile, 1, pc, pr); 
-        	    if(!color_equals(id, COLOR_TRANSPARENT))
-        		    return sca_max(tile_y(r) - pr - 1, y);
+        	    Color_s id = tiles_pixel(tile, 1, pc, pr);
+        	    if(!color_equals(id, COLOR_TRANSPARENT)) {
+        	        if(opt_id)
+        	            *opt_id = id;
+                    return sca_max(tile_y(r) - pr - 1, y);
+                }
             }
         }
         r--;
     }
     if(opt_id)
-    	*opt_id = id;
+    	*opt_id = COLOR_TRANSPARENT;
     return FLT_MAX;
 }
 
 float tilemap_wall_left(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
-    Color_s tile = COLOR_TRANSPARENT;
-    Color_s id = COLOR_TRANSPARENT;
     while(c>=0 && c<L.map->cols 
         && r>=0 && r<L.map->rows) {
-        tile = *image_pixel(L.map, 0, c, r);
+        Color_s tile = *image_pixel(L.map, 0, c, r);
         if(!color_equals(tile, COLOR_TRANSPARENT)) {
             int pr = tile_pixel_r(y);
             for(int pc=TILES_SIZE-1; pc>=0; pc--) {
-        	    id = tiles_pixel(tile, 1, pc, pr); 
-        	    if(!color_equals(id, COLOR_TRANSPARENT))
-        		    return sca_min(tile_x(c) + pc + 1, x);
+        	    Color_s id = tiles_pixel(tile, 1, pc, pr);
+        	    if(!color_equals(id, COLOR_TRANSPARENT)) {
+        	        if(opt_id)
+        	            *opt_id = id;
+                    return sca_min(tile_x(c) + pc + 1, x);
+                }
             }
         }
         c--;
     }
     if(opt_id)
-        *opt_id = id;
+        *opt_id = COLOR_TRANSPARENT;
     return tile_x(0);
 }
 
 float tilemap_wall_right(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
-    Color_s tile = COLOR_TRANSPARENT;
-    Color_s id = COLOR_TRANSPARENT;
     while(c>=0 && c<L.map->cols 
         && r>=0 && r<L.map->rows) {
-        tile = *image_pixel(L.map, 0, c, r);
+        Color_s tile = *image_pixel(L.map, 0, c, r);
         if(!color_equals(tile, COLOR_TRANSPARENT)) {
             int pr = tile_pixel_r(y);
             for(int pc=0; pc<TILES_SIZE; pc++) {
-        	    id = tiles_pixel(tile, 1, pc, pr); 
-        	    if(!color_equals(id, COLOR_TRANSPARENT))
-        		    return sca_max(tile_x(c) + pc, x);
+        	    Color_s id = tiles_pixel(tile, 1, pc, pr);
+        	    if(!color_equals(id, COLOR_TRANSPARENT)) {
+        	        if(opt_id)
+        	            *opt_id = id;
+                    return sca_max(tile_x(c) + pc, x);
+                }
             }
         }
         c++;
     }
     if(opt_id)
-        *opt_id = id;
+        *opt_id = COLOR_TRANSPARENT;
     return tile_x(L.map->cols);
 }

@@ -1,14 +1,17 @@
 #include "mathc/float.h"
 #include "r/ro_single.h"
-#include "r/ro_text.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "camera.h"
-#include "hud_camera.h"
 #include "tilemap.h"
 #include "airstroke.h"
 #include "dead.h"
+#include "tiles.h"
 #include "hare.h"
+
+// debug:
+#include "r/ro_text.h"
+#include "hud_camera.h"
 
 #define MIN_SPEED_X 20
 #define MAX_SPEED_X 100
@@ -113,12 +116,13 @@ static void check_collision_grounded() {
     if(L.speed.y > 0) {
         return; // To jump
     }
-	
+
 	a = tilemap_ground(L.pos.x-3, L.pos.y, NULL);
 	b = tilemap_ground(L.pos.x+3, L.pos.y, NULL);
 	
 	if(L.pos.y < a+17 || L.pos.y < b+17) {
 		L.pos.y = sca_max(a, b) + 14;
+
 	} else if(L.state == HARE_GROUNDED){
 		L.state = HARE_FALLING;
 		L.speed.y = 0;
@@ -283,6 +287,13 @@ void hare_update(float dtime) {
     	default:
     	    assert(0 && "invalid hare state");
         }
+    }
+
+    if(L.state == HARE_GROUNDED) {
+        Color_s state;
+        tilemap_ground(L.pos.x, L.pos.y, &state);
+        if(tiles_get_state(state) == TILES_PIXEL_KILL)
+            dead_set_dead(L.pos.x, L.pos.y);
     }
     
     if(L.pos.y < tilemap_border_bottom()) {

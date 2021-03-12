@@ -3,6 +3,7 @@
 #include "io.h"
 #include "tiles.h"
 
+#include "mathc/uchar.h"
 
 struct TilesGlobals_s tiles;
 
@@ -50,4 +51,14 @@ Color_s tiles_pixel(Color_s code, int layer, int pixel_c, int pixel_r) {
 	return *image_pixel(img, layer, 
 	    pixel_c + tile_col * TILES_SIZE,
 	    pixel_r + tile_row * TILES_SIZE);
+}
+
+enum tiles_pixel_state tiles_get_state(Color_s id) {
+    if(color_equals(id, COLOR_TRANSPARENT))
+        return TILES_PIXEL_EMPTY;
+
+    if(id.r > 150)
+        return TILES_PIXEL_KILL;
+
+    return TILES_PIXEL_SOLID;
 }
