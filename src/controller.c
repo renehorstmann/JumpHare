@@ -9,7 +9,7 @@
 
 #define UP_TIME 0.125
 #define JUMP_TIME 0.25
-#define MULTI_TIME 0.5
+#define MULTI_TIME 0.125
 #define DISTANCE 30
 
 static struct {
@@ -112,8 +112,7 @@ static void pointer_ctrl(float dtime) {
 	}
 	
 	vec2 pos;
-	if(multi_time>=MULTI_TIME
-	    || (single_time<MULTI_TIME && multi_time>=0)) {
+	if(single_time<MULTI_TIME && multi_time>=0) {
 		//pos = vec2_mix(L.pointer[0].pos.xy,
 		//               L.pointer[1].pos.xy,
 		//               0.5);

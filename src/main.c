@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
     camera_init();      // camera for the level
     hud_camera_init();  // camera for hud elements
     tiles_init();       // loads all tile textures
-    level_init(1);  // manages the gameplay (tilemap, hare, background, ...)
+    level_init(1);      // manages the gameplay (tilemap, hare, background, ...)
 
 
     e_window_main_loop(main_loop);
