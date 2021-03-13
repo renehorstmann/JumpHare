@@ -2,6 +2,7 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
+#include "mathc/utils/random.h"
 #include "camera.h"
 #include "tilemap.h"
 #include "airstroke.h"
@@ -50,7 +51,7 @@ static struct {
 	float animate_time;
 	bool animate_looking_left;
 	
-	float particle_add;
+	float emit_dirt_add;
 } L;
 
 
@@ -218,6 +219,34 @@ static void animate(float dtime) {
 	    L.ro.rect.uv = u_pose_new((1+frame) * w, v * h, -w, h);
 }
 
+static void emit_dirt(float dtime) {
+	if(L.state != HARE_GROUNDED 
+	    || sca_abs(L.speed.x) < 10) {
+	    return;
+	}
+	
+	Color_s id;
+	float ground = tilemap_ground(L.pos.x, L.pos.y, &id);
+	if(tiles_get_state(id) != TILES_PIXEL_SOLID_DIRTY) {
+		return;
+	}
+	
+	L.emit_dirt_add += sca_abs(L.speed.x)/2 * dtime;
+	int add = L.emit_dirt_add;
+	L.emit_dirt_add-=add;
+	
+	vec2 grab_pos = {{L.pos.x, ground}};
+	grab_pos = vec2_random_noise_vec(grab_pos, vec2_set(5));
+	
+	Color_s col = tilemap_pixel(0, grab_pos.x, grab_pos.y);
+	
+	vec2 particle_pos = L.pos;
+	particle_pos.y -= 7;
+	vec2 particle_dir = {{-L.speed.x/10, 10}};
+	dirt_particles_add(particle_pos, particle_dir, col, add);
+}
+
+
 
 void hare_init() {
 	L.state = L.prev_state = HARE_FALLING;
@@ -307,17 +336,9 @@ void hare_update(float dtime) {
 	
 	animate(dtime);
 	
-	check_state_change();
+	emit_dirt(dtime);
 	
-	if(L.state == HARE_GROUNDED && sca_abs(L.speed.x) > 10) {
-	    L.particle_add += sca_abs(L.speed.x)/2 * dtime;
-	    int add = L.particle_add;
-	    L.particle_add-=add;
-	    vec2 particle_pos = L.pos;
-	    particle_pos.y -= 7;
-	    vec2 particle_dir = {{-L.speed.x/10, 10}};
-	    dirt_particles_add(particle_pos, particle_dir, (Color_s){{100, 50, 50, 255}}, add);
-	}
+	check_state_change();
 	
 	// debug
 	char text[64];

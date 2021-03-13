@@ -22,4 +22,6 @@ float tilemap_ceiling(float x, float y, Color_s *opt_id);
 float tilemap_wall_left(float x, float y, Color_s *opt_id);
 float tilemap_wall_right(float x, float y, Color_s *opt_id);
 
+Color_s tilemap_pixel(int layer, float x, float y);
+
 #endif //JUMPHARE_TILEMAP_H

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "r/ro_batch.h"
 #include "u/pose.h"
 #include "mathc/sca/int.h"
@@ -237,4 +238,22 @@ float tilemap_wall_right(float x, float y, Color_s *opt_id) {
     if(opt_id)
         *opt_id = COLOR_TRANSPARENT;
     return tile_x(L.map->cols);
+}
+
+Color_s tilemap_pixel(int layer, float x, float y) {
+	assert(layer >= 0 && layer <= 1);
+	
+	int c = tile_c(x);
+    int r = tile_r(y);
+    
+    if(c<0 || c>=L.map->cols 
+        || r<0 || r>=L.map->rows) {
+        return COLOR_TRANSPARENT;
+    }
+    
+    Color_s tile = *image_pixel(L.map, 0, c, r);
+    int pc = tile_pixel_c(x);
+    int pr = tile_pixel_r(y);
+    
+    return tiles_pixel(tile, layer, pc, pr);
 }

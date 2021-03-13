@@ -7,7 +7,7 @@
 #include "dead.h"
 
 #define TIME 0.75
-#define ANIMATE_TIME 0.5
+#define ANIMATE_TIME 0.65
 #define START_SIZE 2048
 #define END_SIZE 512
 
