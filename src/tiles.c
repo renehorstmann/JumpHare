@@ -54,9 +54,15 @@ Color_s tiles_pixel(Color_s code, int layer, int pixel_c, int pixel_r) {
 enum tiles_pixel_state tiles_get_state(Color_s id) {
     if(color_equals(id, COLOR_TRANSPARENT))
         return TILES_PIXEL_EMPTY;
+        
+    // todo: use...
+    int qsum = ucvec4_sum(id);
 
-    if(id.r > 150)
+    if(id.r > 150 && id.g < 100)
         return TILES_PIXEL_KILL;
+        
+    if(id.r > 200 && id.g > 200)
+        return TILES_PIXEL_SOLID_CLEAN;
 
-    return TILES_PIXEL_SOLID;
+    return TILES_PIXEL_SOLID_DIRTY;
 }
