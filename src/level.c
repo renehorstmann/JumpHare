@@ -14,11 +14,26 @@ static struct {
    int state;
 } L;
 
+
+static void load_game() {
+	hare_init();
+    airstroke_init();
+    dirt_particles_init();
+    camera_control_init();
+}
+
+static void unload_game() {
+	hare_kill();
+	airstroke_kill();
+	dirt_particles_kill();
+	camera_control_kill();
+}
+
 static void reset() {
     int state = L.state;
-    level_kill();
+    unload_game();
     L.state = state;
-    level_init(L.current_lvl);
+    load_game();
 }
 
 static void dead_callback(void *ud) {
@@ -33,26 +48,22 @@ void level_init(int lvl) {
 
     background_init("res/backgrounds/greenhills.png");
     tilemap_init("res/levels/level_01.png");
-    hare_init();
-    airstroke_init();
-    dirt_particles_init();
     dead_init(dead_callback, NULL);
     controller_init();
-    camera_control_init();
+    
+    load_game();
 }
 
 void level_kill() {
     background_kill();
     tilemap_kill();
-    hare_kill();
-    airstroke_kill();
-    dirt_particles_kill();
     dead_kill();
     controller_kill();
-    camera_control_kill();
+    unload_game();
 }
 
 void level_update(float dtime) {
+    dead_update(dtime);
     if(!dead_is_dead()) {
         background_update(dtime);
         tilemap_update(dtime);
@@ -61,7 +72,6 @@ void level_update(float dtime) {
         dirt_particles_update(dtime);
         controller_update(dtime);
     }
-    dead_update(dtime);
     camera_control_update(dtime);
 }
 
