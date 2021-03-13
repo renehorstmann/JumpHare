@@ -7,8 +7,9 @@
 #include "dead.h"
 
 #define TIME 0.75
+#define ANIMATE_TIME 0.5
 #define START_SIZE 2048
-#define END_TIME 512
+#define END_SIZE 512
 
 static struct {
 	rRoSingle ro;
@@ -40,8 +41,8 @@ void dead_update(float dtime) {
 	    L.callback_called = true;
     }
 
-	float t = L.time/TIME;
-	float size = sca_mix(START_SIZE, END_TIME, t);
+	float t = sca_clamp(L.time/ANIMATE_TIME, 0, 1);
+	float size = sca_mix(START_SIZE, END_SIZE, t);
 	u_pose_set_size(&L.ro.rect.pose, size, size);
 	L.ro.rect.color.a = sca_mix(0, 0.75, t);
 }
