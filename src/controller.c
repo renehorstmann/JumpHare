@@ -9,11 +9,12 @@
 
 #define UP_TIME 0.125
 #define JUMP_TIME 0.25
+#define MULTI_TIME 0.5
 #define DISTANCE 30
 
 static struct {
     rRoSingle background_ro;
-    ePointer_s pointer;
+    ePointer_s pointer[2];
 } L;
 
 static bool in_control_area(vec2 pos) {
@@ -21,7 +22,7 @@ static bool in_control_area(vec2 pos) {
 }
 
 static void pointer_event(ePointer_s pointer, void *ud) {
-    if(pointer.id != 0)
+    if(pointer.id <0 || pointer.id >1)
         return;
         
     pointer.pos = mat4_mul_vec(hud_camera.matrices.p_inv, pointer.pos);
@@ -30,7 +31,7 @@ static void pointer_event(ePointer_s pointer, void *ud) {
         pointer.action = E_POINTER_UP;
     }
     
-    L.pointer = pointer;
+    L.pointer[pointer.id] = pointer;
 }
 
 static void key_ctrl() {
@@ -53,9 +54,41 @@ static void key_ctrl() {
 
 static void pointer_ctrl(float dtime) {
 	static float up_time = FLT_MAX;
+	static float multi_time = -1;
+	static float single_time = 0;
+	static int main_pointer = 0;
+	
+	int pointers_down = 0;
+	
+	if(L.pointer[0].action != E_POINTER_UP) {
+		pointers_down++;
+		if(main_pointer != 0 && L.pointer[1].action == E_POINTER_UP) {
+			main_pointer = 0;
+		}
+	}
+	
+	if(L.pointer[1].action != E_POINTER_UP) {
+		pointers_down++;
+		if(main_pointer != 1 && L.pointer[0].action == E_POINTER_UP) {
+			main_pointer = 1;
+		}
+	}
+	
+    // single time
+    if(pointers_down == 0) {
+    	single_time = 0;
+    }
+	if(pointers_down == 1) {
+		single_time += dtime;
+	}
+	
+	// stop multi time
+	if(pointers_down != 2) {
+		multi_time = -1;
+	}
 	
 	// stopping?
-	if(L.pointer.action == E_POINTER_UP) {
+	if(pointers_down == 0) {
 		up_time += dtime;
 		if(up_time>=UP_TIME) {
 			hare_set_speed(0);
@@ -68,16 +101,38 @@ static void pointer_ctrl(float dtime) {
 		hare_jump();
 	}
 	
-	// reset up_time, cause we are moving
-	up_time = 0;
+	// multi tap to jump
+	if(multi_time<0 && pointers_down == 2) {
+		multi_time = 0;
+		hare_jump();
+	}
 	
-	float speed = L.pointer.pos.x / DISTANCE;
+	if(multi_time>=0) {
+		multi_time += dtime;
+	}
+	
+	vec2 pos;
+	if(multi_time>=MULTI_TIME
+	    || (single_time<MULTI_TIME && multi_time>=0)) {
+		//pos = vec2_mix(L.pointer[0].pos.xy,
+		//               L.pointer[1].pos.xy,
+		//               0.5);
+		pos = vec2_set(0);
+	} else {
+		pos = L.pointer[main_pointer].pos.xy;
+	}
+	
+	float speed = pos.x / DISTANCE;
 	speed = sca_clamp(speed, -1, 1);
 	hare_set_speed(speed);
+	
+	// reset up_time, cause we are moving
+	up_time = 0;
 }
 
 void controller_init() {
-    L.pointer.action = E_POINTER_UP;
+    L.pointer[0].action = E_POINTER_UP;
+    L.pointer[1].action = E_POINTER_UP;
     e_input_register_pointer_event(pointer_event, NULL);
 
     r_ro_single_init(&L.background_ro, hud_camera.gl, r_texture_init_file("res/hud_background.png", NULL));
