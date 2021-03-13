@@ -52,6 +52,7 @@ static struct {
 	bool animate_looking_left;
 	
 	float emit_dirt_add;
+	int emit_dirt_next_add;
 } L;
 
 
@@ -231,9 +232,13 @@ static void emit_dirt(float dtime) {
 		return;
 	}
 	
-	L.emit_dirt_add += sca_abs(L.speed.x)/2 * dtime;
+	L.emit_dirt_add += sca_abs(L.speed.x)/6 * dtime;
 	int add = L.emit_dirt_add;
+	if(add < L.emit_dirt_next_add)
+	    return;
+	
 	L.emit_dirt_add-=add;
+	L.emit_dirt_next_add = sca_random_noise(6, 2);
 	
 	vec2 grab_pos = {{L.pos.x, ground}};
 	grab_pos = vec2_random_noise_vec(grab_pos, vec2_set(5));
@@ -242,7 +247,7 @@ static void emit_dirt(float dtime) {
 	
 	vec2 particle_pos = L.pos;
 	particle_pos.y -= 7;
-	vec2 particle_dir = {{-L.speed.x/10, 10}};
+	vec2 particle_dir = {{-L.speed.x/10, 12}};
 	dirt_particles_add(particle_pos, particle_dir, col, add);
 }
 

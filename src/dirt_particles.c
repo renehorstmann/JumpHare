@@ -8,8 +8,9 @@
 #include "dirt_particles.h"
 
 
-#define MAX_PARTCLES 1024
-#define LIFETIME 0.75
+#define MAX_PARTCLES 64
+#define LIFETIME 1.0
+#define SIZE 2.0
 
 static struct {
 	rRoParticle ro;
@@ -23,7 +24,7 @@ void dirt_particles_init() {
 	r_ro_particle_init(&L.ro, MAX_PARTCLES, camera.gl_main, tex);
 	
 	for(int i=0; i<L.ro.num; i++) {
-		u_pose_set_size(&L.ro.rects[i].pose, 1.5, 1.5);
+		u_pose_set_size(&L.ro.rects[i].pose, SIZE, SIZE);
 		L.ro.rects[i].color = vec4_set(0);
 		L.ro.rects[i].acc.y = -20;
 		L.ro.rects[i].color_speed.a = -1.0/LIFETIME;

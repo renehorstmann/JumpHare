@@ -16,17 +16,13 @@ In active developmemt
 
 ## Todo
 - draw foreground
-- run particles
-  - tiles state dirt
-  - color of dirt
-  - randomized adds (looks to smoothly)
 - hare double jump animation
 - draw tiles
 - non final sound effects?
 - enemies
 - control optimization
   - multi touch
-    - l + r = middle
+    - left + right = middle
   - visualization
 
 ## Compiling on Windows
