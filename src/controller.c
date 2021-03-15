@@ -36,13 +36,18 @@ static void pointer_event(ePointer_s pointer, void *ud) {
 
 static void key_ctrl() {
     static bool jumped = false;
+    static bool set_0 = true;
 
-    float speed_x = 0;
-    if (e_input.keys.right && !e_input.keys.left)
-        speed_x = 1;
-    if (e_input.keys.left && !e_input.keys.right)
-        speed_x = -1;
-    hare_set_speed(speed_x);
+    if (e_input.keys.right && !e_input.keys.left) {
+        hare_set_speed(1);
+        set_0 = false;
+    } else if (e_input.keys.left && !e_input.keys.right) {
+        hare_set_speed(-1);
+        set_0 = false;
+    } else if(!set_0) {
+        hare_set_speed(0);
+        set_0 = true;
+    }
 
     if (e_input.keys.space && !jumped) {
         jumped = true;
@@ -143,11 +148,8 @@ void controller_kill() {
 }
 
 void controller_update(float dtime) {
-#ifdef GLES
     pointer_ctrl(dtime);
-#else
     key_ctrl();
-#endif
     
     if (hud_camera_is_portrait_mode()) {
         float w = hud_camera_width();

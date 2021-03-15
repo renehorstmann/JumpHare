@@ -93,7 +93,6 @@ void e_window_kill() {
     L.running = false;
 }
 
-
 void e_window_main_loop(eWindowMainLoopFn main_loop) {
     L.main_loop_fn = main_loop;
     L.running = true;
