@@ -17,6 +17,7 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- check browser particle system failure
 - draw foreground
 - hare double jump animation
 - draw tiles
