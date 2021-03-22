@@ -24,11 +24,11 @@ struct CameraMatrices_s {
 struct CameraGlobals_s {
     mat4 matrices_p;
     mat4 matrices_p_inv;
-    
+
     struct CameraMatrices_s matrices_background[CAMERA_BACKGROUNDS];
     struct CameraMatrices_s matrices_main;
     struct CameraMatrices_s matrices_foreground;
-    
+
     const float *gl_background[CAMERA_BACKGROUNDS];
     const float *gl_main;
     const float *gl_foreground;
@@ -43,8 +43,11 @@ void camera_update();
 float camera_real_pixel_per_pixel();
 
 float camera_left();
+
 float camera_right();
+
 float camera_bottom();
+
 float camera_top();
 
 static float camera_width() {

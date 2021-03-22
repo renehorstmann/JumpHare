@@ -4,7 +4,7 @@
 #include "mathc/types/float.h"
 
 struct CameraControlGlobals_s {
-	vec2 pos;
+    vec2 pos;
 };
 extern struct CameraControlGlobals_s camera_control;
 

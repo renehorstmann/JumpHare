@@ -29,7 +29,7 @@ static void camera_matrices_update(struct CameraMatrices_s *self) {
 
 void camera_init() {
     assert(CAMERA_SIZE % 2 == 0 && "CAMERA_SIZE must be even");
-    
+
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera.gl_background[i] = &camera.matrices_background[i].vp.m00;
     camera.gl_main = &camera.matrices_main.vp.m00;
@@ -58,11 +58,11 @@ void camera_update() {
 
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
-    float left = -CAMERA_SIZE/2;
-    float top = CAMERA_SIZE/2;
+    float left = -CAMERA_SIZE / 2;
+    float top = CAMERA_SIZE / 2;
     float right = left + width;;
     float bottom = top - height;
-    
+
 
     camera.matrices_p = mat4_camera_ortho(left, right, bottom, top, -1, 1);
     camera.matrices_p_inv = mat4_inv(camera.matrices_p);
@@ -72,12 +72,12 @@ void camera_update() {
     camera_matrices_update(&camera.matrices_main);
     camera_matrices_update(&camera.matrices_foreground);
 
-    if(wnd_width < wnd_height) {
-    	bottom = top - height*CAMERA_SCREEN_WEIGHT;
+    if (wnd_width < wnd_height) {
+        bottom = top - height * CAMERA_SCREEN_WEIGHT;
     } else {
-    	right = left + width*CAMERA_SCREEN_WEIGHT;
+        right = left + width * CAMERA_SCREEN_WEIGHT;
     }
-    
+
     L.left = left;
     L.right = right;
     L.top = top;

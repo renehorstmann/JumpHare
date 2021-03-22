@@ -8,8 +8,8 @@
 
 typedef struct {
     int layers;
-	int rows, cols;
-	Color_s data[];
+    int rows, cols;
+    Color_s data[];
 } Image;
 
 Image *image_new_empty(int layers, int cols, int rows);
@@ -25,18 +25,18 @@ bool image_copy(Image *self, const Image *from);
 bool image_equals(const Image *self, const Image *from);
 
 static size_t image_data_size(const Image *self) {
-	return sizeof(Color_s) * self->layers * self->rows * self->cols;
+    return sizeof(Color_s) * self->layers * self->rows * self->cols;
 }
 
 static size_t image_full_size(const Image *self) {
-	return sizeof(Image) + image_data_size(self);
+    return sizeof(Image) + image_data_size(self);
 }
 
 static Color_s *image_pixel(Image *self, int layer, int c, int r) {
-	return &self->data[
-	    layer * self->rows * self->cols
-	    + r * self->cols
-	    + c];
+    return &self->data[
+            layer * self->rows * self->cols
+            + r * self->cols
+            + c];
 }
 
 static Color_s *image_pixel_index(Image *self, int layer, int index) {
@@ -48,8 +48,8 @@ static Color_s *image_layer(Image *self, int layer) {
 }
 
 static bool image_contains(const Image *img, int c, int r) {
-	return c >= 0 && c < img->cols 
-	    && r >= 0 && r < img->rows;
+    return c >= 0 && c < img->cols
+           && r >= 0 && r < img->rows;
 }
 
 #endif //JUMPHARE_IMAGE_H

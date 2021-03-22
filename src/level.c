@@ -14,24 +14,24 @@
 #include "level.h"
 
 static struct {
-   rRoBatch borders_ro;
-   int current_lvl;
-   int state;
+    rRoBatch borders_ro;
+    int current_lvl;
+    int state;
 } L;
 
 
 static void load_game() {
-	hare_init();
+    hare_init();
     airstroke_init();
     dirt_particles_init();
     camera_control_init();
 }
 
 static void unload_game() {
-	hare_kill();
-	airstroke_kill();
-	dirt_particles_kill();
-	camera_control_kill();
+    hare_kill();
+    airstroke_kill();
+    dirt_particles_kill();
+    camera_control_kill();
 }
 
 static void reset() {
@@ -46,7 +46,7 @@ static void dead_callback(void *ud) {
 }
 
 void level_init(int lvl) {
-    assume(lvl==1, "...");
+    assume(lvl == 1, "...");
 
     L.current_lvl = lvl;
 
@@ -55,18 +55,18 @@ void level_init(int lvl) {
     tilemap_init("res/levels/level_01.png");
     dead_init(dead_callback, NULL);
     controller_init();
-    
+
     load_game();
-    
+
     Color_s white_pixel = COLOR_WHITE;
     GLuint tex = r_texture_init(1, 1, white_pixel.v);
     r_ro_batch_init(&L.borders_ro, 4, camera.gl_main, tex);
-    
+
     // black borders
-    for(int i=0; i<4; i++) {
-    	L.borders_ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
+    for (int i = 0; i < 4; i++) {
+        L.borders_ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
     }
-    
+
     // border poses
     {
         float l = tilemap_border_left();
@@ -76,14 +76,14 @@ void level_init(int lvl) {
         float w = r - l;
         float h = t - b;
         L.borders_ro.rects[0].pose = u_pose_new_aa(
-                l-1024, t+1024, 1024, h+2048);
+                l - 1024, t + 1024, 1024, h + 2048);
         L.borders_ro.rects[1].pose = u_pose_new_aa(
-                l-1024, t+1024, w+2048, 1024);
+                l - 1024, t + 1024, w + 2048, 1024);
         L.borders_ro.rects[2].pose = u_pose_new_aa(
-                r, t+1024, 1024, h+2048);
+                r, t + 1024, 1024, h + 2048);
         L.borders_ro.rects[3].pose = u_pose_new_aa(
-                l-1024, b, w+2048, 1024);
-    
+                l - 1024, b, w + 2048, 1024);
+
     }
     r_ro_batch_update(&L.borders_ro);
 }
@@ -94,13 +94,13 @@ void level_kill() {
     dead_kill();
     controller_kill();
     unload_game();
-    
+
     r_ro_batch_kill(&L.borders_ro);
 }
 
 void level_update(float dtime) {
     dead_update(dtime);
-    if(!dead_is_dead()) {
+    if (!dead_is_dead()) {
         background_update(dtime);
         tilemap_update(dtime);
         hare_update(dtime);
@@ -119,9 +119,9 @@ void level_render() {
     hare_render();
     tilemap_render_front();
     dead_render();
-    
+
     r_ro_batch_render(&L.borders_ro);
-    
+
     controller_render();
 }
 

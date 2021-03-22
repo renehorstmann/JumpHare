@@ -4,11 +4,11 @@
 #include "mathc/types/float.h"
 
 enum hare_state {
-	HARE_GROUNDED,
-	HARE_FALLING,
-	HARE_JUMPING,
-	HARE_DOUBLE_JUMP,
-	HARE_NUM_STATES
+    HARE_GROUNDED,
+    HARE_FALLING,
+    HARE_JUMPING,
+    HARE_DOUBLE_JUMP,
+    HARE_NUM_STATES
 };
 
 void hare_init();

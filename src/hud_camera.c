@@ -51,12 +51,15 @@ float hud_camera_real_pixel_per_pixel() {
 float hud_camera_left() {
     return L.left;
 }
+
 float hud_camera_right() {
     return L.right;
 }
+
 float hud_camera_bottom() {
     return L.bottom;
 }
+
 float hud_camera_top() {
     return L.top;
 }

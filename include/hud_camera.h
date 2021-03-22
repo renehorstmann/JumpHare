@@ -24,7 +24,6 @@ struct HudCameraGlobals_s {
 extern struct HudCameraGlobals_s hud_camera;
 
 
-
 void hud_camera_init();
 
 void hud_camera_update();
@@ -32,8 +31,11 @@ void hud_camera_update();
 float hud_camera_real_pixel_per_pixel();
 
 float hud_camera_left();
+
 float hud_camera_right();
+
 float hud_camera_bottom();
+
 float hud_camera_top();
 
 static float hud_camera_width() {

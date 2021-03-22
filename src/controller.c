@@ -22,15 +22,15 @@ static bool in_control_area(vec2 pos) {
 }
 
 static void pointer_event(ePointer_s pointer, void *ud) {
-    if(pointer.id <0 || pointer.id >1)
+    if (pointer.id < 0 || pointer.id > 1)
         return;
-        
+
     pointer.pos = mat4_mul_vec(hud_camera.matrices.p_inv, pointer.pos);
 
     if (!in_control_area(pointer.pos.xy)) {
         pointer.action = E_POINTER_UP;
     }
-    
+
     L.pointer[pointer.id] = pointer;
 }
 
@@ -44,7 +44,7 @@ static void key_ctrl() {
     } else if (e_input.keys.left && !e_input.keys.right) {
         hare_set_speed(-1);
         set_0 = false;
-    } else if(!set_0) {
+    } else if (!set_0) {
         hare_set_speed(0);
         set_0 = true;
     }
@@ -58,80 +58,80 @@ static void key_ctrl() {
 }
 
 static void pointer_ctrl(float dtime) {
-	static float up_time = FLT_MAX;
-	static float multi_time = -1;
-	static float single_time = 0;
-	static int main_pointer = 0;
-	
-	int pointers_down = 0;
-	
-	if(L.pointer[0].action != E_POINTER_UP) {
-		pointers_down++;
-		if(main_pointer != 0 && L.pointer[1].action == E_POINTER_UP) {
-			main_pointer = 0;
-		}
-	}
-	
-	if(L.pointer[1].action != E_POINTER_UP) {
-		pointers_down++;
-		if(main_pointer != 1 && L.pointer[0].action == E_POINTER_UP) {
-			main_pointer = 1;
-		}
-	}
-	
-    // single time
-    if(pointers_down == 0) {
-    	single_time = 0;
+    static float up_time = FLT_MAX;
+    static float multi_time = -1;
+    static float single_time = 0;
+    static int main_pointer = 0;
+
+    int pointers_down = 0;
+
+    if (L.pointer[0].action != E_POINTER_UP) {
+        pointers_down++;
+        if (main_pointer != 0 && L.pointer[1].action == E_POINTER_UP) {
+            main_pointer = 0;
+        }
     }
-	if(pointers_down == 1) {
-		single_time += dtime;
-	}
-	
-	// stop multi time
-	if(pointers_down != 2) {
-		multi_time = -1;
-	}
-	
-	// stopping?
-	if(pointers_down == 0) {
-		up_time += dtime;
-		if(up_time>=UP_TIME) {
-			hare_set_speed(0);
-		}
-		return;
-	}
-	
-	// jump tap
-	if(up_time>0 && up_time<=JUMP_TIME) {
-		hare_jump();
-	}
-	
-	// multi tap to jump
-	if(multi_time<0 && pointers_down == 2) {
-		multi_time = 0;
-		hare_jump();
-	}
-	
-	if(multi_time>=0) {
-		multi_time += dtime;
-	}
-	
-	vec2 pos;
-	if(single_time<MULTI_TIME && multi_time>=0) {
-		//pos = vec2_mix(L.pointer[0].pos.xy,
-		//               L.pointer[1].pos.xy,
-		//               0.5);
-		pos = vec2_set(0);
-	} else {
-		pos = L.pointer[main_pointer].pos.xy;
-	}
-	
-	float speed = pos.x / DISTANCE;
-	speed = sca_clamp(speed, -1, 1);
-	hare_set_speed(speed);
-	
-	// reset up_time, cause we are moving
-	up_time = 0;
+
+    if (L.pointer[1].action != E_POINTER_UP) {
+        pointers_down++;
+        if (main_pointer != 1 && L.pointer[0].action == E_POINTER_UP) {
+            main_pointer = 1;
+        }
+    }
+
+    // single time
+    if (pointers_down == 0) {
+        single_time = 0;
+    }
+    if (pointers_down == 1) {
+        single_time += dtime;
+    }
+
+    // stop multi time
+    if (pointers_down != 2) {
+        multi_time = -1;
+    }
+
+    // stopping?
+    if (pointers_down == 0) {
+        up_time += dtime;
+        if (up_time >= UP_TIME) {
+            hare_set_speed(0);
+        }
+        return;
+    }
+
+    // jump tap
+    if (up_time > 0 && up_time <= JUMP_TIME) {
+        hare_jump();
+    }
+
+    // multi tap to jump
+    if (multi_time < 0 && pointers_down == 2) {
+        multi_time = 0;
+        hare_jump();
+    }
+
+    if (multi_time >= 0) {
+        multi_time += dtime;
+    }
+
+    vec2 pos;
+    if (single_time < MULTI_TIME && multi_time >= 0) {
+        //pos = vec2_mix(L.pointer[0].pos.xy,
+        //               L.pointer[1].pos.xy,
+        //               0.5);
+        pos = vec2_set(0);
+    } else {
+        pos = L.pointer[main_pointer].pos.xy;
+    }
+
+    float speed = pos.x / DISTANCE;
+    speed = sca_clamp(speed, -1, 1);
+    hare_set_speed(speed);
+
+    // reset up_time, cause we are moving
+    up_time = 0;
 }
 
 void controller_init() {
@@ -150,7 +150,7 @@ void controller_kill() {
 void controller_update(float dtime) {
     pointer_ctrl(dtime);
     key_ctrl();
-    
+
     if (hud_camera_is_portrait_mode()) {
         float w = hud_camera_width();
         float h = hud_camera_height() * HUD_CAMERA_SCREEN_WEIGHT;
