@@ -17,9 +17,6 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- update some
-  - ignore GL_RGB_SIZE attributes
-  - check context valid
 - check browser size camera position error
 - draw foreground
 - hare double jump animation
