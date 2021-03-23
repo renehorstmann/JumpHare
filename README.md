@@ -4,11 +4,13 @@ Based on [some](https://github.com/renehorstmann/some) framework.
 
 ## Art
 Pixelart was made with my [Pixelc](https://github.com/renehorstmann/pixelc) App.
+
 Tile maps are designed with [Tilec](https://github.com/renehorstmann/tilec).
+
 Both Apps are also based on [some](https://github.com/renehorstmann/some) framework.
 
 ## Live demo
-Compiled with Emscripten [livedemo](https://renehorstmann.github.io)
+Compiled with Emscripten: [livedemo](https://renehorstmann.github.io)
 
 ## Warning
 In active developmemt
