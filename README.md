@@ -10,7 +10,7 @@ Tile maps are designed with [Tilec](https://github.com/renehorstmann/tilec).
 Both Apps are also based on [some](https://github.com/renehorstmann/some) framework.
 
 ## Live demo
-Compiled with Emscripten: [livedemo](https://renehorstmann.github.io)
+Compiled with emscripten: [livedemo](https://renehorstmann.github.io)
 
 ## Warning
 In active developmemt
