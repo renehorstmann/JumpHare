@@ -45,5 +45,6 @@ gcc -o some src/* -Iinclude $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_t
 René Horstmann
 
 ## Licence
-The game ane its assets are licenced under GPLv3, see LICENCE.
+The game and its assets are licenced under GPLv3, see LICENCE.
+
 The [some](https://github.com/renehorstmann/some) framework is under MIT licence, see someLICENCE.
