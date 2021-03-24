@@ -3,6 +3,7 @@
 #include "u/pose.h"
 #include "mathc/sca/int.h"
 #include "mathc/sca/float.h"
+#include "utilc/assume.h"
 
 #include "tiles.h"
 #include "io.h"
@@ -128,6 +129,23 @@ void tilemap_render_front() {
     for (int i = 0; i < tiles.size; i++) {
 //        r_ro_batch_render(&L.ro_front[i]);
     }
+}
+
+int tilemap_get_positions(vec2 *out_positions, int max_positions, Color_s code, int layer) {
+    assume(layer <= L.map->layers, "invalid layer");
+    
+    int idx = 0;
+    for(int r=0; r<L.map->rows; r++) {
+        for(int c=0; c<L.map->cols; c++) {
+            if(color_equals(code, *image_pixel(L.map, layer, c, r))) {
+                out_positions[idx].x = tile_x(c);
+                out_positions[idx].y = tile_y(r);
+                if(++idx>=max_positions)
+                    return idx;
+            }
+        }
+    }
+    return idx;
 }
 
 float tilemap_border_left() {

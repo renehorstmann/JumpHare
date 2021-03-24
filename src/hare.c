@@ -252,8 +252,11 @@ static void emit_dirt(float dtime) {
 }
 
 
-void hare_init() {
+void hare_init(float pos_x, float pos_y) {
     L.state = L.prev_state = HARE_FALLING;
+    
+    L.pos.x = pos_x;
+    L.pos.y = pos_y;
 
     r_ro_single_init(&L.ro, camera.gl_main, r_texture_init_file("res/hare.png", NULL));
 

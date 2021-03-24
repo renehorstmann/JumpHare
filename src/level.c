@@ -13,15 +13,19 @@
 #include "camera.h"
 #include "level.h"
 
+const static Color_s START_CODE = {{0, 0, 2, 0}};
+
 static struct {
     rRoBatch borders_ro;
     int current_lvl;
     int state;
 } L;
 
-
 static void load_game() {
-    hare_init();
+    vec2 start_pos;
+    assume(tilemap_get_positions(&start_pos, 1, START_CODE, 1) == 1, "start not found");
+    
+    hare_init(start_pos.x, start_pos.y);
     airstroke_init();
     dirt_particles_init();
     camera_control_init();

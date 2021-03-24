@@ -1,6 +1,7 @@
 #ifndef JUMPHARE_TILEMAP_H
 #define JUMPHARE_TILEMAP_H
 
+#include "mathc/types/float.h"
 #include "color.h"
 
 void tilemap_init(const char *file);
@@ -12,6 +13,8 @@ void tilemap_update(float dtime);
 void tilemap_render_back();
 
 void tilemap_render_front();
+
+int tilemap_get_positions(vec2 *out_positions, int max_positions, Color_s code, int layer);
 
 float tilemap_border_left();
 

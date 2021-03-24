@@ -11,7 +11,7 @@ enum hare_state {
     HARE_NUM_STATES
 };
 
-void hare_init();
+void hare_init(float pos_x, float pos_y);
 
 void hare_kill();
 
