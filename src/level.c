@@ -49,6 +49,16 @@ static void reset() {
     load_game();
 }
 
+static void check_carrot() {
+    vec2 hare_pos = hare_position();
+    carrot_collect(hare_pos.x, hare_pos.y);
+    
+    vec2 strokes[AIRSTROKE_MAX];
+    int strokes_num = airstroke_get_positions(strokes, AIRSTROKE_MAX);
+    for(int i=0; i<strokes_num; i++)
+        carrot_collect(strokes[i].x, strokes[i].y);
+}
+
 static void dead_callback(void *ud) {
     reset();
 }
@@ -124,8 +134,7 @@ void level_update(float dtime) {
         dirt_particles_update(dtime);
         controller_update(dtime);
         
-        vec2 hare_pos = hare_position();
-        carrot_collect(hare_pos.x, hare_pos.y);
+        check_carrot();
     }
     camera_control_update(dtime);
 }

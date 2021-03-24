@@ -7,7 +7,6 @@
 #include "tilemap.h"
 #include "airstroke.h"
 
-#define MAX_STROKES 8
 
 #define SPEED -350
 #define FRAMES 4
@@ -21,13 +20,13 @@ typedef struct {
 
 static struct {
     rRoBatch ro;
-    Stroke strokes[MAX_STROKES];
+    Stroke strokes[AIRSTROKE_MAX];
 } L;
 
 void airstroke_init() {
-    r_ro_batch_init(&L.ro, MAX_STROKES, camera.gl_main, r_texture_init_file("res/airstroke.png", NULL));
+    r_ro_batch_init(&L.ro, AIRSTROKE_MAX, camera.gl_main, r_texture_init_file("res/airstroke.png", NULL));
 
-    for (int i = 0; i < MAX_STROKES; i++) {
+    for (int i = 0; i < AIRSTROKE_MAX; i++) {
         L.ro.rects[i].pose = u_pose_new_hidden();
         L.strokes[i].rect = &L.ro.rects[i];
     }
@@ -40,7 +39,7 @@ void airstroke_kill() {
 }
 
 void airstroke_update(float dtime) {
-    for (int i = 0; i < MAX_STROKES; i++) {
+    for (int i = 0; i < AIRSTROKE_MAX; i++) {
         Stroke *s = &L.strokes[i];
 
         // check dead
@@ -94,6 +93,18 @@ void airstroke_add(float x, float y) {
     s->time = 0;
     s->hit = 0;
 
-    next = (next + 1) % MAX_STROKES;
+    next = (next + 1) % AIRSTROKE_MAX;
 }
 
+int airstroke_get_positions(vec2 *out_positions, int max_positions) {
+    int idx = 0;
+    for(int i=0; i<AIRSTROKE_MAX; i++) {
+        if(L.strokes[i].time < 0)
+            continue;
+        out_positions[i].x = u_pose_get_x(L.ro.rects[i].pose);
+        out_positions[i].y = u_pose_get_y(L.ro.rects[i].pose);
+        if(++idx >= max_positions)
+            return idx;
+    }
+    return idx;
+}
