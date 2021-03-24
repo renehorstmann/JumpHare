@@ -19,6 +19,10 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- carrot mini cnt + collect move
+- carrot save_state + load_state
+  - save on checkpoint creation
+  - load on dead
 - check browser size camera position error
 - draw foreground
 - hare double jump animation
