@@ -13,6 +13,8 @@
 #define COLLECT_SHRINK_SPEED 96
 
 #define NUM_PARTICLES 256
+#define PARTICLE_SIZE 2.0
+#define PARTICLE_SPEED 100.0
 #define PARTICLE_TIME 1.0
 
 static const vec3 PARTICLE_COLOR = {{1, 0.65, 0}};
@@ -29,9 +31,9 @@ static struct {
 static void collect_particles(float x, float y) {
     for(int i=0; i<L.collect_ro.num; i++) {
         rParticleRect_s *r = &L.collect_ro.rects[i];
-        r->pose = u_pose_new(x, y, 1, 1);
+        r->pose = u_pose_new(x, y, PARTICLE_SIZE, PARTICLE_SIZE);
         float angle = sca_random_range(0, 2*M_PI);
-        float speed = sca_random_range(10, 100);
+        float speed = sca_random_range(0.1*PARTICLE_SPEED, PARTICLE_SPEED);
         r->speed.x = sca_cos(angle) * speed;
         r->speed.y = sca_sin(angle) * speed;
         r->acc.xy = vec2_scale(r->speed.xy, -0.5/PARTICLE_TIME);
