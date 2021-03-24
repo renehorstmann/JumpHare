@@ -43,12 +43,14 @@ void airstroke_kill() {
 void airstroke_update(float dtime) {
     for (int i = 0; i < AIRSTROKE_MAX; i++) {
         Stroke *s = &L.strokes[i];
-        s->prev_pos = u_pose_get_xy(s->rect->pose);
-
+       
         // check dead
         if (s->time < 0) {
             continue;
         }
+        
+        s->prev_pos = u_pose_get_xy(s->rect->pose);
+
 
         if (!s->hit) {
             vec2 pos = u_pose_get_xy(s->rect->pose);
@@ -103,7 +105,7 @@ int airstroke_positions(vec2 *out_positions, int max_positions) {
     for(int i=0; i<AIRSTROKE_MAX; i++) {
         if(L.strokes[i].time < 0)
             continue;
-        out_positions[i] = u_pose_get_xy(L.ro.rects[i].pose);
+        out_positions[idx] = u_pose_get_xy(L.ro.rects[i].pose);
         if(++idx >= max_positions)
             return idx;
     }
@@ -115,7 +117,7 @@ int airstroke_prev_positions(vec2 *out_prev_positions, int max_positions) {
     for(int i=0; i<AIRSTROKE_MAX; i++) {
         if(L.strokes[i].time < 0)
             continue;
-        out_prev_positions[i] = L.strokes[i].prev_pos;
+        out_prev_positions[idx] = L.strokes[i].prev_pos;
         if(++idx >= max_positions)
             return idx;
     }

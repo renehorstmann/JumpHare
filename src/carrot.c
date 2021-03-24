@@ -142,7 +142,7 @@ bool carrot_collect(vec2 pos, vec2 prev_pos) {
     for(int i=0; i<3; i++) {
         if(L.collected[i])
             continue;
-        if(u_pose_aa_intersects_line(L.carrot_ro.rects[i].pose, prev_pos, pos)) {
+        if(u_pose_aa_contains(L.carrot_ro.rects[i].pose, pos)) {
             L.collected[i] = true;
             float cx = u_pose_get_x(L.carrot_ro.rects[i].pose);
             float cy = u_pose_get_y(L.carrot_ro.rects[i].pose);

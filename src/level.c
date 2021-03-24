@@ -61,8 +61,6 @@ static void check_carrot() {
     
     assume(airstroke_prev_positions(prev_strokes, AIRSTROKE_MAX) == strokes_num, "wtf");
     for(int i=0; i<strokes_num; i++) {
-        //vec2_print(strokes[i]);
-        //vec2_println(prev_strokes[i]);
         carrot_collect(strokes[i], prev_strokes[i]);
     }
 }
