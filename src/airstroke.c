@@ -16,6 +16,7 @@ typedef struct {
     rRect_s *rect;
     float time;
     bool hit;
+    vec2 prev_pos;
 } Stroke;
 
 static struct {
@@ -41,6 +42,7 @@ void airstroke_kill() {
 void airstroke_update(float dtime) {
     for (int i = 0; i < AIRSTROKE_MAX; i++) {
         Stroke *s = &L.strokes[i];
+        s->prev_pos = u_pose_get_xy(s->rect->pose);
 
         // check dead
         if (s->time < 0) {
@@ -48,18 +50,17 @@ void airstroke_update(float dtime) {
         }
 
         if (!s->hit) {
-            float x = u_pose_get_x(s->rect->pose);
-            float y = u_pose_get_y(s->rect->pose);
-            float ground = tilemap_ground(x, y, NULL);
+            vec2 pos = u_pose_get_xy(s->rect->pose);
+            float ground = tilemap_ground(pos.x, pos.y, NULL);
 
-            y += SPEED * dtime;
-            if (y <= ground + 12) {
+            pos.y += SPEED * dtime;
+            if (pos.y <= ground + 12) {
                 s->hit = true;
                 s->time = 0;
-                y = ground + 12;
+                pos.y = ground + 12;
             }
 
-            u_pose_set_y(&s->rect->pose, y);
+            u_pose_set_y(&s->rect->pose, pos.y);
         }
 
         s->time += dtime;
@@ -96,13 +97,24 @@ void airstroke_add(float x, float y) {
     next = (next + 1) % AIRSTROKE_MAX;
 }
 
-int airstroke_get_positions(vec2 *out_positions, int max_positions) {
+int airstroke_positions(vec2 *out_positions, int max_positions) {
     int idx = 0;
     for(int i=0; i<AIRSTROKE_MAX; i++) {
         if(L.strokes[i].time < 0)
             continue;
-        out_positions[i].x = u_pose_get_x(L.ro.rects[i].pose);
-        out_positions[i].y = u_pose_get_y(L.ro.rects[i].pose);
+        out_positions[i] = u_pose_get_xy(L.ro.rects[i].pose);
+        if(++idx >= max_positions)
+            return idx;
+    }
+    return idx;
+}
+
+int airstroke_prev_positions(vec2 *out_prev_positions, int max_positions) {
+    int idx = 0;
+    for(int i=0; i<AIRSTROKE_MAX; i++) {
+        if(L.strokes[i].time < 0)
+            continue;
+        out_prev_positions[i] = L.strokes[i].prev_pos;
         if(++idx >= max_positions)
             return idx;
     }

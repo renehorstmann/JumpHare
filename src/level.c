@@ -52,13 +52,15 @@ static void reset() {
 }
 
 static void check_carrot() {
-    vec2 hare_pos = hare_position();
-    carrot_collect(hare_pos.x, hare_pos.y);
+    carrot_collect(hare_position(), hare_prev_position());
     
     vec2 strokes[AIRSTROKE_MAX];
-    int strokes_num = airstroke_get_positions(strokes, AIRSTROKE_MAX);
+    vec2 prev_strokes[AIRSTROKE_MAX];
+    int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
+    
+    assume(airstroke_prev_positions(prev_strokes, AIRSTROKE_MAX) == strokes_num, "wtf");
     for(int i=0; i<strokes_num; i++)
-        carrot_collect(strokes[i].x, strokes[i].y);
+        carrot_collect(strokes[i], prev_strokes[i]);
 }
 
 static void dead_callback(void *ud) {

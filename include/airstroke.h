@@ -15,7 +15,9 @@ void airstroke_render();
 
 void airstroke_add(float x, float y);
 
-int airstroke_get_positions(vec2 *out_positions, int max_positions);
+int airstroke_positions(vec2 *out_positions, int max_positions);
+
+int airstroke_prev_positions(vec2 *out_prev_positions, int max_positions);
 
 
 #endif //JUMPHARE_AIRSTROKE_H

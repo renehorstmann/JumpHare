@@ -12,7 +12,7 @@ void carrot_update(float dtime);
 
 void carrot_render();
 
-bool carrot_collect(float x, float y);
+bool carrot_collect(vec2 pos, vec2 prev_pos);
 
 void carrot_save();
 

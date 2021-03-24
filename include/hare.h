@@ -23,6 +23,8 @@ enum hare_state hare_state();
 
 vec2 hare_position();
 
+vec2 hare_prev_position();
+
 // [-1 : 1]
 void hare_set_speed(float dx);
 

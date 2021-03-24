@@ -40,7 +40,7 @@ static struct {
 
     enum hare_state state, prev_state;
 
-    vec2 pos;
+    vec2 pos, prev_pos;
     vec2 speed;
 
     float jump_time;
@@ -277,7 +277,7 @@ void hare_kill() {
 
 void hare_update(float dtime) {
     L.prev_state = L.state;
-    vec2 prev_pos = L.pos;
+    L.prev_pos = L.pos;
 
     // check jumping
     if (L.set_jump_time <= 0) {
@@ -312,7 +312,7 @@ void hare_update(float dtime) {
     float dist = vec2_distance(L.pos, dst_pos);
     int checks = ceilf(dist / COLLISION_DISTANCE);
     for (int i = 1; i <= checks; i++) {
-        L.pos = vec2_mix(prev_pos, dst_pos, (float) i / checks);
+        L.pos = vec2_mix(L.prev_pos, dst_pos, (float) i / checks);
 
         switch (L.state) {
             case HARE_GROUNDED:
@@ -368,6 +368,10 @@ enum hare_state hare_state() {
 
 vec2 hare_position() {
     return (vec2) {{L.pos.x, L.pos.y}};
+}
+
+vec2 hare_prev_position() {
+    return (vec2) {{L.prev_pos.x, L.prev_pos.y}};
 }
 
 // [-1 : 1]
