@@ -19,7 +19,9 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- carrot mini cnt + collect move
+- carrot mini collect move
+- collision detection for carrots)
+  - stroke can jump over the carrot :/
 - carrot save_state + load_state
   - save on checkpoint creation
   - load on dead

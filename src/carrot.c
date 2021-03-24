@@ -29,6 +29,10 @@ static struct {
     bool collected[3];
     int collected_cnt;
     float time;
+    
+    struct {
+        bool collected[3];
+    } save;
 } L;
 
 
@@ -150,3 +154,40 @@ bool carrot_collect(float x, float y) {
     }
     return false;
 }
+
+void carrot_save() {
+    memcpy(L.save.collected, L.collected, sizeof(L.collected));
+}
+
+void carrot_load() {
+    memcpy(L.collected, L.save.collected, sizeof(L.collected));
+    L.collected_cnt = 0;
+    
+    
+    // particles
+    for(int i=0; i<L.particle_ro.num; i++) {
+        L.particle_ro.rects[i].pose = u_pose_new_hidden();
+    }
+    r_ro_particle_update(&L.particle_ro);
+    
+    // hud carrots
+    for(int i=0; i<3; i++) {
+        L.cnt_ro.rects[i].pose = u_pose_new_hidden();
+    }
+    r_ro_batch_update(&L.cnt_ro);
+    for(int i=0; i<3; i++) {
+        if(L.collected[i])
+            collect_cnt(-1, -1);
+    }
+    
+    // in game carrots
+    for(int i=0; i<3; i++) {
+        if(L.collected[i]) {
+            u_pose_set_size(&L.carrot_ro.rects[i].pose, 0, 0);
+        } else {
+            u_pose_set_size_angle(&L.carrot_ro.rects[i].pose, 16, 32, 0);
+        }
+    }
+    r_ro_batch_update(&L.carrot_ro);
+}
+

@@ -47,6 +47,8 @@ static void reset() {
     unload_game();
     L.state = state;
     load_game();
+    
+    carrot_load();
 }
 
 static void check_carrot() {

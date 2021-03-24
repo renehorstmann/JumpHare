@@ -14,5 +14,8 @@ void carrot_render();
 
 bool carrot_collect(float x, float y);
 
+void carrot_save();
+
+void carrot_load();
 
 #endif //JUMPHARE_CARROT_H
