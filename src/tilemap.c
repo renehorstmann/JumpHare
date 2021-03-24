@@ -131,7 +131,7 @@ void tilemap_render_front() {
     }
 }
 
-int tilemap_get_positions(vec2 *out_positions, int max_positions, Color_s code, int layer) {
+int tilemap_get_positions_aa(vec2 *out_positions, int max_positions, Color_s code, int layer) {
     assume(layer <= L.map->layers, "invalid layer");
     
     int idx = 0;
@@ -146,6 +146,16 @@ int tilemap_get_positions(vec2 *out_positions, int max_positions, Color_s code, 
         }
     }
     return idx;
+}
+
+int tilemap_get_positions(vec2 *out_positions, int max_positions, Color_s code, int layer) {
+    int cnt = tilemap_get_positions_aa(out_positions, max_positions, code, layer);
+    
+    for(int i=0; i<cnt; i++) {
+        out_positions[i].x += TILES_SIZE/2.0;
+        out_positions[i].y -= TILES_SIZE/2.0;
+    }
+    return cnt;
 }
 
 float tilemap_border_left() {

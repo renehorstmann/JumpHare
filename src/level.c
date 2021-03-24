@@ -6,6 +6,7 @@
 #include "tilemap.h"
 #include "hare.h"
 #include "airstroke.h"
+#include "carrot.h"
 #include "dirt_particles.h"
 #include "dead.h"
 #include "controller.h"
@@ -14,6 +15,9 @@
 #include "level.h"
 
 const static Color_s START_CODE = {{0, 0, 2, 0}};
+const static Color_s CARROT_CODE = {{0, 0, 2, 1}};
+
+
 
 static struct {
     rRoBatch borders_ro;
@@ -57,8 +61,14 @@ void level_init(int lvl) {
 
     background_init("res/backgrounds/greenhills.png");
     tilemap_init("res/levels/level_01.png");
+    
+    vec2 carrot_pos[3];
+    assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, 1) == 3, "level needs 3 carrots");
+    carrot_init(carrot_pos);
+    
     dead_init(dead_callback, NULL);
     controller_init();
+    
 
     load_game();
 
@@ -95,6 +105,7 @@ void level_init(int lvl) {
 void level_kill() {
     background_kill();
     tilemap_kill();
+    carrot_kill();
     dead_kill();
     controller_kill();
     unload_game();
@@ -107,6 +118,7 @@ void level_update(float dtime) {
     if (!dead_is_dead()) {
         background_update(dtime);
         tilemap_update(dtime);
+        carrot_update(dtime);
         hare_update(dtime);
         airstroke_update(dtime);
         dirt_particles_update(dtime);
@@ -118,6 +130,7 @@ void level_update(float dtime) {
 void level_render() {
     background_render();
     tilemap_render_back();
+    carrot_render();
     dirt_particles_render();
     airstroke_render();
     hare_render();
