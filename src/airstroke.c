@@ -30,6 +30,7 @@ void airstroke_init() {
     for (int i = 0; i < AIRSTROKE_MAX; i++) {
         L.ro.rects[i].pose = u_pose_new_hidden();
         L.strokes[i].rect = &L.ro.rects[i];
+        L.strokes[i].time = -1;
     }
     r_ro_batch_update(&L.ro);
 }

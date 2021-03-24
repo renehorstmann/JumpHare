@@ -1,6 +1,7 @@
 #include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
+#include "mathc/float.h"
 #include "utilc/assume.h"
 #include "background.h"
 #include "tilemap.h"
@@ -59,8 +60,11 @@ static void check_carrot() {
     int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
     
     assume(airstroke_prev_positions(prev_strokes, AIRSTROKE_MAX) == strokes_num, "wtf");
-    for(int i=0; i<strokes_num; i++)
+    for(int i=0; i<strokes_num; i++) {
+        //vec2_print(strokes[i]);
+        //vec2_println(prev_strokes[i]);
         carrot_collect(strokes[i], prev_strokes[i]);
+    }
 }
 
 static void dead_callback(void *ud) {
