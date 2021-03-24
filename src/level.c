@@ -123,6 +123,9 @@ void level_update(float dtime) {
         airstroke_update(dtime);
         dirt_particles_update(dtime);
         controller_update(dtime);
+        
+        vec2 hare_pos = hare_position();
+        carrot_collect(hare_pos.x, hare_pos.y);
     }
     camera_control_update(dtime);
 }
