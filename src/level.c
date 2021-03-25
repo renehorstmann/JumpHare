@@ -127,6 +127,10 @@ void level_kill() {
 }
 
 void level_update(float dtime) {
+    static int cnt =0;
+    cnt++;
+    if(cnt%2000 != 0)
+        return;
     dead_update(dtime);
     if (!dead_is_dead()) {
         background_update(dtime);
