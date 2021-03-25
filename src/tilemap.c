@@ -16,6 +16,7 @@
 static struct {
     rRoBatch ro_back[MAX_TILES];
 //    rRoBatch ro_front[MAX_TILES];
+    bool ro_back_active[MAX_TILES];
     Image *map;
 } L;
 
@@ -79,6 +80,9 @@ void tilemap_init(const char *file) {
     }
 
     for (int i = 0; i < tiles.size; i++) {
+        L.ro_back_active[i] = tile_nums[i] > 0;
+        if(!L.ro_back_active[i])
+            continue;
         r_ro_batch_init(&L.ro_back[i], tile_nums[i], camera.gl_main, tiles.textures[i]);
         L.ro_back[i].owns_tex = false;
     }
@@ -101,7 +105,8 @@ void tilemap_init(const char *file) {
     }
 
     for (int i = 0; i < tiles.size; i++) {
-        r_ro_batch_update(&L.ro_back[i]);
+        if(L.ro_back_active[i])
+            r_ro_batch_update(&L.ro_back[i]);
 //        r_ro_batch_update(&L.ro_front[i]);
     }
 }
@@ -109,7 +114,8 @@ void tilemap_init(const char *file) {
 void tilemap_kill() {
     image_delete(L.map);
     for (int i = 0; i < tiles.size; i++) {
-        r_ro_batch_kill(&L.ro_back[i]);
+        if(L.ro_back_active[i])
+            r_ro_batch_kill(&L.ro_back[i]);
 //        r_ro_batch_kill(&L.ro_front[i]);
     }
     memset(&L, 0, sizeof(L));
@@ -121,7 +127,8 @@ void tilemap_update(float dtime) {
 
 void tilemap_render_back() {
     for (int i = 0; i < tiles.size; i++) {
-        r_ro_batch_render(&L.ro_back[i]);
+        if(L.ro_back_active[i])
+            r_ro_batch_render(&L.ro_back[i]);
     }
 }
 
