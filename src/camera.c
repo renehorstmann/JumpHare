@@ -19,12 +19,13 @@ static void camera_matrices_init(struct CameraMatrices_s *self) {
     self->v = mat4_eye();
     self->v_inv = mat4_eye();
     self->vp = mat4_eye();
+    self->v_p_inv = mat4_eye();
 }
 
 static void camera_matrices_update(struct CameraMatrices_s *self) {
     self->v_inv = mat4_inv(self->v);
     self->vp = mat4_mul_mat(camera.matrices_p, self->v_inv);
-//    camera.matrices.v_p_inv = mat4_mul_mat(camera.matrices.v, camera.matrices.p_inv);
+    self->v_p_inv = mat4_mul_mat(self->v, camera.matrices_p_inv);
 }
 
 void camera_init() {

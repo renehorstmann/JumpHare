@@ -152,6 +152,10 @@ bool carrot_collect(vec2 position) {
     return false;
 }
 
+int carrot_collected() {
+    return L.collected_cnt;
+}
+
 void carrot_save() {
     memcpy(L.save.collected, L.collected, sizeof(L.collected));
 }

@@ -18,7 +18,7 @@ struct CameraMatrices_s {
     mat4 v;
     mat4 v_inv;
     mat4 vp;
-//    mat4 v_p_inv;   // v @ p_inv
+    mat4 v_p_inv;   // v @ p_inv
 };
 
 struct CameraGlobals_s {
