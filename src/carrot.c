@@ -36,7 +36,7 @@ static struct {
 } L;
 
 
-static void collect_particles(float x, float y) {
+static void emit_particles(float x, float y) {
     for(int i=0; i<L.particle_ro.num; i++) {
         rParticleRect_s *r = &L.particle_ro.rects[i];
         r->pose = u_pose_new(x, y, PARTICLE_SIZE, PARTICLE_SIZE);
@@ -144,7 +144,7 @@ bool carrot_collect(vec2 position) {
         if(u_pose_aa_contains(L.carrot_ro.rects[i].pose, position)) {
             L.collected[i] = true;
             vec2 cxy = u_pose_get_xy(L.carrot_ro.rects[i].pose);
-            collect_particles(cxy.x, cxy.y);
+            emit_particles(cxy.x, cxy.y);
             collect_cnt(cxy.x, cxy.y);
             return true;
         }

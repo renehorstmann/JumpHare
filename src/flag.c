@@ -18,12 +18,37 @@
 #define MAX_DIST 40.0
 #define MIN_DIST 15.0
 
+#define MAX_PARTICLES 128
+#define PARTICLE_SIZE 2.0
+#define PARTICLE_SPEED 100.0
+#define PARTICLE_TIME 1.5
+
+
 static struct {
     rRoBatch flag_ro;
     rRoBatch btn_ro;
+    rRoParticle particle_ro;
     float time;
 } L;
 
+static void emit_particles(float x, float y) {
+    for(int i=0; i<L.particle_ro.num; i++) {
+        rParticleRect_s *r = &L.particle_ro.rects[i];
+        r->pose = u_pose_new(x, y, PARTICLE_SIZE, PARTICLE_SIZE);
+        float angle = sca_random_range(
+                sca_radians(90-20),
+                sca_radians(90+20));
+        float speed = sca_random_range(0.1*PARTICLE_SPEED, PARTICLE_SPEED);
+        r->speed.x = sca_cos(angle) * speed;
+        r->speed.y = sca_sin(angle) * speed;
+        r->acc.y = - speed * 0.33;
+        
+        r->color.rgb = vec3_set(sca_random_noise(0.9, 0.1));
+        r->color.a = 1;
+        r->start_time = L.time;
+    }
+    r_ro_particle_update(&L.particle_ro);
+}
 
 static void pointer_callback(ePointer_s pointer, void *user_data) {
     pointer.pos = mat4_mul_vec(camera.matrices_main.v_p_inv, pointer.pos);
@@ -34,10 +59,13 @@ static void pointer_callback(ePointer_s pointer, void *user_data) {
         
         if(button_clicked(&L.btn_ro.rects[i], pointer)) {
             u_pose_set_y(&L.flag_ro.rects[i].uv, 0);
+            
+            vec2 pos = u_pose_get_xy(L.flag_ro.rects[i].pose);
+            pos.y += 8;
+            emit_particles(pos.x, pos.y);
         }
     }
 }
-
 
 void flag_init(const vec2 *positions, int num) {
     e_input_register_pointer_event(pointer_callback, NULL);
@@ -68,12 +96,25 @@ void flag_init(const vec2 *positions, int num) {
         L.btn_ro.rects[i].color.a = 1;
     }
     r_ro_batch_update(&L.btn_ro);
+    
+    
+    GLuint white_pixel = r_texture_init(1, 1, (uint8_t[]){255, 255, 255, 255});
+    r_ro_particle_init(&L.particle_ro, MAX_PARTICLES,
+            camera.gl_main, white_pixel);
+    for(int i=0; i<L.particle_ro.num; i++) {
+        L.particle_ro.rects[i].pose = u_pose_new_hidden();
+        L.particle_ro.rects[i].color = vec4_set(0);
+        L.particle_ro.rects[i].color_speed.a = -1.0/PARTICLE_TIME;
+    }
+    r_ro_particle_update(&L.particle_ro);
 }
 
 void flag_kill() {
-    e_input_unregister_pointer_event(pointer_callback);
+    e_input_unregister_pointer_event(
+            pointer_callback);
     r_ro_batch_kill(&L.flag_ro);
     r_ro_batch_kill(&L.btn_ro);
+    r_ro_particle_kill(&L.particle_ro);
 }
 
 void flag_update(float dtime) {
@@ -113,6 +154,7 @@ void flag_update(float dtime) {
 }
 
 void flag_render() {
+    r_ro_particle_render(&L.particle_ro, L.time);
     r_ro_batch_render(&L.flag_ro);
     r_ro_batch_render(&L.btn_ro);
 }
