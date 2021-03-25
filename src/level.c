@@ -8,6 +8,7 @@
 #include "hare.h"
 #include "airstroke.h"
 #include "carrot.h"
+#include "flag.h"
 #include "dirt_particles.h"
 #include "dead.h"
 #include "controller.h"
@@ -17,7 +18,7 @@
 
 const static Color_s START_CODE = {{0, 0, 2, 0}};
 const static Color_s CARROT_CODE = {{0, 0, 2, 1}};
-
+const static Color_s FLAG_CODE = {{0, 0, 2, 2}};
 
 
 static struct {
@@ -79,6 +80,10 @@ void level_init(int lvl) {
     assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, 1) == 3, "level needs 3 carrots");
     carrot_init(carrot_pos);
     
+    vec2 flag_pos[64];
+    int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, 1);
+    flag_init(flag_pos, flags);
+    
     dead_init(dead_callback, NULL);
     controller_init();
     
@@ -119,6 +124,7 @@ void level_kill() {
     background_kill();
     tilemap_kill();
     carrot_kill();
+    flag_kill();
     dead_kill();
     controller_kill();
     unload_game();
@@ -132,6 +138,7 @@ void level_update(float dtime) {
         background_update(dtime);
         tilemap_update(dtime);
         carrot_update(dtime);
+        flag_update(dtime);
         hare_update(dtime);
         airstroke_update(dtime);
         dirt_particles_update(dtime);
@@ -144,6 +151,7 @@ void level_update(float dtime) {
 
 void level_render() {
     background_render();
+    flag_render();
     tilemap_render_back();
     carrot_render();
     dirt_particles_render();
