@@ -93,16 +93,16 @@ void carrot_init(const vec2 *positions_3) {
 
     
     // particles
-//    GLuint white_pixel = r_texture_init(1, 1, (u_int8_t[]) {255, 255, 255, 255});
-//    r_ro_particle_init(&L.particle_ro, NUM_PARTICLES, camera.gl_main, white_pixel);
-//
-//    for(int i=0; i<L.particle_ro.num; i++) {
-//        L.particle_ro.rects[i].pose = u_pose_new_hidden();
-//        L.particle_ro.rects[i].color = vec4_set(0);
-//        L.particle_ro.rects[i].color_speed.a = -1.0/PARTICLE_TIME;
-//    }
-//
-//    r_ro_particle_update(&L.particle_ro);
+    GLuint white_pixel = r_texture_init(1, 1, (u_int8_t[]) {255, 255, 255, 255});
+    r_ro_particle_init(&L.particle_ro, NUM_PARTICLES, camera.gl_main, white_pixel);
+
+    for(int i=0; i<L.particle_ro.num; i++) {
+        L.particle_ro.rects[i].pose = u_pose_new_hidden();
+        L.particle_ro.rects[i].color = vec4_set(0);
+        L.particle_ro.rects[i].color_speed.a = -1.0/PARTICLE_TIME;
+    }
+
+    r_ro_particle_update(&L.particle_ro);
 }
 
 void carrot_kill() {
@@ -132,7 +132,7 @@ void carrot_update(float dtime) {
 }
 
 void carrot_render() {
-//    r_ro_particle_render(&L.particle_ro, L.time);
+    r_ro_particle_render(&L.particle_ro, L.time);
     r_ro_batch_render(&L.carrot_ro);
     r_ro_batch_render(&L.cnt_ro);
 }
@@ -144,7 +144,7 @@ bool carrot_collect(vec2 position) {
         if(u_pose_aa_contains(L.carrot_ro.rects[i].pose, position)) {
             L.collected[i] = true;
             vec2 cxy = u_pose_get_xy(L.carrot_ro.rects[i].pose);
-//            collect_particles(cxy.x, cxy.y);
+            collect_particles(cxy.x, cxy.y);
             collect_cnt(cxy.x, cxy.y);
             return true;
         }
@@ -162,10 +162,10 @@ void carrot_load() {
     
     
     // particles
-//    for(int i=0; i<L.particle_ro.num; i++) {
-//        L.particle_ro.rects[i].pose = u_pose_new_hidden();
-//    }
-//    r_ro_particle_update(&L.particle_ro);
+    for(int i=0; i<L.particle_ro.num; i++) {
+        L.particle_ro.rects[i].pose = u_pose_new_hidden();
+    }
+    r_ro_particle_update(&L.particle_ro);
     
     // hud carrots
     for(int i=0; i<3; i++) {

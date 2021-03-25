@@ -145,7 +145,7 @@ void level_update(float dtime) {
 void level_render() {
     background_render();
     tilemap_render_back();
-    //carrot_render();
+    carrot_render();
     dirt_particles_render();
     airstroke_render();
     hare_render();
