@@ -127,28 +127,25 @@ void level_kill() {
 }
 
 void level_update(float dtime) {
-    //dead_update(dtime);
+    dead_update(dtime);
     if (!dead_is_dead()) {
         background_update(dtime);
-        /*
         tilemap_update(dtime);
-        //carrot_update(dtime);
+        carrot_update(dtime);
         hare_update(dtime);
         airstroke_update(dtime);
         dirt_particles_update(dtime);
         controller_update(dtime);
         
-        //check_carrot();
-        */
+        check_carrot();     
     }
-    //camera_control_update(dtime);
+    camera_control_update(dtime);
 }
 
 void level_render() {
     background_render();
-    /*
     tilemap_render_back();
-    //carrot_render();
+    carrot_render();
     dirt_particles_render();
     airstroke_render();
     hare_render();
@@ -158,6 +155,5 @@ void level_render() {
     r_ro_batch_render(&L.borders_ro);
 
     controller_render();
-    */
 }
 
