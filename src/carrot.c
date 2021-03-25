@@ -56,7 +56,14 @@ static void emit_particles(float x, float y) {
 }
 
 static void update_cnt() {
-    assume(L.collected_cnt >=0 && L.collected_cnt <3, "wtf");
+    if(L.collected_cnt<0) {
+        L.collected_cnt = 0;
+        SDL_Log("carot cnt wtf < 0?");
+    } else if(L.collected_cnt>3) {
+        L.collected_cnt = 3;
+        SDL_Log("carot cnt wtf < 3?");
+    }
+    
     for(int i=0; i<L.collected_cnt; i++) {
          L.cnt_ro.rects[i].pose = u_pose_new_aa(
             hud_camera_left() + 2 + i * 8,
