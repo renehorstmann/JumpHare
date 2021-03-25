@@ -24,11 +24,13 @@ void flag_init(const vec2 *positions, int num) {
     for(int i=0; i<num; i++) {
         L.flag_ro.rects[i].pose = u_pose_new(
                 positions[i].x,
-                positions[i].y+4,
+                positions[i].y+8,
                 32, 48);
                 
-        u_pose_set_size(&L.flag_ro.rects[i].uv, 1.0/FRAMES, 1.0/2);                
-    }        
+        u_pose_set_size(&L.flag_ro.rects[i].uv, 1.0/FRAMES, 0.5);
+        u_pose_set_y(&L.flag_ro.rects[i].uv, 0.5);          
+    }
+    u_pose_set_y(&L.flag_ro.rects[0].uv, 0);
 }
 
 void flag_kill() {
