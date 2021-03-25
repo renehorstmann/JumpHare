@@ -126,11 +126,7 @@ void level_kill() {
     r_ro_batch_kill(&L.borders_ro);
 }
 
-void level_update(float dtime) {
-    static int cnt =0;
-    cnt++;
-    if(cnt%2000 != 0)
-        return;
+void level_update(float dtime) {  
     dead_update(dtime);
     if (!dead_is_dead()) {
         background_update(dtime);
