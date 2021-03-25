@@ -12,7 +12,7 @@ Both Apps are also based on [some](https://github.com/renehorstmann/some) framew
 ## Live demo
 Compiled with emscripten: [livedemo](https://renehorstmann.github.io)
 
-Will not run on Apple, because... Apple... (bad WebGL2 support)
+Doesn't run on Apple, because... Apple... (poor WebGL2 support)
 
 ## Warning
 In active developmemt
