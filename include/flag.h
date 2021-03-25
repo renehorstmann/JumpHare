@@ -12,5 +12,7 @@ void flag_update(float dtime);
 
 void flag_render();
 
+// returns NAN, NAN if no flag is actice
+vec2 flag_active_position();
 
 #endif //JUMPHARE_FLAG_H

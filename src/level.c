@@ -31,6 +31,10 @@ static void load_game() {
     vec2 start_pos;
     assume(tilemap_get_positions(&start_pos, 1, START_CODE, 1) == 1, "start not found");
     
+    vec2 flag_pos = flag_active_position();
+    if(!sca_isnan(flag_pos.x))
+        start_pos = flag_pos;
+    
     hare_init(start_pos.x, start_pos.y);
     airstroke_init();
     dirt_particles_init();

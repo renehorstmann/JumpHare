@@ -32,6 +32,7 @@ static struct {
     
     struct {
         bool collected[3];
+        int collected_cnt;
     } save;
 } L;
 
@@ -54,17 +55,20 @@ static void emit_particles(float x, float y) {
     r_ro_particle_update(&L.particle_ro);
 }
 
-static void collect_cnt(float x, float y) {
-    assume(L.collected_cnt < 3, "already all collected?");
-    
-    L.cnt_ro.rects[L.collected_cnt].pose = u_pose_new_aa(
-            hud_camera_left() + 2 + L.collected_cnt * 8,
+static void update_cnt() {
+    assume(L.collected_cnt >=0 && L.collected_cnt <3, "wtf");
+    for(int i=0; i<L.collected_cnt; i++) {
+         L.cnt_ro.rects[i].pose = u_pose_new_aa(
+            hud_camera_left() + 2 + i * 8,
             hud_camera_top() - 2,
             8, 16);
+    }
+    for(int i=L.collected_cnt; i<3; i++) {
+        L.cnt_ro.rects[i].pose = u_pose_new_hidden();
+    }
     r_ro_batch_update(&L.cnt_ro);
-    
-    L.collected_cnt++;
 }
+
 
 void carrot_init(const vec2 *positions_3) {
     
@@ -86,11 +90,8 @@ void carrot_init(const vec2 *positions_3) {
     // mini hud carrot
     r_ro_batch_init(&L.cnt_ro, 3, hud_camera.gl,
             r_texture_init_file("res/carrot_mini.png", NULL));
-            
-    for(int i=0; i<3; i++)
-        L.cnt_ro.rects[i].pose = u_pose_new_hidden();
-    r_ro_batch_update(&L.cnt_ro);
-
+    update_cnt();
+    
     
     // particles
     GLuint white_pixel = r_texture_init(1, 1, (u_int8_t[]) {255, 255, 255, 255});
@@ -145,7 +146,8 @@ bool carrot_collect(vec2 position) {
             L.collected[i] = true;
             vec2 cxy = u_pose_get_xy(L.carrot_ro.rects[i].pose);
             emit_particles(cxy.x, cxy.y);
-            collect_cnt(cxy.x, cxy.y);
+            L.collected_cnt++;
+            update_cnt();
             return true;
         }
     }
@@ -156,13 +158,24 @@ int carrot_collected() {
     return L.collected_cnt;
 }
 
+
+void carrot_eat() {
+    if(L.collected_cnt <= 0) {
+        SDL_Log("carrot_eat failed");
+        return;
+    }
+    L.collected_cnt--;
+    update_cnt();
+}
+
 void carrot_save() {
     memcpy(L.save.collected, L.collected, sizeof(L.collected));
+    L.save.collected_cnt = L.collected_cnt;
 }
 
 void carrot_load() {
     memcpy(L.collected, L.save.collected, sizeof(L.collected));
-    L.collected_cnt = 0;
+    L.collected_cnt = L.save.collected_cnt;
     
     
     // particles
@@ -170,16 +183,6 @@ void carrot_load() {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
     }
     r_ro_particle_update(&L.particle_ro);
-    
-    // hud carrots
-    for(int i=0; i<3; i++) {
-        L.cnt_ro.rects[i].pose = u_pose_new_hidden();
-    }
-    r_ro_batch_update(&L.cnt_ro);
-    for(int i=0; i<3; i++) {
-        if(L.collected[i])
-            collect_cnt(-1, -1);
-    }
     
     // in game carrots
     for(int i=0; i<3; i++) {
@@ -190,5 +193,8 @@ void carrot_load() {
         }
     }
     r_ro_batch_update(&L.carrot_ro);
+    
+    // hud carrots
+    update_cnt();
 }
 

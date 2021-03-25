@@ -12,6 +12,8 @@
 #include "button.h"
 #include "flag.h"
 
+#define FLAG_OFFSET_Y 8.0
+
 #define FPS 4.0
 #define FRAMES 4
 
@@ -29,6 +31,7 @@ static struct {
     rRoBatch btn_ro;
     rRoParticle particle_ro;
     float time;
+    vec2 active_pos;
 } L;
 
 static void emit_particles(float x, float y) {
@@ -61,8 +64,15 @@ static void pointer_callback(ePointer_s pointer, void *user_data) {
             u_pose_set_y(&L.flag_ro.rects[i].uv, 0);
             
             vec2 pos = u_pose_get_xy(L.flag_ro.rects[i].pose);
-            pos.y += 8;
+            
+            pos.y -= FLAG_OFFSET_Y;
+            L.active_pos = pos;
+            
+            pos.y += 8 + FLAG_OFFSET_Y;
             emit_particles(pos.x, pos.y);
+            
+            carrot_eat();
+            carrot_save();
         }
     }
 }
@@ -70,12 +80,14 @@ static void pointer_callback(ePointer_s pointer, void *user_data) {
 void flag_init(const vec2 *positions, int num) {
     e_input_register_pointer_event(pointer_callback, NULL);
     
+    L.active_pos = (vec2) {{NAN, NAN}};
+    
     r_ro_batch_init(&L.flag_ro, num, camera.gl_main, 
             r_texture_init_file("res/flag.png", NULL));
     for(int i=0; i<num; i++) {
         L.flag_ro.rects[i].pose = u_pose_new(
                 positions[i].x,
-                positions[i].y+8,
+                positions[i].y+FLAG_OFFSET_Y,
                 32, 48);
                 
         u_pose_set_size(&L.flag_ro.rects[i].uv, 1.0/FRAMES, 0.5);
@@ -157,4 +169,8 @@ void flag_render() {
     r_ro_particle_render(&L.particle_ro, L.time);
     r_ro_batch_render(&L.flag_ro);
     r_ro_batch_render(&L.btn_ro);
+}
+
+vec2 flag_active_position() {
+    return L.active_pos;
 }

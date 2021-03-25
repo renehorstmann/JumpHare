@@ -16,6 +16,8 @@ bool carrot_collect(vec2 position);
 
 int carrot_collected();
 
+void carrot_eat();
+
 void carrot_save();
 
 void carrot_load();
