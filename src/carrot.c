@@ -138,16 +138,15 @@ void carrot_render() {
     r_ro_batch_render(&L.cnt_ro);
 }
 
-bool carrot_collect(vec2 pos, vec2 prev_pos) {
+bool carrot_collect(vec2 position) {
     for(int i=0; i<3; i++) {
         if(L.collected[i])
             continue;
-        if(u_pose_aa_contains(L.carrot_ro.rects[i].pose, pos)) {
+        if(u_pose_aa_contains(L.carrot_ro.rects[i].pose, position)) {
             L.collected[i] = true;
-            float cx = u_pose_get_x(L.carrot_ro.rects[i].pose);
-            float cy = u_pose_get_y(L.carrot_ro.rects[i].pose);
-            collect_particles(cx, cy);
-            collect_cnt(cx, cy);
+            vec2 cxy = u_pose_get_xy(L.carrot_ro.rects[i].pose);
+            collect_particles(cxy.x, cxy.y);
+            collect_cnt(cxy.x, cxy.y);
             return true;
         }
     }

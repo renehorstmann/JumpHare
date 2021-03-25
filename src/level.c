@@ -53,15 +53,12 @@ static void reset() {
 }
 
 static void check_carrot() {
-    carrot_collect(hare_position(), hare_prev_position());
+    carrot_collect(hare_position());
     
     vec2 strokes[AIRSTROKE_MAX];
-    vec2 prev_strokes[AIRSTROKE_MAX];
     int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
-    
-    assume(airstroke_prev_positions(prev_strokes, AIRSTROKE_MAX) == strokes_num, "wtf");
     for(int i=0; i<strokes_num; i++) {
-        carrot_collect(strokes[i], prev_strokes[i]);
+        carrot_collect(strokes[i]);
     }
 }
 
