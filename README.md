@@ -19,13 +19,7 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- carrot mini collect move
-- collision detection for carrots)
-  - stroke can jump over the carrot :/
-- carrot save_state + load_state
-  - save on checkpoint creation
-  - load on dead
-- check browser size camera position error
+- save flags
 - draw foreground
 - hare double jump animation
 - draw tiles
@@ -33,6 +27,7 @@ In active developmemt
 - enemies
 - control optimization
   - visualization
+- check browser size camera position error
 
 
 ## Compiling for Web
