@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
             hud_camera_right() - 8*6, 
             hud_camera_top()-2);
     for(int i=0; i<fps_ro.ro.num; i++)
-        fps_ro.ro.rects[i].color = (vec4) {{1, 0, 0, 1}};
+        fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
     e_window_main_loop(main_loop);
 
@@ -84,7 +84,7 @@ static void main_loop(float delta_time) {
 
 
     // render
-    //level_render();
+    level_render();
     
     // fps
     {
