@@ -6,7 +6,7 @@
 #include "mathc/utils/random.h"
 #include "utilc/assume.h"
 #include "camera.h"
-
+#include "hare.h"
 #include "flag.h"
 
 #define FPS 4.0
@@ -14,12 +14,17 @@
 
 static struct {
     rRoBatch flag_ro;
+    rRoBatch carrot_ro;
     float time;
 } L;
 
 void flag_init(const vec2 *positions, int num) {
     r_ro_batch_init(&L.flag_ro, num, camera.gl_main, 
             r_texture_init_file("res/flag.png", NULL));
+            
+    r_ro_batch_init(&L.carrot_ro, num, camera.gl_main,
+            r_texture_init_file("res/carrot_btn.png", NULL));
+    
     
     for(int i=0; i<num; i++) {
         L.flag_ro.rects[i].pose = u_pose_new(
@@ -29,8 +34,20 @@ void flag_init(const vec2 *positions, int num) {
                 
         u_pose_set_size(&L.flag_ro.rects[i].uv, 1.0/FRAMES, 0.5);
         u_pose_set_y(&L.flag_ro.rects[i].uv, 0.5);          
+        
+        L.carrot_ro.rects[i].pose = u_pose_new(
+                positions[i].x,
+                positions[i].y+72,
+                32, 32);
+        u_pose_set_w(&L.carrot_ro.rects[i].uv, 0.5);
+        L.carrot_ro.rects[i].color.a = 1;
     }
+    
+    // test
     u_pose_set_y(&L.flag_ro.rects[0].uv, 0);
+    
+    r_ro_batch_update(&L.flag_ro);
+    r_ro_batch_update(&L.carrot_ro);
 }
 
 void flag_kill() {
@@ -46,8 +63,12 @@ void flag_update(float dtime) {
         u_pose_set_x(&L.flag_ro.rects[i].uv, u);
     
     r_ro_batch_update(&L.flag_ro);
+    
+    
+    //vec2 hare_pos = hare_pos
 }
 
 void flag_render() {
     r_ro_batch_render(&L.flag_ro);
+    r_ro_batch_render(&L.carrot_ro);
 }
