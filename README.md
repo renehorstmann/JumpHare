@@ -21,7 +21,6 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- save flags
 - draw foreground
 - hare double jump animation
 - draw tiles
