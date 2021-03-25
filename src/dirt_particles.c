@@ -11,6 +11,7 @@
 #define MAX_PARTCLES 64
 #define LIFETIME 1.0
 #define SIZE 2.0
+#define PARTICLE_ALPHA 1.0
 
 static struct {
     rRoParticle ro;
@@ -27,7 +28,8 @@ void dirt_particles_init() {
         u_pose_set_size(&L.ro.rects[i].pose, SIZE, SIZE);
         L.ro.rects[i].color = vec4_set(0);
         L.ro.rects[i].acc.y = -20;
-        L.ro.rects[i].color_speed.a = -1.0 / LIFETIME;
+        L.ro.rects[i].color_speed.a = 
+                (float)-PARTICLE_ALPHA / LIFETIME;
     }
     r_ro_particle_update(&L.ro);
 }
@@ -61,6 +63,7 @@ void dirt_particles_add(vec2 pos, vec2 dir, Color_s color, int n) {
         L.ro.rects[idx].speed.y = sca_random_noise(dir.y, 5);
 
         L.ro.rects[idx].color = vec4_random_noise_vec(col, vec4_set(0.1));
+        L.ro.rects[idx].color.a *= PARTICLE_ALPHA;
 
         L.ro.rects[idx].start_time = L.time;
     }

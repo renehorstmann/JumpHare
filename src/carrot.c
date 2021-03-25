@@ -18,6 +18,7 @@
 #define PARTICLE_SIZE 2.0
 #define PARTICLE_SPEED 100.0
 #define PARTICLE_TIME 1.0
+#define PARTICLE_ALPHA 1.5
 
 static const vec3 PARTICLE_COLOR = {{1, 0.65, 0}};
 
@@ -49,7 +50,7 @@ static void emit_particles(float x, float y) {
         r->color.rgb = vec3_random_noise_vec(
                 PARTICLE_COLOR,
                 (vec3) {{0.2, 0.2, 0.2}});
-        r->color.a = 1;
+        r->color.a = PARTICLE_ALPHA;
         r->start_time = L.time;
     }
     r_ro_particle_update(&L.particle_ro);
@@ -107,7 +108,8 @@ void carrot_init(const vec2 *positions_3) {
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
         L.particle_ro.rects[i].color = vec4_set(0);
-        L.particle_ro.rects[i].color_speed.a = -1.0/PARTICLE_TIME;
+        L.particle_ro.rects[i].color_speed.a = 
+                (float)-PARTICLE_ALPHA/PARTICLE_TIME;
     }
 
     r_ro_particle_update(&L.particle_ro);

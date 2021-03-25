@@ -24,6 +24,7 @@
 #define PARTICLE_SIZE 2.0
 #define PARTICLE_SPEED 100.0
 #define PARTICLE_TIME 1.5
+#define PARTICLE_ALPHA 2.0
 
 
 static struct {
@@ -47,7 +48,7 @@ static void emit_particles(float x, float y) {
         r->acc.y = - speed * 0.33;
         
         r->color.rgb = vec3_set(sca_random_noise(0.9, 0.1));
-        r->color.a = 1;
+        r->color.a = PARTICLE_ALPHA;
         r->start_time = L.time;
     }
     r_ro_particle_update(&L.particle_ro);
@@ -116,7 +117,8 @@ void flag_init(const vec2 *positions, int num) {
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
         L.particle_ro.rects[i].color = vec4_set(0);
-        L.particle_ro.rects[i].color_speed.a = -1.0/PARTICLE_TIME;
+        L.particle_ro.rects[i].color_speed.a = 
+            (float)-PARTICLE_ALPHA/PARTICLE_TIME;
     }
     r_ro_particle_update(&L.particle_ro);
 }
