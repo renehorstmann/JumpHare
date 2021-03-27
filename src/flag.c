@@ -83,13 +83,21 @@ static void pointer_callback(ePointer_s pointer, void *user_data) {
 }
 
 static void check_key_click() {
+    static bool key_was_pressed = false;
+    
     for(int i=0; i<L.btn_ro.num; i++) {
         if(L.btn_ro.rects[i].color.a<0.99)
             continue;
         if(e_input.keys.enter) {
             button_set_pressed(&L.btn_ro.rects[i], true);
-        } else if(button_is_pressed(&L.btn_ro.rects[i])) {
-            activate(i);
+            key_was_pressed = true;
+        }
+        
+        if(key_was_pressed && !e_input.keys.enter) {
+            key_was_pressed = false;
+            if(button_is_pressed(&L.btn_ro.rects[i])) {
+                activate(i);
+            }
         }
     }
 }
