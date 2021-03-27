@@ -3,6 +3,7 @@
 #include "e/input.h"
 #include "u/pose.h"
 #include "mathc/float.h"
+#include "mathc/bool.h"
 #include "mathc/sca/int.h"
 #include "hare.h"
 #include "hud_camera.h"
@@ -16,6 +17,7 @@
 static struct {
     rRoSingle background_ro;
     ePointer_s pointer[2];
+    bvec2 pointer_down_map;
     int pointer_down;
     int main_pointer;
 } L;
@@ -35,16 +37,15 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     }
 
     if(pointer.action == E_POINTER_DOWN) {
-        L.pointer_down = isca_min(2, L.pointer_down+1);
-        if(L.pointer_down == 1) {
-            L.main_pointer = pointer.id;
-        }
+        L.pointer_down_map.v[pointer.id] = true;
     }
     if(pointer.action == E_POINTER_UP) {
-        L.pointer_down = isca_max(0, L.pointer_down-1);
-        if(L.pointer_down == 1) {
-            L.main_pointer = pointer.id==0? 1 : 0;
-        }
+        L.pointer_down_map.v[pointer.id] = false;
+    }
+
+    L.pointer_down = bvec2_sum(L.pointer_down_map);
+    if(L.pointer_down == 1) {
+        L.main_pointer = L.pointer_down_map.v0 == 0? 1 : 0;
     }
 
     L.pointer[pointer.id] = pointer;
