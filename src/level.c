@@ -108,8 +108,8 @@ void level_init(int lvl) {
         float r = tilemap_border_right();
         float t = tilemap_border_top();
         float b = tilemap_border_bottom();
-        float w = r - l;
-        float h = t - b;
+        float w = r-l;
+        float h = t-b;
         L.borders_ro.rects[0].pose = u_pose_new_aa(
                 l - 1024, t + 1024, 1024, h + 2048);
         L.borders_ro.rects[1].pose = u_pose_new_aa(
