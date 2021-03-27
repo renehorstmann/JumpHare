@@ -140,6 +140,7 @@ void controller_init() {
     e_input_register_pointer_event(pointer_event, NULL);
 
     r_ro_single_init(&L.background_ro, hud_camera.gl, r_texture_init_file("res/hud_background.png", NULL));
+    //L.background_ro.rect.color.a = 0.0;
 }
 
 void controller_kill() {

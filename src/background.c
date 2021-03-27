@@ -7,41 +7,38 @@
 #include "io.h"
 #include "background.h"
 
-#define BACKGROUND_COLS 256
-#define BACKGROUND_ROWS 128
-#define MAX_LEVEL_SIZE 4096
+#define PIXEL_SIZE 2.0
 
 static struct {
     rRoBatch ro[CAMERA_BACKGROUNDS];
 } L;
 
-static void set_image(const char *file) {
+
+void background_init(float level_width, float level_height, 
+        bool repeat_h, bool repeat_v, 
+        const char *file) {
     Image *img = io_load_image(file, CAMERA_BACKGROUNDS);
-    assume(img->cols == BACKGROUND_COLS && img->rows == BACKGROUND_ROWS, "wrong background format");
+    
+    float rows = img->rows * PIXEL_SIZE;
+    float cols = img->cols * PIXEL_SIZE;
+
+    int size_h = repeat_h? ceilf(level_width / cols) : 1;
+    int size_v = repeat_v? ceilf(level_height / rows) : 1;
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
-        r_texture_update(L.ro[i].tex, img->cols, img->rows, image_layer(img, i));
-    }
-}
+        GLuint tex = r_texture_init(img->cols, img->rows, image_layer(img, i));
+        r_ro_batch_init(&L.ro[i], size_h*size_v, camera.gl_background[i], tex);
 
-
-void background_init(const char *file) {
-    int size = (int) ceilf((float) MAX_LEVEL_SIZE / BACKGROUND_COLS);
-
-    float w = 512;
-    float h = 256;
-
-
-    for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
-        GLuint tex = r_texture_init(BACKGROUND_COLS, BACKGROUND_ROWS, NULL);
-        r_ro_batch_init(&L.ro[i], size, camera.gl_background[i], tex);
-
-        for (int j = 0; j < size; j++) {
-            L.ro[i].rects[j].pose = u_pose_new(w * j, 0, w, h);
+        for (int v = 0; v < size_v; v++) {
+            for(int h = 0; h < size_h; h++) {
+                L.ro[i].rects[v*size_h+h].pose = 
+                        u_pose_new_aa(
+                        cols * h, rows *(v+1), 
+                        cols, rows);
+            }
         }
         r_ro_batch_update(&L.ro[i]);
     }
-    set_image("res/backgrounds/greenhills.png");
 }
 
 

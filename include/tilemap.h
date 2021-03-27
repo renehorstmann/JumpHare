@@ -18,13 +18,9 @@ int tilemap_get_positions_aa(vec2 *out_positions, int max_positions, Color_s cod
 
 int tilemap_get_positions(vec2 *out_positions, int max_positions, Color_s code, int layer);
 
-float tilemap_border_left();
+float tilemap_width();
 
-float tilemap_border_right();
-
-float tilemap_border_top();
-
-float tilemap_border_bottom();
+float tilemap_height();
 
 float tilemap_ground(float x, float y, Color_s *opt_id);
 
@@ -35,5 +31,20 @@ float tilemap_wall_left(float x, float y, Color_s *opt_id);
 float tilemap_wall_right(float x, float y, Color_s *opt_id);
 
 Color_s tilemap_pixel(int layer, float x, float y);
+
+
+static float tilemap_border_left() {
+    return 0;   
+}
+static float tilemap_border_bottom() {
+    return 0;
+}
+static float tilemap_border_right() {
+    return tilemap_width();
+}
+static float tilemap_border_top() {
+    return tilemap_height();
+}
+
 
 #endif //JUMPHARE_TILEMAP_H

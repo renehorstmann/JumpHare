@@ -76,9 +76,11 @@ void level_init(int lvl) {
 
     L.current_lvl = lvl;
 
-
-    background_init("res/backgrounds/greenhills.png");
+    
     tilemap_init("res/levels/level_01.png");
+    background_init(tilemap_width(), tilemap_height(), 
+            true, false, 
+            "res/backgrounds/greenhills.png");
     
     vec2 carrot_pos[3];
     assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, 1) == 3, "level needs 3 carrots");
@@ -100,7 +102,7 @@ void level_init(int lvl) {
 
     // black borders
     for (int i = 0; i < 4; i++) {
-        L.borders_ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
+        L.borders_ro.rects[i].color = (vec4) {{0.4, 0, 0, 1}};
     }
 
     // border poses

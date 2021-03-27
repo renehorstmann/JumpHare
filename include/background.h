@@ -1,7 +1,11 @@
 #ifndef JUMPHARE_BACKGROUND_H
 #define JUMPHARE_BACKGROUND_H
 
-void background_init(const char *file);
+#include <stdbool.h>
+
+void background_init(float level_width, float level_height, 
+        bool repeat_h, bool repeat_v, 
+        const char *file);
 
 void background_kill();
 

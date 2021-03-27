@@ -15,6 +15,8 @@
 #include "r/ro_text.h"
 #include "hud_camera.h"
 
+#define GOD_MODE
+
 #define MIN_SPEED_X 20
 #define MAX_SPEED_X 100
 #define MAX_SPEED_Y 250
@@ -165,10 +167,10 @@ static void check_collision_falling() {
         L.speed.x = 0;
     }
 
-    a = tilemap_ground(L.pos.x - 3, L.pos.y, NULL);
-    b = tilemap_ground(L.pos.x + 3, L.pos.y, NULL);
+    a = tilemap_ground(L.pos.x - 3, L.pos.y-11, NULL);
+    b = tilemap_ground(L.pos.x + 3, L.pos.y-11, NULL);
 
-    if (L.pos.y < a + 17 || L.pos.y < b + 17) {
+    if (L.pos.y < a + 14 || L.pos.y < b + 14) {
         L.pos.y = sca_max(a, b) + 14;
         L.state = HARE_GROUNDED;
         L.speed.y = 0;
@@ -289,7 +291,10 @@ void hare_update(float dtime) {
 
         if (L.state == HARE_FALLING && L.jump_time > DOUBLE_JUMP_START_TIME) {
             L.speed.y = sca_max(L.speed.y, DOUBLE_JUMP_SPEED_Y);
+            
+#ifndef GOD_MODE 
             L.state = HARE_DOUBLE_JUMP;
+#endif
         }
         L.set_jump_time += dtime;
     }
@@ -336,7 +341,11 @@ void hare_update(float dtime) {
     }
 
     if (L.pos.y < tilemap_border_bottom()) {
+#ifdef GOD_MODE
+        L.pos.y = tilemap_border_bottom();
+#else
         dead_set_dead(L.pos.x, L.pos.y);
+#endif
     }
 
     u_pose_set_xy(&L.ro.rect.pose, L.pos.x, L.pos.y);

@@ -25,7 +25,7 @@ static int tile_c(float x) {
 }
 
 static int tile_r(float y) {
-    return L.map->rows / 2 - y / TILES_SIZE;
+    return L.map->rows - y / TILES_SIZE;
 }
 
 static int tile_pixel_c(float x) {
@@ -33,7 +33,7 @@ static int tile_pixel_c(float x) {
 }
 
 static int tile_pixel_r(float y) {
-    return (int) (L.map->rows / 2 * TILES_SIZE - y) % TILES_SIZE;
+    return (int) (L.map->rows * TILES_SIZE - y) % TILES_SIZE;
 }
 
 static float tile_x(int c) {
@@ -41,7 +41,7 @@ static float tile_x(int c) {
 }
 
 static float tile_y(int r) {
-    return (L.map->rows / 2 - r) * TILES_SIZE;
+    return (L.map->rows - r) * TILES_SIZE;
 }
 
 static mat4 tile_pose(int c, int r) {
@@ -65,6 +65,14 @@ static bool pixel_collision(Color_s code, int pixel_c, int pixel_r) {
 
 void tilemap_init(const char *file) {
     L.map = io_load_image(file, MAP_LAYERS);
+    
+    /*
+    for(int r=0; r<L.map->rows; r++) {
+       for(int c=1; c<L.map->cols-1; c++) {
+           *image_pixel(L.map, 0, c, r) = COLOR_TRANSPARENT;
+       }
+    }
+    */
 
     int tile_nums[MAX_TILES] = {0};
     for (int r = 0; r < L.map->rows; r++) {
@@ -165,22 +173,13 @@ int tilemap_get_positions(vec2 *out_positions, int max_positions, Color_s code, 
     return cnt;
 }
 
-float tilemap_border_left() {
-    return 0;
-}
-
-float tilemap_border_right() {
+float tilemap_width() {
     return L.map->cols * TILES_SIZE;
 }
 
-float tilemap_border_top() {
-    return floor(L.map->rows / 2.0) * TILES_SIZE;
+float tilemap_height() {
+    return L.map->rows * TILES_SIZE;
 }
-
-float tilemap_border_bottom() {
-    return -ceilf(L.map->rows / 2.0) * TILES_SIZE;
-}
-
 
 float tilemap_ground(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);

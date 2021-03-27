@@ -4,7 +4,6 @@
 #include "mathc/utils/camera.h"
 #include "camera.h"
 
-
 #define BACKGROUND_SPEED_FACTOR 0.2
 #define FOREGROUND_SPEED_FACTOR 1.5
 
@@ -54,16 +53,16 @@ void camera_update() {
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     L.real_pixel_per_pixel = floorf(smaller_size / CAMERA_SIZE);
 
-    float width = (float) wnd_width / L.real_pixel_per_pixel;
-    float height = (float) wnd_height / L.real_pixel_per_pixel;
+    float width = (float)wnd_width / L.real_pixel_per_pixel;
+    float height = (float)wnd_height / L.real_pixel_per_pixel;
 
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
     float left = -CAMERA_SIZE / 2;
     float top = CAMERA_SIZE / 2;
-    float right = left + width;;
+    float right = left + width;
+    ;
     float bottom = top - height;
-
 
     camera.matrices_p = mat4_camera_ortho(left, right, bottom, top, -1, 1);
     camera.matrices_p_inv = mat4_inv(camera.matrices_p);
@@ -106,14 +105,19 @@ float camera_top() {
 }
 
 void camera_set_pos(float x, float y) {
+    // bottom left 'c'orner
+    float cx = x + L.left;
+    float cy = y + L.bottom;
+    
     x = floorf(x * L.real_pixel_per_pixel) / L.real_pixel_per_pixel;
     y = floorf(y * L.real_pixel_per_pixel) / L.real_pixel_per_pixel;
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
-        float t = (float) i / CAMERA_BACKGROUNDS;
+        float t = (float)i / CAMERA_BACKGROUNDS;
         float scale = sca_mix(BACKGROUND_SPEED_FACTOR, 1, t);
-        u_pose_set_xy(&camera.matrices_background[i].v,
-                      scale * x, scale * y);
+        float bg_x = scale * cx - L.left;
+        float bg_y = scale * cy - L.bottom;
+        u_pose_set_xy(&camera.matrices_background[i].v, bg_x, bg_y);
     }
     u_pose_set_xy(&camera.matrices_main.v, x, y);
     u_pose_set_xy(&camera.matrices_foreground.v,
