@@ -1,9 +1,11 @@
 #include "u/pose.h"
 #include "e/window.h"
 #include "mathc/float.h"
+#include "mathc/sca/int.h"
 #include "mathc/utils/camera.h"
 #include "camera.h"
 
+#define MIN_PIXEL_SIZE 2
 #define BACKGROUND_SPEED_FACTOR 0.2
 #define FOREGROUND_SPEED_FACTOR 1.5
 
@@ -51,7 +53,8 @@ void camera_update() {
     int wnd_height = e_window.size.y;
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
-    L.real_pixel_per_pixel = floorf(smaller_size / CAMERA_SIZE);
+    L.real_pixel_per_pixel = sca_floor(smaller_size / CAMERA_SIZE);
+    L.real_pixel_per_pixel = isca_max(MIN_PIXEL_SIZE, L.real_pixel_per_pixel);
 
     float width = (float)wnd_width / L.real_pixel_per_pixel;
     float height = (float)wnd_height / L.real_pixel_per_pixel;
@@ -121,8 +124,8 @@ void camera_set_pos(float x, float y) {
     }
     u_pose_set_xy(&camera.matrices_main.v, x, y);
     u_pose_set_xy(&camera.matrices_foreground.v,
-                  FOREGROUND_SPEED_FACTOR * x,
-                  FOREGROUND_SPEED_FACTOR * y);
+                  FOREGROUND_SPEED_FACTOR * cx - L.left,
+                  FOREGROUND_SPEED_FACTOR * cy - L.bottom);
 }
 
 void camera_set_size(float size) {

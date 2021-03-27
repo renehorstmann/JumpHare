@@ -12,6 +12,8 @@ void carrot_update(float dtime);
 
 void carrot_render();
 
+void carrot_render_hud();
+
 bool carrot_collect(vec2 position);
 
 int carrot_collected();

@@ -3,6 +3,7 @@
 #include "e/input.h"
 #include "u/pose.h"
 #include "mathc/float.h"
+#include "mathc/sca/int.h"
 #include "hare.h"
 #include "hud_camera.h"
 #include "controller.h"
@@ -15,6 +16,8 @@
 static struct {
     rRoSingle background_ro;
     ePointer_s pointer[2];
+    int pointer_down;
+    int main_pointer;
 } L;
 
 static bool in_control_area(vec2 pos) {
@@ -29,6 +32,16 @@ static void pointer_event(ePointer_s pointer, void *ud) {
 
     if (!in_control_area(pointer.pos.xy)) {
         pointer.action = E_POINTER_UP;
+    }
+
+    if(pointer.action == E_POINTER_DOWN) {
+        L.pointer_down = isca_min(2, L.pointer_down+1);
+        if(L.pointer_down == 1) {
+            L.main_pointer = pointer.id;
+        }
+    }
+    if(pointer.action == E_POINTER_UP) {
+        L.pointer_down = isca_max(0, L.pointer_down-1);
     }
 
     L.pointer[pointer.id] = pointer;
@@ -61,39 +74,22 @@ static void pointer_ctrl(float dtime) {
     static float up_time = FLT_MAX;
     static float multi_time = -1;
     static float single_time = 0;
-    static int main_pointer = 0;
-
-    int pointers_down = 0;
-
-    if (L.pointer[0].action != E_POINTER_UP) {
-        pointers_down++;
-        if (main_pointer != 0 && L.pointer[1].action == E_POINTER_UP) {
-            main_pointer = 0;
-        }
-    }
-
-    if (L.pointer[1].action != E_POINTER_UP) {
-        pointers_down++;
-        if (main_pointer != 1 && L.pointer[0].action == E_POINTER_UP) {
-            main_pointer = 1;
-        }
-    }
 
     // single time
-    if (pointers_down == 0) {
+    if (L.pointer_down == 0) {
         single_time = 0;
     }
-    if (pointers_down == 1) {
+    if (L.pointer_down == 1) {
         single_time += dtime;
     }
 
     // stop multi time
-    if (pointers_down != 2) {
+    if (L.pointer_down != 2) {
         multi_time = -1;
     }
 
     // stopping?
-    if (pointers_down == 0) {
+    if (L.pointer_down == 0) {
         up_time += dtime;
         if (up_time >= UP_TIME) {
             hare_set_speed(0);
@@ -107,7 +103,7 @@ static void pointer_ctrl(float dtime) {
     }
 
     // multi tap to jump
-    if (multi_time < 0 && pointers_down == 2) {
+    if (multi_time < 0 && L.pointer_down == 2) {
         multi_time = 0;
         hare_jump();
     }
@@ -123,7 +119,7 @@ static void pointer_ctrl(float dtime) {
         //               0.5);
         pos = vec2_set(0);
     } else {
-        pos = L.pointer[main_pointer].pos.xy;
+        pos = L.pointer[L.main_pointer].pos.xy;
     }
 
     float speed = pos.x / DISTANCE;
@@ -146,6 +142,7 @@ void controller_init() {
 void controller_kill() {
     e_input_unregister_pointer_event(pointer_event);
     r_ro_single_kill(&L.background_ro);
+    memset(&L, 0, sizeof(L));
 }
 
 void controller_update(float dtime) {

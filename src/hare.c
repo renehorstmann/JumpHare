@@ -15,7 +15,7 @@
 #include "r/ro_text.h"
 #include "hud_camera.h"
 
-//#define GOD_MODE
+// #define GOD_MODE
 
 #define MIN_SPEED_X 20
 #define MAX_SPEED_X 100

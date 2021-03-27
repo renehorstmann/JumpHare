@@ -139,11 +139,15 @@ void carrot_update(float dtime) {
     }
     
     r_ro_batch_update(&L.carrot_ro);
+    update_cnt();
 }
 
 void carrot_render() {
     r_ro_particle_render(&L.particle_ro, L.time);
     r_ro_batch_render(&L.carrot_ro);
+}
+
+void carrot_render_hud() {
     r_ro_batch_render(&L.cnt_ro);
 }
 

@@ -167,6 +167,8 @@ void level_render() {
 
     r_ro_batch_render(&L.borders_ro);
 
+    carrot_render_hud();
+
     controller_render();
 }
 

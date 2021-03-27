@@ -1,9 +1,11 @@
 #include "u/pose.h"
 #include "e/window.h"
 #include "mathc/float.h"
+#include "mathc/sca/int.h"
 #include "mathc/utils/camera.h"
 #include "hud_camera.h"
 
+#define MIN_PIXEL_SIZE 2
 
 struct HudCameraGlobals_s hud_camera;
 
@@ -28,7 +30,8 @@ void hud_camera_update() {
 
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
-    L.real_pixel_per_pixel = floorf(smaller_size / HUD_CAMERA_SIZE);
+    L.real_pixel_per_pixel = sca_floor(smaller_size / HUD_CAMERA_SIZE);
+    L.real_pixel_per_pixel = isca_max(MIN_PIXEL_SIZE, L.real_pixel_per_pixel);
 
     float width_2 = wnd_width / (2 * L.real_pixel_per_pixel);
     float height_2 = wnd_height / (2 * L.real_pixel_per_pixel);
