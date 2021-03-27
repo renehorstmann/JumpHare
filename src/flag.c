@@ -54,6 +54,21 @@ static void emit_particles(float x, float y) {
     r_ro_particle_update(&L.particle_ro);
 }
 
+static void activate(int flag_index) {
+    u_pose_set_y(&L.flag_ro.rects[flag_index].uv, 0);
+
+    vec2 pos = u_pose_get_xy(L.flag_ro.rects[flag_index].pose);
+
+    pos.y -= FLAG_OFFSET_Y;
+    L.active_pos = pos;
+
+    pos.y += 8 + FLAG_OFFSET_Y;
+    emit_particles(pos.x, pos.y);
+
+    carrot_eat();
+    carrot_save();
+}
+
 static void pointer_callback(ePointer_s pointer, void *user_data) {
     pointer.pos = mat4_mul_vec(camera.matrices_main.v_p_inv, pointer.pos);
     
@@ -62,18 +77,19 @@ static void pointer_callback(ePointer_s pointer, void *user_data) {
             continue;
         
         if(button_clicked(&L.btn_ro.rects[i], pointer)) {
-            u_pose_set_y(&L.flag_ro.rects[i].uv, 0);
-            
-            vec2 pos = u_pose_get_xy(L.flag_ro.rects[i].pose);
-            
-            pos.y -= FLAG_OFFSET_Y;
-            L.active_pos = pos;
-            
-            pos.y += 8 + FLAG_OFFSET_Y;
-            emit_particles(pos.x, pos.y);
-            
-            carrot_eat();
-            carrot_save();
+            activate(i);
+        }
+    }
+}
+
+static void check_key_click() {
+    for(int i=0; i<L.btn_ro.num; i++) {
+        if(L.btn_ro.rects[i].color.a<0.99)
+            continue;
+        if(e_input.keys.enter) {
+            button_set_pressed(&L.btn_ro.rects[i], true);
+        } else if(button_is_pressed(&L.btn_ro.rects[i])) {
+            activate(i);
         }
     }
 }
@@ -132,6 +148,9 @@ void flag_kill() {
 
 void flag_update(float dtime) {
     L.time += dtime;
+
+    check_key_click();
+
     float animate_time = sca_mod(L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
     float u = (float) frame / FRAMES;
@@ -152,13 +171,13 @@ void flag_update(float dtime) {
         
         vec2 center = u_pose_get_xy(L.flag_ro.rects[i].pose);
         center.y -= 8;
-        float dist = vec2_distance(hare_pos, center);        if(dist < MIN_DIST) {
+        float dist = vec2_distance(hare_pos, center);
+        if(dist < MIN_DIST) {
             L.btn_ro.rects[i].color.a = 1;
         } else {
-            L.btn_ro.rects[i].color.a 
-                    = sca_max(0,
-                    1-(dist-MIN_DIST) / (MAX_DIST-MIN_DIST)
-            );
+            float t = dist / MAX_DIST;
+            L.btn_ro.rects[i].color.a = sca_clamp(sca_mix(1, 0, t), 0, 1);
+
             button_set_pressed(&L.btn_ro.rects[i], false);
         }
     }

@@ -1,7 +1,9 @@
+#include "r/render.h"
 #include "r/ro_single.h"
 #include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
+#include "mathc/float.h"
 #include "utilc/assume.h"
 #include "camera.h"
 #include "io.h"
@@ -18,7 +20,10 @@ void background_init(float level_width, float level_height,
         bool repeat_h, bool repeat_v, 
         const char *file) {
     Image *img = io_load_image(file, CAMERA_BACKGROUNDS);
-    
+
+    // top left pixel will be clear color
+    r_render.clear_color.rgb = vec3_cast_from_uchar_1(image_pixel(img, 0, 0, 0)->v);
+
     float rows = img->rows * PIXEL_SIZE;
     float cols = img->cols * PIXEL_SIZE;
 
