@@ -20,9 +20,7 @@ static struct {
 } L;
 
 void dirt_particles_init() {
-    Color_s white_pixel = COLOR_WHITE;
-    GLuint tex = r_texture_init(1, 1, &white_pixel);
-    r_ro_particle_init(&L.ro, MAX_PARTCLES, camera.gl_main, tex);
+    r_ro_particle_init(&L.ro, MAX_PARTCLES, camera.gl_main, r_texture_new_white_pixel());
 
     for (int i = 0; i < L.ro.num; i++) {
         u_pose_set_size(&L.ro.rects[i].pose, SIZE, SIZE);

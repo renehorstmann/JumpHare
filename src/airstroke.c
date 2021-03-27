@@ -25,7 +25,7 @@ static struct {
 } L;
 
 void airstroke_init() {
-    r_ro_batch_init(&L.ro, AIRSTROKE_MAX, camera.gl_main, r_texture_init_file("res/airstroke.png", NULL));
+    r_ro_batch_init(&L.ro, AIRSTROKE_MAX, camera.gl_main, r_texture_new_file("res/airstroke.png", NULL));
 
     for (int i = 0; i < AIRSTROKE_MAX; i++) {
         L.ro.rects[i].pose = u_pose_new_hidden();

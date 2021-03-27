@@ -82,7 +82,7 @@ void carrot_init(const vec2 *positions_3) {
     
     // in game carrots
     r_ro_batch_init(&L.carrot_ro, 3, camera.gl_main,
-            r_texture_init_file("res/carrot.png", NULL));
+                    r_texture_new_file("res/carrot.png", NULL));
             
     for(int i=0; i<3; i++) {
         L.carrot_ro.rects[i].pose = u_pose_new(
@@ -97,13 +97,12 @@ void carrot_init(const vec2 *positions_3) {
     
     // mini hud carrot
     r_ro_batch_init(&L.cnt_ro, 3, hud_camera.gl,
-            r_texture_init_file("res/carrot_mini.png", NULL));
+                    r_texture_new_file("res/carrot_mini.png", NULL));
     update_cnt();
     
     
     // particles
-    GLuint white_pixel = r_texture_init(1, 1, (u_int8_t[]) {255, 255, 255, 255});
-    r_ro_particle_init(&L.particle_ro, NUM_PARTICLES, camera.gl_main, white_pixel);
+    r_ro_particle_init(&L.particle_ro, NUM_PARTICLES, camera.gl_main, r_texture_new_white_pixel());
 
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();

@@ -138,7 +138,7 @@ void controller_init() {
     L.pointer[1].action = E_POINTER_UP;
     e_input_register_pointer_event(pointer_event, NULL);
 
-    r_ro_single_init(&L.background_ro, hud_camera.gl, r_texture_init_file("res/hud_background.png", NULL));
+    r_ro_single_init(&L.background_ro, hud_camera.gl, r_texture_new_file("res/hud_background.png", NULL));
     //L.background_ro.rect.color.a = 0.0;
 }
 

@@ -259,7 +259,7 @@ void hare_init(float pos_x, float pos_y) {
     L.pos.x = pos_x;
     L.pos.y = pos_y;
 
-    r_ro_single_init(&L.ro, camera.gl_main, r_texture_init_file("res/hare.png", NULL));
+    r_ro_single_init(&L.ro, camera.gl_main, r_texture_new_file("res/hare.png", NULL));
 
     u_pose_set_size(&L.ro.rect.pose, 32, 32);
 

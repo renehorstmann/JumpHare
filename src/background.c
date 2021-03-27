@@ -26,7 +26,7 @@ void background_init(float level_width, float level_height,
     int size_v = repeat_v? ceilf(level_height / rows) : 1;
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
-        GLuint tex = r_texture_init(img->cols, img->rows, image_layer(img, i));
+        GLuint tex = r_texture_new(img->cols, img->rows, image_layer(img, i));
         r_ro_batch_init(&L.ro[i], size_h*size_v, camera.gl_background[i], tex);
 
         for (int v = 0; v < size_v; v++) {

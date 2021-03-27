@@ -27,11 +27,9 @@ static struct {
 void dead_init(DeadFinishedFn callback, void *callback_user_data) {
     L.callback = callback;
     L.callback_user_data = callback_user_data;
-    r_ro_single_init(&L.strike_ro, camera.gl_main, r_texture_init_file("res/dead_overlay.png", NULL));
+    r_ro_single_init(&L.strike_ro, camera.gl_main, r_texture_new_file("res/dead_overlay.png", NULL));
 
-    Color_s white_pixel = COLOR_WHITE;
-    GLuint tex = r_texture_init(1, 1, &white_pixel);
-    r_ro_single_init(&L.blend_ro, hud_camera.gl, tex);
+    r_ro_single_init(&L.blend_ro, hud_camera.gl, r_texture_new_white_pixel());
 
     u_pose_set_size(&L.blend_ro.rect.pose, 1024, 1024);
     L.time = -1;

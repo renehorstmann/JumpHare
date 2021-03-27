@@ -20,7 +20,7 @@ void tiles_init() {
                && img->rows == TILES_ROWS * TILES_SIZE,
                "wrong tiles size");
 
-        GLuint tex = r_texture_init(img->cols, img->rows, image_layer(img, 0));
+        GLuint tex = r_texture_new(img->cols, img->rows, image_layer(img, 0));
 
         tiles.imgs[tiles.size] = img;
         tiles.textures[tiles.size] = tex;
