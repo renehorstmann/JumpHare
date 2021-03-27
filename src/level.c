@@ -76,20 +76,19 @@ void level_init(int lvl) {
 
     L.current_lvl = lvl;
 
-    
     tilemap_init("res/levels/level_01.png");
-    background_init(tilemap_width(), tilemap_height(), 
-            true, false, 
+    background_init(tilemap_width(), tilemap_height(),
+            true, false,
             "res/backgrounds/greenhills.png");
-    
+
     vec2 carrot_pos[3];
     assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, 1) == 3, "level needs 3 carrots");
     carrot_init(carrot_pos);
-    
+
     vec2 flag_pos[64];
     int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, 1);
     flag_init(flag_pos, flags);
-    
+
     dead_init(dead_callback, NULL);
     controller_init();
     
@@ -102,7 +101,7 @@ void level_init(int lvl) {
 
     // black borders
     for (int i = 0; i < 4; i++) {
-        L.borders_ro.rects[i].color = (vec4) {{0.4, 0, 0, 1}};
+        L.borders_ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
     }
 
     // border poses
@@ -149,8 +148,8 @@ void level_update(float dtime) {
         airstroke_update(dtime);
         dirt_particles_update(dtime);
         controller_update(dtime);
-        
-        check_carrot();     
+
+        check_carrot();
     }
     camera_control_update(dtime);
 }

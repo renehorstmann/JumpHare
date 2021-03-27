@@ -15,7 +15,7 @@
 #include "r/ro_text.h"
 #include "hud_camera.h"
 
-#define GOD_MODE
+//#define GOD_MODE
 
 #define MIN_SPEED_X 20
 #define MAX_SPEED_X 100
@@ -85,7 +85,6 @@ static vec2 apply_speed(float dtime) {
                               * dtime, set_speed_x);
     }
     float actual_speed = sca_abs(L.speed.x) < MIN_SPEED_X ? 0 : L.speed.x;
-
 
     pos.x += actual_speed * dtime;
 

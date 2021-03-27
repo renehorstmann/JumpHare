@@ -79,10 +79,11 @@ static void pointer_callback(ePointer_s pointer, void *user_data) {
 }
 
 void flag_init(const vec2 *positions, int num) {
+    assume(num>=1, "a level needs at least one flag");
     e_input_register_pointer_event(pointer_callback, NULL);
-    
+
     L.active_pos = (vec2) {{NAN, NAN}};
-    
+
     r_ro_batch_init(&L.flag_ro, num, camera.gl_main, 
             r_texture_init_file("res/flag.png", NULL));
     for(int i=0; i<num; i++) {
@@ -109,7 +110,6 @@ void flag_init(const vec2 *positions, int num) {
         L.btn_ro.rects[i].color.a = 1;
     }
     r_ro_batch_update(&L.btn_ro);
-    
     
     GLuint white_pixel = r_texture_init(1, 1, (uint8_t[]){255, 255, 255, 255});
     r_ro_particle_init(&L.particle_ro, MAX_PARTICLES,
