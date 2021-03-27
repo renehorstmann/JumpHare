@@ -169,7 +169,7 @@ static void check_collision_falling() {
     a = tilemap_ground(L.pos.x - 3, L.pos.y-11, NULL);
     b = tilemap_ground(L.pos.x + 3, L.pos.y-11, NULL);
 
-    if (L.pos.y < a + 14 || L.pos.y < b + 14) {
+    if (L.pos.y < a + 17 || L.pos.y < b + 17) {
         L.pos.y = sca_max(a, b) + 14;
         L.state = HARE_GROUNDED;
         L.speed.y = 0;

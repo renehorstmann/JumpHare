@@ -42,6 +42,9 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     }
     if(pointer.action == E_POINTER_UP) {
         L.pointer_down = isca_max(0, L.pointer_down-1);
+        if(L.pointer_down == 1) {
+            L.main_pointer = pointer.id==0? 1 : 0;
+        }
     }
 
     L.pointer[pointer.id] = pointer;
