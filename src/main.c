@@ -10,8 +10,6 @@
 
 #define UPDATES_PER_SECOND 200
 
-// #define TRACK_WORKLOAD
-
 
 static rRoText fps_ro;
 
@@ -39,9 +37,6 @@ int main(int argc, char **argv) {
     level_init(1);      // manages the gameplay (tilemap, hare, background, ...)
 
     r_ro_text_init_font55(&fps_ro, 64, hud_camera.gl);
-    u_pose_set_xy(&fps_ro.pose, 
-            hud_camera_right() - 8*6, 
-            hud_camera_top()-2);
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
@@ -60,9 +55,7 @@ static void main_loop(float delta_time) {
 
     r_render_begin_frame(e_window.size.x, e_window.size.y);
 
-#ifdef TRACK_WORKLOAD
     float start_time = current_time();
-#endif
 
 
     // fixed update ps
@@ -86,30 +79,32 @@ static void main_loop(float delta_time) {
     // render
     level_render();
     
-    // fps
+    // fps + load
     {
         static float time = 0;
         static int cnt = 0;
+
+
+        float frame_time = current_time() - start_time;
+        float load = frame_time / delta_time;
+
         time += delta_time;
         cnt++;
         if(time>0.25) {
             char text[64];
-            sprintf(text, "%7.2f", cnt/time);
-            r_ro_text_set_text(&fps_ro, text);
+            sprintf(text, "%7.2f %3.0f%%", cnt/time, load*100);
+            vec2 size = r_ro_text_set_text(&fps_ro, text);
+            u_pose_set_xy(&fps_ro.pose,
+                          hud_camera_right() - size.x-2,
+                          hud_camera_top()-2);
             time -= 0.25;
             cnt = 0;
         }
+        r_ro_text_render(&fps_ro);
     }
-    r_ro_text_render(&fps_ro);
 
     // nuklear debug windows
     e_gui_render();
-
-#ifdef TRACK_WORKLOAD
-    float frame_time = current_time() - start_time;
-    float load = frame_time / delta_time;
-    printf("load: %.4f\n", load);
-#endif
 
     // swap buffers
     r_render_end_frame();
