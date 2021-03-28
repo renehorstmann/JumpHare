@@ -21,6 +21,7 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- landscape camera position bug
 - draw foreground
 - hare double jump animation
 - draw tiles
