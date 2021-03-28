@@ -76,9 +76,12 @@ void camera_update() {
     camera_matrices_update(&camera.matrices_foreground);
 
     if (wnd_width < wnd_height) {
-        bottom = top - height * CAMERA_SCREEN_WEIGHT;
+        float screen = height * CAMERA_SCREEN_WEIGHT;
+        bottom = top - screen;
     } else {
-        right = left + width * CAMERA_SCREEN_WEIGHT;
+        float screen = width * CAMERA_SCREEN_WEIGHT;
+        left += (width-screen)/2;
+        right -= (width-screen)/2;
     }
 
     L.left = left;
