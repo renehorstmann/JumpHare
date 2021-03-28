@@ -1,4 +1,4 @@
-#include "r/ro_single.h"
+#include "r/ro_batch.h"
 #include "r/texture.h"
 #include "e/input.h"
 #include "u/pose.h"
@@ -14,8 +14,10 @@
 #define MULTI_TIME 0.125
 #define DISTANCE 30
 
+#define BACKGROUND_SIZE 512
+
 static struct {
-    rRoSingle background_ro;
+    rRoBatch background_ro;
     ePointer_s pointer[2];
     bvec2 pointer_down_map;
     int pointer_down;
@@ -23,7 +25,8 @@ static struct {
 } L;
 
 static bool in_control_area(vec2 pos) {
-    return u_pose_aa_contains(L.background_ro.rect.pose, pos);
+    return u_pose_aa_contains(L.background_ro.rects[0].pose, pos)
+            || u_pose_aa_contains(L.background_ro.rects[1].pose, pos);
 }
 
 static void pointer_event(ePointer_s pointer, void *ud) {
@@ -139,13 +142,13 @@ void controller_init() {
     L.pointer[1].action = E_POINTER_UP;
     e_input_register_pointer_event(pointer_event, NULL);
 
-    r_ro_single_init(&L.background_ro, hud_camera.gl, r_texture_new_file("res/hud_background.png", NULL));
+    r_ro_batch_init(&L.background_ro, 2, hud_camera.gl, r_texture_new_file("res/hud_background.png", NULL));
     //L.background_ro.rect.color.a = 0.0;
 }
 
 void controller_kill() {
     e_input_unregister_pointer_event(pointer_event);
-    r_ro_single_kill(&L.background_ro);
+    r_ro_batch_kill(&L.background_ro);
     memset(&L, 0, sizeof(L));
 }
 
@@ -156,15 +159,28 @@ void controller_update(float dtime) {
     if (hud_camera_is_portrait_mode()) {
         float w = hud_camera_width();
         float h = hud_camera_height() * HUD_CAMERA_SCREEN_WEIGHT;
-        L.background_ro.rect.pose = u_pose_new(hud_camera_left() + w / 2, hud_camera_bottom() + h - w / 2, w, w);
+        L.background_ro.rects[0].pose = u_pose_new(
+                0, 
+                hud_camera_bottom() + h - BACKGROUND_SIZE/2, 
+                BACKGROUND_SIZE, BACKGROUND_SIZE);
+        
+        L.background_ro.rects[1].pose = u_pose_new_hidden();
     } else {
         float w = hud_camera_width() * HUD_CAMERA_SCREEN_WEIGHT;
         float h = hud_camera_height();
-        L.background_ro.rect.pose = u_pose_new_angle(hud_camera_right() - w + h / 2, hud_camera_bottom() + h / 2, h, h,
-                                                     M_PI_2);
+        L.background_ro.rects[0].pose = u_pose_new(
+                hud_camera_left() + w/2 - BACKGROUND_SIZE/2, 
+                0, 
+                BACKGROUND_SIZE, BACKGROUND_SIZE);
+        L.background_ro.rects[1].pose = u_pose_new(
+                hud_camera_right() - w/2 + BACKGROUND_SIZE/2, 
+                0, 
+                BACKGROUND_SIZE, BACKGROUND_SIZE);
     }
+    
+    r_ro_batch_update(&L.background_ro);
 }
 
 void controller_render() {
-    r_ro_single_render(&L.background_ro);
+    r_ro_batch_render(&L.background_ro);
 }
