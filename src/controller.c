@@ -14,7 +14,7 @@
 #define JUMP_TIME 0.25
 #define MULTI_TIME 0.125
 #define DISTANCE 30
-#define MIN_SPEED_X 20
+#define MIN_SPEED_X 0.2
 
 #define BACKGROUND_SIZE 512
 
@@ -27,8 +27,8 @@ static struct {
 } L;
 
 static bool in_control_area(vec2 pos) {
-    return u_pose_aa_contains(L.background_ro.rects[0].pose, pos)
-            || u_pose_aa_contains(L.background_ro.rects[1].pose, pos);
+    return pos.x < camera_left() || pos.x > camera_right()
+           || pos.y > camera_top() || pos.y < camera_bottom();
 }
 
 static void pointer_event(ePointer_s pointer, void *ud) {
@@ -129,6 +129,15 @@ static void pointer_ctrl(float dtime) {
         pos = vec2_set(0);
     } else {
         pos = L.pointer[L.main_pointer].pos.xy;
+    }
+
+
+    if(!hud_camera_is_portrait_mode()) {
+        if(pos.x > 0) {
+            pos.x -= sca_mix(camera_right(), hud_camera_right(), 0.5);
+        } else {
+            pos.x -= sca_mix(camera_left(), hud_camera_left(), 0.5);
+        }
     }
 
     float speed = pos.x / DISTANCE;

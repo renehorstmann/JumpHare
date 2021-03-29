@@ -60,10 +60,6 @@ static float camera_height() {
     return -camera_bottom() + camera_top();
 }
 
-static bool camera_is_portrait_mode() {
-    return camera_height() > camera_width();
-}
-
 void camera_set_pos(float x, float y);
 
 void camera_set_size(float size);
