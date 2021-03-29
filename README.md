@@ -21,15 +21,11 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- landscape camera position bug
 - draw foreground
 - hare double jump animation
 - draw tiles
 - non final sound effects?
 - enemies
-- control optimization
-  - visualization
-- check browser size camera position error
 
 
 ## Compiling for Web
