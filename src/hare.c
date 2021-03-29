@@ -17,7 +17,7 @@
 
 // #define GOD_MODE
 
-#define MIN_SPEED_X 20
+#define MIN_SPEED_X 5
 #define MAX_SPEED_X 100
 #define MAX_SPEED_Y 250
 #define JUMP_SPEED 225

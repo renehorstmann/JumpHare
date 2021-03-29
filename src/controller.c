@@ -14,6 +14,7 @@
 #define JUMP_TIME 0.25
 #define MULTI_TIME 0.125
 #define DISTANCE 30
+#define MIN_SPEED_X 20
 
 #define BACKGROUND_SIZE 512
 
@@ -132,6 +133,10 @@ static void pointer_ctrl(float dtime) {
 
     float speed = pos.x / DISTANCE;
     speed = sca_clamp(speed, -1, 1);
+
+    if(sca_abs(speed) < MIN_SPEED_X)
+        speed = 0;
+
     hare_set_speed(speed);
 
     // reset up_time, cause we are moving
@@ -157,18 +162,17 @@ void controller_update(float dtime) {
     pointer_ctrl(dtime);
     key_ctrl();
 
-    mat4 cam2hud = mat4_mul_mat(hud_camera.matrices.p_inv, camera.matrices_p);
     mat4 pose = u_pose_new(0, 0, BACKGROUND_SIZE, BACKGROUND_SIZE);
     if (hud_camera_is_portrait_mode()) {
         u_pose_set_y(&pose, camera_bottom() - BACKGROUND_SIZE/2);
-        L.background_ro.rects[0].pose = mat4_mul_mat(cam2hud, pose);
+        L.background_ro.rects[0].pose = pose;
         
         L.background_ro.rects[1].pose = u_pose_new_hidden();
     } else {
         u_pose_set_x(&pose, camera_left() - BACKGROUND_SIZE/2);
-        L.background_ro.rects[0].pose = mat4_mul_mat(cam2hud, pose);
+        L.background_ro.rects[0].pose = pose;
         u_pose_set_x(&pose, camera_right() + BACKGROUND_SIZE/2);
-        L.background_ro.rects[1].pose = mat4_mul_mat(cam2hud, pose);
+        L.background_ro.rects[1].pose = pose;
     }
     
     r_ro_batch_update(&L.background_ro);
