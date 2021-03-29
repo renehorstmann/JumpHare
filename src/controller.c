@@ -134,9 +134,9 @@ static void pointer_ctrl(float dtime) {
 
     if(!hud_camera_is_portrait_mode()) {
         if(pos.x > 0) {
-            pos.x -= sca_mix(camera_right(), hud_camera_right(), 0.5);
+            pos.x -= camera_right();
         } else {
-            pos.x -= sca_mix(camera_left(), hud_camera_left(), 0.5);
+            pos.x -= camera_left();
         }
     }
 
