@@ -12,6 +12,10 @@ Both Apps are also based on [some](https://github.com/renehorstmann/some) framew
 ## Live demo
 Compiled with emscripten: [livedemo](https://renehorstmann.github.io)
 
+Runs really well on touch screens.
+
+On Desktop, use arrow keys to move, space to jump and enter to press a button.
+
 Doesn't run on Apple, because... Apple... (poor WebGL2 support)
 
 ## Warning
