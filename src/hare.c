@@ -137,39 +137,60 @@ static void check_collision_grounded() {
 
 static void check_collision_falling() {
     float a, b;
-
-    a = tilemap_ceiling(L.pos.x - 3, L.pos.y, NULL);
-    b = tilemap_ceiling(L.pos.x + 3, L.pos.y, NULL);
-
-    if (L.pos.y > a - 8 || L.pos.y > b - 8) {
+    Color_s id_a, id_b;
+    
+    a = tilemap_ceiling(L.pos.x - 3, L.pos.y, &id_a);
+    b = tilemap_ceiling(L.pos.x + 3, L.pos.y, &id_b);
+    if(tiles_get_state(id_a) == TILES_PIXEL_ONEWAY_UP)
+        a = FLT_MAX;
+    if(tiles_get_state(id_b) == TILES_PIXEL_ONEWAY_UP)
+        b = FLT_MAX;
+        
+    if((L.pos.y > a - 8) || (L.pos.y > b - 8)){
         // jump collision?
         L.pos.y = sca_min(a, b) - 8;
         L.speed.y = 0;
     }
-
-    a = tilemap_wall_left(L.pos.x, L.pos.y - 10, NULL);
-    b = tilemap_wall_left(L.pos.x, L.pos.y + 3, NULL);
-
-    if (L.pos.x < a + 7 || L.pos.x < b + 7) {
+    
+    
+    a = tilemap_wall_left(L.pos.x, L.pos.y - 10, &id_a);
+    b = tilemap_wall_left(L.pos.x, L.pos.y + 3, &id_b);
+    
+    if(tiles_get_state(id_a) == TILES_PIXEL_ONEWAY_UP)
+        a = -FLT_MAX;
+    if(tiles_get_state(id_b) == TILES_PIXEL_ONEWAY_UP)
+        b = -FLT_MAX;
+    
+    if ((L.pos.x < a + 7) || (L.pos.x < b + 7)) {
         // collision?
         L.pos.x = sca_max(a, b) + 7;
         L.speed.x = 0;
     }
 
 
-    a = tilemap_wall_right(L.pos.x, L.pos.y - 10, NULL);
-    b = tilemap_wall_right(L.pos.x, L.pos.y + 3, NULL);
-
-    if (L.pos.x > a - 7 || L.pos.x > b - 7) {
+    a = tilemap_wall_right(L.pos.x, L.pos.y - 10, &id_a);
+    b = tilemap_wall_right(L.pos.x, L.pos.y + 3, &id_b);
+    
+    if(tiles_get_state(id_a) == TILES_PIXEL_ONEWAY_UP)
+        a = FLT_MAX;
+    if(tiles_get_state(id_b) == TILES_PIXEL_ONEWAY_UP)
+        b = FLT_MAX;
+    
+    if ((L.pos.x > a - 7) || (L.pos.x > b - 7)) {
         // collision?
         L.pos.x = sca_min(a, b) - 7;
         L.speed.x = 0;
     }
 
-    a = tilemap_ground(L.pos.x - 3, L.pos.y-11, NULL);
-    b = tilemap_ground(L.pos.x + 3, L.pos.y-11, NULL);
+    a = tilemap_ground(L.pos.x - 3, L.pos.y-11, &id_a);
+    b = tilemap_ground(L.pos.x + 3, L.pos.y-11, &id_b);
+    
+    if(L.speed.y>0 && tiles_get_state(id_a) == TILES_PIXEL_ONEWAY_UP)
+        a = -FLT_MAX;
+    if(L.speed.y>0 && tiles_get_state(id_b) == TILES_PIXEL_ONEWAY_UP)
+        b = -FLT_MAX;
 
-    if (L.pos.y < a + 17 || L.pos.y < b + 17) {
+    if ((L.pos.y < a + 17) || (L.pos.y < b + 17) ) {
         L.pos.y = sca_max(a, b) + 14;
         L.state = HARE_GROUNDED;
         L.speed.y = 0;

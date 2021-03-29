@@ -60,6 +60,9 @@ enum tiles_pixel_state tiles_get_state(Color_s id) {
 
     if (id.r > 150 && id.g < 100)
         return TILES_PIXEL_KILL;
+        
+    if (id.b > 150 && id.g < 100)
+        return TILES_PIXEL_ONEWAY_UP;
 
     if (id.r > 200 && id.g > 200)
         return TILES_PIXEL_SOLID_CLEAN;
