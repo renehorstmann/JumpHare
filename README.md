@@ -25,7 +25,6 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- draw foreground
 - hare double jump animation
 - draw tiles
 - non final sound effects?

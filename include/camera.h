@@ -27,11 +27,9 @@ struct CameraGlobals_s {
 
     struct CameraMatrices_s matrices_background[CAMERA_BACKGROUNDS];
     struct CameraMatrices_s matrices_main;
-    struct CameraMatrices_s matrices_foreground;
-
+    
     const float *gl_background[CAMERA_BACKGROUNDS];
     const float *gl_main;
-    const float *gl_foreground;
 };
 extern struct CameraGlobals_s camera;
 

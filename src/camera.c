@@ -7,7 +7,6 @@
 
 #define MIN_PIXEL_SIZE 2
 #define BACKGROUND_SPEED_FACTOR 0.2
-#define FOREGROUND_SPEED_FACTOR 1.5
 
 struct CameraGlobals_s camera;
 
@@ -36,13 +35,11 @@ void camera_init() {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera.gl_background[i] = &camera.matrices_background[i].vp.m00;
     camera.gl_main = &camera.matrices_main.vp.m00;
-    camera.gl_foreground = &camera.matrices_foreground.vp.m00;
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera_matrices_init(&camera.matrices_background[i]);
     camera_matrices_init(&camera.matrices_main);
-    camera_matrices_init(&camera.matrices_foreground);
-
+    
     camera.matrices_p = mat4_eye();
     camera.matrices_p_inv = mat4_eye();
 
@@ -76,8 +73,7 @@ void camera_update() {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera_matrices_update(&camera.matrices_background[i]);
     camera_matrices_update(&camera.matrices_main);
-    camera_matrices_update(&camera.matrices_foreground);
-
+    
     if (wnd_width < wnd_height) {
         float screen = height * CAMERA_SCREEN_WEIGHT;
         bottom = top - screen;
@@ -134,22 +130,20 @@ void camera_set_pos(float x, float y) {
         float bg_y = scale * cy - L.bottom;
         u_pose_set_xy(&camera.matrices_background[i].v, bg_x, bg_y);
     }
+    
     u_pose_set_xy(&camera.matrices_main.v, x, y);
-    u_pose_set_xy(&camera.matrices_foreground.v,
-                  FOREGROUND_SPEED_FACTOR * cx - L.left,
-                  FOREGROUND_SPEED_FACTOR * cy - L.bottom);
 }
 
 void camera_set_size(float size) {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         u_pose_set_size(&camera.matrices_background[i].v, size, size);
+        
     u_pose_set_size(&camera.matrices_main.v, size, size);
-    u_pose_set_size(&camera.matrices_foreground.v, size, size);
 }
 
 void camera_set_angle(float alpha) {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         u_pose_set_angle(&camera.matrices_background[i].v, alpha);
+        
     u_pose_set_angle(&camera.matrices_main.v, alpha);
-    u_pose_set_angle(&camera.matrices_foreground.v, alpha);
 }
