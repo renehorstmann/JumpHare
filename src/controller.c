@@ -37,17 +37,15 @@ static void pointer_event(ePointer_s pointer, void *ud) {
 
     pointer.pos = mat4_mul_vec(hud_camera.matrices.p_inv, pointer.pos);
 
-    if (!in_control_area(pointer.pos.xy)) {
-        pointer.action = E_POINTER_UP;
+    if(in_control_area(pointer.pos.xy)) {
+        if(pointer.action == E_POINTER_DOWN) {
+            L.pointer_down_map.v[pointer.id] = true;
+        }
+        if(pointer.action == E_POINTER_UP) {
+            L.pointer_down_map.v[pointer.id] = false;
+        }
     }
-
-    if(pointer.action == E_POINTER_DOWN) {
-        L.pointer_down_map.v[pointer.id] = true;
-    }
-    if(pointer.action == E_POINTER_UP) {
-        L.pointer_down_map.v[pointer.id] = false;
-    }
-
+    
     L.pointer_down = bvec2_sum(L.pointer_down_map);
     if(L.pointer_down == 1) {
         L.main_pointer = L.pointer_down_map.v0 == 0? 1 : 0;
@@ -121,23 +119,19 @@ static void pointer_ctrl(float dtime) {
         multi_time += dtime;
     }
 
-    vec2 pos;
-    if (single_time < MULTI_TIME && multi_time >= 0) {
-        //pos = vec2_mix(L.pointer[0].pos.xy,
-        //               L.pointer[1].pos.xy,
-        //               0.5);
-        pos = vec2_set(0);
-    } else {
-        pos = L.pointer[L.main_pointer].pos.xy;
-    }
-
+    vec2 pos = L.pointer[L.main_pointer].pos.xy;
 
     if(!hud_camera_is_portrait_mode()) {
+        float center;
         if(pos.x > 0) {
-            pos.x -= camera_right();
+            center = sca_mix(camera_right(), hud_camera_right(), 0.33);
+            center = sca_min(center, hud_camera_right()-DISTANCE*1.5);
         } else {
-            pos.x -= camera_left();
+            center = sca_mix(camera_left(), hud_camera_left(), 0.33);
+            center = sca_max(center, hud_camera_left()+DISTANCE*1.5);
         }
+        
+        pos.x -= center;
     }
 
     float speed = pos.x / DISTANCE;
@@ -145,6 +139,10 @@ static void pointer_ctrl(float dtime) {
 
     if(sca_abs(speed) < MIN_SPEED_X)
         speed = 0;
+
+    if (single_time < MULTI_TIME && multi_time >= 0) {
+        speed = 0;
+    }
 
     hare_set_speed(speed);
 
