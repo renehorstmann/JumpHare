@@ -25,6 +25,8 @@ vec2 hare_position();
 
 vec2 hare_prev_position();
 
+bool hare_looking_left();
+
 // [-1 : 1]
 void hare_set_speed(float dx);
 

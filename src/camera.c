@@ -14,6 +14,7 @@ struct CameraGlobals_s camera;
 static struct {
     float real_pixel_per_pixel;
     float left, right, bottom, top;
+    vec2 offset;
 } L;
 
 static void camera_matrices_init(struct CameraMatrices_s *self) {
@@ -59,13 +60,15 @@ void camera_update() {
     float width = (float)wnd_width / L.real_pixel_per_pixel;
     float height = (float)wnd_height / L.real_pixel_per_pixel;
 
+    float width_2 = width / 2;
+    float height_2 = height / 2;
+
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
-    float left = -CAMERA_SIZE / 2;
-    float top = CAMERA_SIZE / 2;
-    float right = left + width;
-    ;
-    float bottom = top - height;
+    float left = -floorf(width_2);
+    float top = floorf(height_2);
+    float right = width_2 + (width_2 - floorf(width_2));
+    float bottom = -height_2 - (height_2 - floorf(height_2));
 
     camera.matrices_p = mat4_camera_ortho(left, right, bottom, top, -1, 1);
     camera.matrices_p_inv = mat4_inv(camera.matrices_p);
@@ -78,10 +81,12 @@ void camera_update() {
     if (wnd_width < wnd_height) {
         float screen = height * CAMERA_SCREEN_WEIGHT;
         bottom = top - screen;
+        L.offset = (vec2) {{0, -(height - screen)/2}};
     } else {
         float screen = width * CAMERA_SCREEN_WEIGHT;
-        left += (width-screen)/2;
-        right -= (width-screen)/2;
+        left += sca_floor((width-screen)/2);
+        right -= sca_ceil((width-screen)/2);
+        L.offset = (vec2) {{0, 0}};
     }
 
     L.left = left;
@@ -108,6 +113,10 @@ float camera_bottom() {
 
 float camera_top() {
     return L.top;
+}
+
+vec2 camera_center_offset() {
+    return L.offset;
 }
 
 void camera_set_pos(float x, float y) {

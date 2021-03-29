@@ -50,6 +50,8 @@ float camera_bottom();
 
 float camera_top();
 
+vec2 camera_center_offset();
+
 static float camera_width() {
     return -camera_left() + camera_right();
 }

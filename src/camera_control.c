@@ -8,6 +8,9 @@
 
 struct CameraControlGlobals_s camera_control;
 
+static struct {
+    vec2 pos;
+} L;
 
 static void check_limits() {
     vec2 min, max;
@@ -26,13 +29,16 @@ static void check_limits() {
         min.y = max.y = (min.y + max.y) / 2;
     }
 
-    camera_control.pos = vec2_clamp_vec(camera_control.pos, min, max);
+    L.pos = vec2_clamp_vec(L.pos, min, max);
+}
+
+static void apply_pos(float dtime) {
+    L.pos = vec2_add_vec(camera_control.pos, camera_center_offset());
 }
 
 
 void camera_control_init() {
     camera_control.pos = hare_position();
-    camera_set_pos(camera_control.pos.x, camera_control.pos.y);
 }
 
 void camera_control_kill() {
@@ -53,8 +59,9 @@ void camera_control_update(float dtime) {
         camera_control.pos.y += sca_sign(delta.y) * diff.y;
     }
 
-    check_limits();
+    apply_pos(dtime);
 
-    camera_set_pos(camera_control.pos.x, camera_control.pos.y);
+    check_limits();
+    camera_set_pos(L.pos.x, L.pos.y);
 }
 

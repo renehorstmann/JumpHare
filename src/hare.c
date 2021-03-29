@@ -51,7 +51,7 @@ static struct {
     float set_jump_time;
 
     float animate_time;
-    bool animate_looking_left;
+    bool looking_left;
 
     float emit_dirt_add;
     int emit_dirt_next_add;
@@ -200,9 +200,9 @@ static void animate(float dtime) {
     float h = 1.0 / 5.0;
 
     if (L.speed.x < -MIN_SPEED_X)
-        L.animate_looking_left = true;
+        L.looking_left = true;
     if (L.speed.x > MIN_SPEED_X)
-        L.animate_looking_left = false;
+        L.looking_left = false;
 
     float v;
     if (L.state == HARE_GROUNDED) {
@@ -215,7 +215,7 @@ static void animate(float dtime) {
         v = 3;
     }
 
-    if (!L.animate_looking_left)
+    if (!L.looking_left)
         L.ro.rect.uv = u_pose_new(frame * w, v * h, w, h);
     else
         L.ro.rect.uv = u_pose_new((1 + frame) * w, v * h, -w, h);
@@ -380,6 +380,10 @@ vec2 hare_position() {
 
 vec2 hare_prev_position() {
     return (vec2) {{L.prev_pos.x, L.prev_pos.y}};
+}
+
+bool hare_looking_left() {
+    return L.looking_left;
 }
 
 // [-1 : 1]

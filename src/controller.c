@@ -6,6 +6,7 @@
 #include "mathc/bool.h"
 #include "mathc/sca/int.h"
 #include "hare.h"
+#include "camera.h"
 #include "hud_camera.h"
 #include "controller.h"
 
@@ -156,26 +157,18 @@ void controller_update(float dtime) {
     pointer_ctrl(dtime);
     key_ctrl();
 
+    mat4 cam2hud = mat4_mul_mat(hud_camera.matrices.p_inv, camera.matrices_p);
+    mat4 pose = u_pose_new(0, 0, BACKGROUND_SIZE, BACKGROUND_SIZE);
     if (hud_camera_is_portrait_mode()) {
-        float w = hud_camera_width();
-        float h = hud_camera_height() * HUD_CAMERA_SCREEN_WEIGHT;
-        L.background_ro.rects[0].pose = u_pose_new(
-                0, 
-                hud_camera_bottom() + h - BACKGROUND_SIZE/2, 
-                BACKGROUND_SIZE, BACKGROUND_SIZE);
+        u_pose_set_y(&pose, camera_bottom() - BACKGROUND_SIZE/2);
+        L.background_ro.rects[0].pose = mat4_mul_mat(cam2hud, pose);
         
         L.background_ro.rects[1].pose = u_pose_new_hidden();
     } else {
-        float w = hud_camera_width() * HUD_CAMERA_SCREEN_WEIGHT;
-        float h = hud_camera_height();
-        L.background_ro.rects[0].pose = u_pose_new(
-                hud_camera_left() + w/2 - BACKGROUND_SIZE/2, 
-                0, 
-                BACKGROUND_SIZE, BACKGROUND_SIZE);
-        L.background_ro.rects[1].pose = u_pose_new(
-                hud_camera_right() - w/2 + BACKGROUND_SIZE/2, 
-                0, 
-                BACKGROUND_SIZE, BACKGROUND_SIZE);
+        u_pose_set_x(&pose, camera_left() - BACKGROUND_SIZE/2);
+        L.background_ro.rects[0].pose = mat4_mul_mat(cam2hud, pose);
+        u_pose_set_x(&pose, camera_right() + BACKGROUND_SIZE/2);
+        L.background_ro.rects[1].pose = mat4_mul_mat(cam2hud, pose);
     }
     
     r_ro_batch_update(&L.background_ro);
