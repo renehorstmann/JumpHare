@@ -18,9 +18,6 @@ static void check_limits() {
     max.x = tilemap_border_right() - camera_right();
     min.y = tilemap_border_bottom() - camera_bottom();
     max.y = tilemap_border_top() - camera_top();
-
-    min = vec2_floor(min);
-    max = vec2_floor(max);
     
     if (min.x > max.x) {
         min.x = max.x = (min.x + max.x) / 2;
