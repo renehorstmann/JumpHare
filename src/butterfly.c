@@ -14,11 +14,17 @@
 #define FRAMES 12
 #define FLY_SPEED 100
 
+static const float RESET_TIME = 10.0 * FRAMES / CHILL_FPS;
 
 static struct {
     rRoParticle ro;
     float time;
+    float reset_time;
 } L;
+
+static bool is_flying(int i) {
+    return u_pose_get_y(L.ro.rects[i].uv) > 0.25;
+}
 
 static void fly_away(int i) {
     L.ro.rects[i].uv_time = 1.0/FLY_FPS;
@@ -71,8 +77,17 @@ void butterfly_kill() {
 
 void butterfly_update(float dtime) {
     L.time += dtime;
+    L.reset_time += dtime;
     
-    
+    if(L.reset_time >= RESET_TIME) {
+        L.reset_time -= RESET_TIME;
+        for(int i=0; i<L.ro.num; i++) {
+            if(is_flying(i))
+                continue;
+            L.ro.rects[i].start_time = L.time;
+        }
+        r_ro_particle_update(&L.ro);
+    }
 }
 
 void butterfly_render() {
@@ -82,7 +97,7 @@ void butterfly_render() {
 
 bool butterfly_collect(vec2 position) {
     for(int i=0; i<L.ro.num; i++) {
-        if(u_pose_get_y(L.ro.rects[i].uv) > 0.25)
+        if(is_flying(i))
             continue;
         if(u_pose_aa_contains(L.ro.rects[i].pose, position)) {
             fly_away(i);
