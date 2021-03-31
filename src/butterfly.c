@@ -13,6 +13,7 @@
 #define FLY_FPS 8.0
 #define FRAMES 12
 #define FLY_SPEED 100
+#define COLLECT_DISTANCE 16
 
 static const float RESET_TIME = 10.0 * FRAMES / CHILL_FPS;
 
@@ -99,7 +100,7 @@ bool butterfly_collect(vec2 position) {
     for(int i=0; i<L.ro.num; i++) {
         if(is_flying(i))
             continue;
-        if(u_pose_aa_contains(L.ro.rects[i].pose, position)) {
+        if(vec2_distance(position, u_pose_get_xy(L.ro.rects[i].pose)) <= COLLECT_DISTANCE) {
             fly_away(i);
             return true;
         }
