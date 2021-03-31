@@ -12,4 +12,6 @@ void butterfly_update(float dtime);
 
 void butterfly_render();
 
+bool butterfly_collect(vec2 position);
+
 #endif //JUMPHARE_BUTTERFLY_H

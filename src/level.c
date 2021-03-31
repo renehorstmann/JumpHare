@@ -9,6 +9,7 @@
 #include "airstroke.h"
 #include "carrot.h"
 #include "flag.h"
+#include "butterfly.h"
 #include "dirt_particles.h"
 #include "dead.h"
 #include "controller.h"
@@ -19,6 +20,7 @@
 const static Color_s START_CODE = {{0, 0, 2, 0}};
 const static Color_s CARROT_CODE = {{0, 0, 2, 1}};
 const static Color_s FLAG_CODE = {{0, 0, 2, 2}};
+const static Color_s BUTTERFLY_CODE = {{0, 0, 2, 3}};
 
 
 static struct {
@@ -39,6 +41,10 @@ static void load_game() {
     airstroke_init();
     dirt_particles_init();
     camera_control_init();
+    
+    vec2 butterfly_pos[512];
+    int butterflies = tilemap_get_positions(butterfly_pos, 512, BUTTERFLY_CODE, 1);
+    butterfly_init(butterfly_pos, butterflies);
 }
 
 static void unload_game() {
@@ -46,6 +52,8 @@ static void unload_game() {
     airstroke_kill();
     dirt_particles_kill();
     camera_control_kill();
+    
+    butterfly_kill();
 }
 
 static void reset() {
@@ -64,6 +72,16 @@ static void check_carrot() {
     int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
     for(int i=0; i<strokes_num; i++) {
         carrot_collect(strokes[i]);
+    }
+}
+
+static void check_butterfly() {
+    butterfly_collect(hare_position());
+    
+    vec2 strokes[AIRSTROKE_MAX];
+    int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
+    for(int i=0; i<strokes_num; i++) {
+        butterfly_collect(strokes[i]);
     }
 }
 
@@ -144,10 +162,12 @@ void level_update(float dtime) {
         flag_update(dtime);
         hare_update(dtime);
         airstroke_update(dtime);
+        butterfly_update(dtime);
         dirt_particles_update(dtime);
         controller_update(dtime);
 
         check_carrot();
+        check_butterfly();
     }
     camera_control_update(dtime);
 }
@@ -160,6 +180,7 @@ void level_render() {
     dirt_particles_render();
     airstroke_render();
     hare_render();
+    butterfly_render();
     tilemap_render_front();
     dead_render();
 
