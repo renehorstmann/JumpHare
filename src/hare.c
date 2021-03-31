@@ -355,8 +355,8 @@ void hare_update(float dtime) {
 
     if (L.state == HARE_GROUNDED) {
         Color_s state;
-        tilemap_ground(L.pos.x, L.pos.y, &state);
-        if (tiles_get_state(state) == TILES_PIXEL_KILL)
+        float dist = tilemap_ground(L.pos.x, L.pos.y, &state);
+        if (dist > L.pos.y-17 && tiles_get_state(state) == TILES_PIXEL_KILL)
             dead_set_dead(L.pos.x, L.pos.y);
     }
 
