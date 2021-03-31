@@ -15,7 +15,7 @@
 #define FLY_SPEED 100
 #define COLLECT_DISTANCE 16
 
-static const float RESET_TIME = 10.0 * FRAMES / CHILL_FPS;
+static const float RESET_TIME = 5.0 * FRAMES / CHILL_FPS;
 
 static struct {
     rRoParticle ro;
@@ -74,6 +74,7 @@ void butterfly_init(const vec2 *positions, int num) {
 
 void butterfly_kill() {
     r_ro_particle_kill(&L.ro);
+    memset(&L, 0, sizeof(L));
 }
 
 void butterfly_update(float dtime) {
