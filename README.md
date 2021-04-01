@@ -25,8 +25,10 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- redraw background with levelheight/2=256 (instead of 128)
 - hare double jump animation
 - draw tiles
+- goal?
 - non final sound effects?
 - enemies
 
