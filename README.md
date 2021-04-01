@@ -26,7 +26,7 @@ In active developmemt
 
 ## Todo
 - remove USING_TOUCH
-- replace IS_ANDROID_OS with NK_SCALE
+- replace IS_ANDROID_OS with NK_SCALE=3
 - redraw background with levelheight/2=256 (instead of 128)
 - hare double jump animation
 - draw tiles
