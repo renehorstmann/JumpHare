@@ -12,7 +12,8 @@
 #define CHILL_FPS 6.0
 #define FLY_FPS 8.0
 #define FRAMES 12
-#define FLY_SPEED 100
+#define FLY_SPEED 75
+#define FLY_ACC_Y 25
 #define COLLECT_DISTANCE 16
 
 static const float RESET_TIME = 5.0 * FRAMES / CHILL_FPS;
@@ -39,6 +40,9 @@ static void fly_away(int i) {
     L.ro.rects[i].uv = u_pose_new(0, 0.5, uv_w, 0.5);
     L.ro.rects[i].speed.x = sca_cos(sca_radians(angle)) * FLY_SPEED;
     L.ro.rects[i].speed.y = sca_sin(sca_radians(angle)) * FLY_SPEED;
+    
+    L.ro.rects[i].acc.y = sca_random_noise(0, FLY_ACC_Y);
+    
     L.ro.rects[i].start_time = L.time;
     r_ro_particle_update_sub(&L.ro, i, 1);
 }
