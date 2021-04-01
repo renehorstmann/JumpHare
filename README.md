@@ -25,8 +25,6 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- remove USING_TOUCH
-- replace IS_ANDROID_OS with NK_SCALE=3
 - redraw background with levelheight/2=256 (instead of 128)
 - hare double jump animation
 - draw tiles
@@ -38,7 +36,7 @@ In active developmemt
 ## Compiling for Web
 Using Emscripten:
 ```
-emcc -I../include/ -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_TTF=2 -s FULL_ES3=1 -s SDL2_IMAGE_FORMATS='["png"]' --preload-file ../res -s ALLOW_MEMORY_GROWTH=1 -DUSING_GLES -DUSING_TOUCH ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -o index.html
+emcc -I../include/ -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s -s FULL_ES3=1 -s SDL2_IMAGE_FORMATS='["png"]' --preload-file ../res -s ALLOW_MEMORY_GROWTH=1 -DUSING_GLES ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -o index.html
 ```
 
 ## Compiling on Windows
@@ -46,7 +44,7 @@ Compiling with Mingw (msys2).
 Currently not working with cmake, but with the following gcc call.
 I had to put all source files into one dir (from src/e/*, r/*, p/*, u/* into src/*) to get the linker happy.
 ```
-gcc -o some src/* -Iinclude $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lglew32 -lopengl32 -lglu32 -DUSING_GLEW
+gcc -o some src/* -Iinclude $(sdl2-config --cflags --libs) -lSDL2_image -lglew32 -lopengl32 -lglu32 -DUSING_GLEW
 ```
 
 ## Author
