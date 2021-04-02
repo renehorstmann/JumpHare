@@ -17,6 +17,7 @@
 #include "camera.h"
 #include "level.h"
 
+#define CODE_LAYER 2
 const static Color_s START_CODE = {{0, 0, 2, 0}};
 const static Color_s CARROT_CODE = {{0, 0, 2, 1}};
 const static Color_s FLAG_CODE = {{0, 0, 2, 2}};
@@ -31,7 +32,7 @@ static struct {
 
 static void load_game() {
     vec2 start_pos;
-    assume(tilemap_get_positions(&start_pos, 1, START_CODE, 1) == 1, "start not found");
+    assume(tilemap_get_positions(&start_pos, 1, START_CODE, CODE_LAYER) == 1, "start not found");
     
     vec2 flag_pos = flag_active_position();
     if(!sca_isnan(flag_pos.x))
@@ -43,7 +44,7 @@ static void load_game() {
     camera_control_init();
     
     vec2 butterfly_pos[512];
-    int butterflies = tilemap_get_positions(butterfly_pos, 512, BUTTERFLY_CODE, 1);
+    int butterflies = tilemap_get_positions(butterfly_pos, 512, BUTTERFLY_CODE, CODE_LAYER);
     butterfly_init(butterfly_pos, butterflies);
 }
 
@@ -100,11 +101,11 @@ void level_init(int lvl) {
             "res/backgrounds/greenhills.png");
 
     vec2 carrot_pos[3];
-    assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, 1) == 3, "level needs 3 carrots");
+    assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, CODE_LAYER) == 3, "level needs 3 carrots");
     carrot_init(carrot_pos);
 
     vec2 flag_pos[64];
-    int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, 1);
+    int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, CODE_LAYER);
     flag_init(flag_pos, flags);
 
     dead_init(dead_callback, NULL);

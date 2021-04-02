@@ -265,7 +265,7 @@ static void emit_dirt(float dtime) {
     vec2 grab_pos = {{L.pos.x, ground}};
     grab_pos = vec2_random_noise_vec(grab_pos, vec2_set(5));
 
-    Color_s col = tilemap_pixel(0, grab_pos.x, grab_pos.y);
+    Color_s col = tilemap_pixel(1, grab_pos.x, grab_pos.y);
 
     vec2 particle_pos = L.pos;
     particle_pos.y -= 7;
