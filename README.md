@@ -25,10 +25,26 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- collision module
+  - tilemap collision
+    - grounded
+    - falling
+    - callbacks
+  - object object
+    - aabb or cirlces?
+    - collision_with_hare_callback
+    - visualization
+    - carrots + butterflies
+- level object init module (positions)
+  - carrot
+  - butterfly
+  - ...
 - hare double jump animation
 - draw tiles
   - bg + fg for caves, etc.
-- goal?
+- goal
+  - goal flag that gets hissed if grounded in the near
+  - short win animation stuff
 - non final sound effects?
 - enemies
 
