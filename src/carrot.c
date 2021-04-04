@@ -67,8 +67,8 @@ static void update_cnt() {
     
     for(int i=0; i<L.collected_cnt; i++) {
          L.cnt_ro.rects[i].pose = u_pose_new_aa(
-            hud_camera_left() + 2 + i * 8,
-            hud_camera_top() - 2,
+            camera_left() + 2 + i * 8,
+            camera_top() - 2,
             8, 16);
     }
     for(int i=L.collected_cnt; i<3; i++) {
