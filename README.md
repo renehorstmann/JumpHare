@@ -25,6 +25,7 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- carrot counter landscape position
 - collision module
   - tilemap collision
     - grounded
