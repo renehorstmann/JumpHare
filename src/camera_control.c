@@ -26,6 +26,9 @@ static void check_limits() {
         min.y = max.y = (min.y + max.y) / 2;
     }
 
+    min = vec2_ceil(min);
+    max = vec2_ceil(max);
+
     L.pos = vec2_clamp_vec(L.pos, min, max);
 }
 
