@@ -7,6 +7,7 @@
 #include "tiles.h"
 #include "level.h"
 
+#include "io.h"
 
 #define UPDATES_PER_SECOND 200
 
@@ -29,6 +30,23 @@ int main(int argc, char **argv) {
 
     // init r (render)
     r_render_init(e_window.window);
+    
+    
+    /*
+    Image *lvl = io_load_image("res/levels/level_01_old.png", 3);
+    for(int layer=0; layer<3; layer++) {
+        for(int i=0; i<lvl->rows * lvl->cols; i++) {
+            if(image_pixel_index(lvl, layer, i)->b == 1) {
+                image_pixel_index(lvl, layer, i)->b=2;
+            }
+            else if(image_pixel_index(lvl, layer, i)->b==2) {
+                image_pixel_index(lvl, layer, i)->b=1;
+            }
+        }
+    }
+    io_save_image("levelswap.png", lvl);
+    return 0;
+    */
 
     // init systems
     camera_init();      // camera for the level
