@@ -7,6 +7,7 @@
 #include "tilemap.h"
 #include "hare.h"
 #include "airstroke.h"
+#include "goal.h"
 #include "carrot.h"
 #include "flag.h"
 #include "butterfly.h"
@@ -19,9 +20,11 @@
 
 #define CODE_LAYER 2
 const static Color_s START_CODE = {{0, 0, 1, 0}};
+const static Color_s GOAL_CODE = {{0, 0, 1, 8}};
 const static Color_s CARROT_CODE = {{0, 0, 1, 1}};
 const static Color_s FLAG_CODE = {{0, 0, 1, 2}};
 const static Color_s BUTTERFLY_CODE = {{0, 0, 1, 3}};
+
 
 
 static struct {
@@ -99,6 +102,10 @@ void level_init(int lvl) {
     background_init(tilemap_width(), tilemap_height(),
             true, false,
             "res/backgrounds/greenhills.png");
+            
+    vec2 goal_pos;
+    assume(tilemap_get_positions(&goal_pos, 1, GOAL_CODE, CODE_LAYER) == 1, "level needs 1 goal");
+    goal_init(goal_pos);
 
     vec2 carrot_pos[3];
     assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, CODE_LAYER) == 3, "level needs 3 carrots");
@@ -145,6 +152,7 @@ void level_init(int lvl) {
 void level_kill() {
     background_kill();
     tilemap_kill();
+    goal_kill();
     carrot_kill();
     flag_kill();
     dead_kill();
@@ -155,6 +163,7 @@ void level_kill() {
 }
 
 void level_update(float dtime) {  
+    goal_update(dtime);
     dead_update(dtime);
     if (!dead_is_dead()) {
         background_update(dtime);
@@ -176,6 +185,7 @@ void level_update(float dtime) {
 void level_render() {
     background_render();
     flag_render();
+    goal_render();
     tilemap_render_back();
     carrot_render();
     dirt_particles_render();

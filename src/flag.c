@@ -35,6 +35,10 @@ static struct {
     vec2 active_pos;
 } L;
 
+static bool flag_reached(int index) {
+    return u_pose_get_y(L.flag_ro.rects[index].uv) < 0.25;
+}
+
 static void emit_particles(float x, float y) {
     for(int i=0; i<L.particle_ro.num; i++) {
         rParticleRect_s *r = &L.particle_ro.rects[i];
@@ -170,15 +174,14 @@ void flag_update(float dtime) {
     
     vec2 hare_pos = hare_position();
     for(int i=0; i<L.flag_ro.num; i++) {
-        if(u_pose_get_y(L.flag_ro.rects[i].uv) < 0.25
-                || carrot_collected() == 0) {
+        if(flag_reached(i) || carrot_collected() == 0) {
             L.btn_ro.rects[i].color.a = 0;
             continue;
         }
         
         
         vec2 center = u_pose_get_xy(L.flag_ro.rects[i].pose);
-        center.y -= 8;
+        center.y -= FLAG_OFFSET_Y;
         float dist = vec2_distance(hare_pos, center);
         if(dist < MIN_DIST) {
             L.btn_ro.rects[i].color.a = 1;
