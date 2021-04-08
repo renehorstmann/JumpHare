@@ -9,6 +9,7 @@
 #include "dirt_particles.h"
 #include "dead.h"
 #include "tiles.h"
+#include "collision.h"
 #include "hare.h"
 
 // debug:
@@ -28,9 +29,14 @@
 #define GRAVITY -400
 
 #define JUMP_START_TIME 0.1
+#define JUMP_FALL_TIME 0.2
 #define DOUBLE_JUMP_START_TIME 0.25
 
-#define COLLISION_DISTANCE 10
+#define COLL_DISTANCE 10
+
+#define COLL_OFFSET_Y -3.0
+#define COLL_RADIUS_X 7.0
+#define COLL_RADIUS_Y 11.0
 
 #define ANIMATION_GROUNDED_FPS 6
 
@@ -99,103 +105,31 @@ static vec2 apply_speed(float dtime) {
     return pos;
 }
 
-static void check_collision_grounded() {
-    float a, b;
-
-    a = tilemap_wall_left(L.pos.x, L.pos.y, NULL);
-
-    if (L.pos.x < a + 7) {
-        // collision?
-        L.pos.x = a + 7;
-        L.speed.x = 0;
-    }
-
-
-    a = tilemap_wall_right(L.pos.x, L.pos.y, NULL);
-
-    if (L.pos.x > a - 7) {
-        // collision?
-        L.pos.x = a - 7;
-        L.speed.x = 0;
-    }
-
-    if (L.speed.y > 0) {
-        return; // To jump
-    }
-
-    a = tilemap_ground(L.pos.x - 3, L.pos.y, NULL);
-    b = tilemap_ground(L.pos.x + 3, L.pos.y, NULL);
-
-    if (L.pos.y < a + 17 || L.pos.y < b + 17) {
-        L.pos.y = sca_max(a, b) + 14;
-
-    } else if (L.state == HARE_GROUNDED) {
+static void collision_callback(vec2 delta, enum collision_state state, void *ud) {
+    if(state == COLLISION_FALLING && L.state == HARE_GROUNDED) {
         L.state = HARE_FALLING;
         L.speed.y = 0;
+        return;
+    } else if(state == COLLISION_KILL) {
+        dead_set_dead(L.pos.x, L.pos.y);
+        return;
     }
-}
-
-static void check_collision_falling() {
-    float a, b;
-    Color_s id_a, id_b;
     
-    a = tilemap_ceiling(L.pos.x - 3, L.pos.y, &id_a);
-    b = tilemap_ceiling(L.pos.x + 3, L.pos.y, &id_b);
-    if(tiles_get_state(id_a) == TILES_PIXEL_ONEWAY_UP)
-        a = FLT_MAX;
-    if(tiles_get_state(id_b) == TILES_PIXEL_ONEWAY_UP)
-        b = FLT_MAX;
+    if(L.state==HARE_JUMPING && state==COLLISION_BOTTOM)
+        delta.y = sca_max(delta.y, 0);
         
-    if((L.pos.y > a - 8) || (L.pos.y > b - 8)){
-        // jump collision?
-        L.pos.y = sca_min(a, b) - 8;
+    L.pos = vec2_add_vec(L.pos, delta);
+    
+    if(state == COLLISION_BOTTOM) {
+        if(L.state != HARE_JUMPING)
+            L.speed.y = 0;
+        if(L.state == HARE_FALLING || L.state == HARE_DOUBLE_JUMP)
+            L.state = HARE_GROUNDED;
+    } else if(state == COLLISION_TOP) {
         L.speed.y = 0;
-    }
-    
-    
-    a = tilemap_wall_left(L.pos.x, L.pos.y - 10, &id_a);
-    b = tilemap_wall_left(L.pos.x, L.pos.y + 3, &id_b);
-    
-    if(tiles_get_state(id_a) == TILES_PIXEL_ONEWAY_UP)
-        a = -FLT_MAX;
-    if(tiles_get_state(id_b) == TILES_PIXEL_ONEWAY_UP)
-        b = -FLT_MAX;
-    
-    if ((L.pos.x < a + 7) || (L.pos.x < b + 7)) {
-        // collision?
-        L.pos.x = sca_max(a, b) + 7;
+    } else if(state == COLLISION_LEFT || state == COLLISION_RIGHT){
         L.speed.x = 0;
     }
-
-
-    a = tilemap_wall_right(L.pos.x, L.pos.y - 10, &id_a);
-    b = tilemap_wall_right(L.pos.x, L.pos.y + 3, &id_b);
-    
-    if(tiles_get_state(id_a) == TILES_PIXEL_ONEWAY_UP)
-        a = FLT_MAX;
-    if(tiles_get_state(id_b) == TILES_PIXEL_ONEWAY_UP)
-        b = FLT_MAX;
-    
-    if ((L.pos.x > a - 7) || (L.pos.x > b - 7)) {
-        // collision?
-        L.pos.x = sca_min(a, b) - 7;
-        L.speed.x = 0;
-    }
-
-    a = tilemap_ground(L.pos.x - 3, L.pos.y-11, &id_a);
-    b = tilemap_ground(L.pos.x + 3, L.pos.y-11, &id_b);
-    
-    if(L.speed.y>0 && tiles_get_state(id_a) == TILES_PIXEL_ONEWAY_UP)
-        a = -FLT_MAX;
-    if(L.speed.y>0 && tiles_get_state(id_b) == TILES_PIXEL_ONEWAY_UP)
-        b = -FLT_MAX;
-
-    if ((L.pos.y < a + 17) || (L.pos.y < b + 17) ) {
-        L.pos.y = sca_max(a, b) + 14;
-        L.state = HARE_GROUNDED;
-        L.speed.y = 0;
-    }
-
 }
 
 static void animate(float dtime) {
@@ -325,7 +259,7 @@ void hare_update(float dtime) {
         if (L.jump_time >= JUMP_START_TIME && L.speed.y <= 0) {
             L.speed.y = JUMP_SPEED;
         }
-        if (L.jump_time >= 0.125) {
+        if (L.jump_time >= JUMP_FALL_TIME) {
             L.state = HARE_FALLING;
         }
     }
@@ -335,18 +269,23 @@ void hare_update(float dtime) {
 
     // collision checks
     float dist = vec2_distance(L.pos, dst_pos);
-    int checks = ceilf(dist / COLLISION_DISTANCE);
+    int checks = ceilf(dist / COLL_DISTANCE);
     for (int i = 1; i <= checks; i++) {
         L.pos = vec2_mix(L.prev_pos, dst_pos, (float) i / checks);
+        
+        Collision_s coll = {collision_callback};
+        vec2 center = {{L.pos.x, L.pos.y+COLL_OFFSET_Y}};
+        vec2 radius = {{COLL_RADIUS_X, COLL_RADIUS_Y}};
+        vec2 speed = L.speed;
 
         switch (L.state) {
             case HARE_GROUNDED:
             case HARE_JUMPING:
-                check_collision_grounded();
+                collision_tilemap_grounded(coll, center, radius, speed);
                 break;
             case HARE_FALLING:
             case HARE_DOUBLE_JUMP:
-                check_collision_falling();
+                collision_tilemap_falling(coll, center, radius, speed);
                 break;
             default:
                 assert(0 && "invalid hare state");
@@ -354,10 +293,12 @@ void hare_update(float dtime) {
     }
 
     if (L.state == HARE_GROUNDED) {
+        /*
         Color_s state;
         float dist = tilemap_ground(L.pos.x, L.pos.y, &state);
         if (dist > L.pos.y-17 && tiles_get_state(state) == TILES_PIXEL_KILL)
             dead_set_dead(L.pos.x, L.pos.y);
+        */
     }
 
     if (L.pos.y < tilemap_border_bottom()) {
@@ -383,7 +324,7 @@ void hare_update(float dtime) {
             L.set_speed_x, L.set_jump_time,
             L.speed.x, L.speed.y);
     r_ro_text_set_text(&L.input_text, text);
-    u_pose_set_xy(&L.input_text.pose, hud_camera_left(), hud_camera_top());
+    u_pose_set_xy(&L.input_text.pose, camera_left(), camera_top());
 }
 
 void hare_render() {
