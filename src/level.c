@@ -129,7 +129,7 @@ void level_init(int lvl) {
         speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "a\nC>H");
     }
     if(tilemap_get_positions(&bubble_pos, 1, SPEECHBUBBLE_2_CODE, CODE_LAYER)) {
-        speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "HBZ");
+        speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "TBZ");
     }
 
     dead_init(dead_callback, NULL);

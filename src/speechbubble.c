@@ -8,8 +8,8 @@
 
 
 #define OFFSET_Y 64
-#define MAX_DIST 60.0
-#define MIN_DIST 20.0
+#define MAX_DIST 45.0
+#define MIN_DIST 15.0
 
 static bool emojifont_uv_cb(mat4 *uv, char c) {
     static const int cols = 16*6;
