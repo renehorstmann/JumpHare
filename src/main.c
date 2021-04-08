@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
         
-    speechbubble_init(&bubble, (vec2){{80,220}}, "C>E=f\n\na\nC=H");
+    speechbubble_init(&bubble, (vec2){{80,160}}, "C>E=f");
 
     e_window_main_loop(main_loop);
 

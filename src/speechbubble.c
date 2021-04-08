@@ -68,13 +68,50 @@ void speechbubble_init(SpeechBubble *self, vec2 center, const char *emojitext) {
     emojifont_init(&self->text, len, camera.gl_main);
     vec2 size = r_ro_text_set_text(&self->text, emojitext);
     
-    vec2 text_pos = vec2_sub_vec(center, vec2_scale(size, 0.5));
-    u_pose_set_xy(&self->text.pose, text_pos.x, text_pos.y);
+    float text_x = center.x - size.x/2;
+    float text_y = center.y + size.y/2;
+    u_pose_set_xy(&self->text.pose, text_x, text_y);
+    
+    int rows = floorf(size.y/16)+2;
+    int cols = floorf(size.x/16)+2;
+    
+    float bubbly_x = text_x-18/2;
+    float bubble_y = text_y+18/2;
+    
+    r_ro_batch_init(&self->bubble, rows*cols, camera.gl_main, r_texture_new_file("res/speechbubble.png", NULL));
+    
+    for(int r=0; r<rows; r++) {
+        for(int c=0; c<cols;c++) {
+            float u, v;
+            if(r==0)
+                v = 0;
+            else if(r==rows-1)
+                v = 2.0/3.0;
+            else 
+                v = 1.0/3.0;
+                
+            if(c==0)
+                u = 0;
+            else if(c==cols-1)
+                u = 2.0/3.0;
+            else
+                u = 1.0/3.0;
+                
+            self->bubble.rects[r*cols+c].uv = u_pose_new(u, v, 1.0/3.0, 1.0/3.0);
+            
+            self->bubble.rects[r*cols+c].pose = u_pose_new(
+                    bubbly_x + c*18,
+                    bubble_y - r*18,
+                    18, 18);
+        }
+    }
+    
+    r_ro_batch_update(&self->bubble);
 }
 
 void speechbubble_kill(SpeechBubble *self) {
     r_ro_text_kill(&self->text);
-    //r_ro_batch_kill(&self->bubble);
+    r_ro_batch_kill(&self->bubble);
 }
 
 void speechbubble_update(SpeechBubble *self, float dtime) {
@@ -82,6 +119,6 @@ void speechbubble_update(SpeechBubble *self, float dtime) {
 }
 
 void speechbubble_render(SpeechBubble *self) {
-    //r_ro_batch_render(&self->bubble);
+    r_ro_batch_render(&self->bubble);
     r_ro_text_render(&self->text);
 }
