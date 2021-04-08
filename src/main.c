@@ -7,11 +7,14 @@
 #include "tiles.h"
 #include "level.h"
 
+#include "speechbubble.h"
+
 
 #define UPDATES_PER_SECOND 200
 
 
 static rRoText fps_ro;
+static SpeechBubble bubble;
 
 static float current_time() {
     return SDL_GetTicks() / 1000.0f;
@@ -40,6 +43,8 @@ int main(int argc, char **argv) {
     r_ro_text_init_font55(&fps_ro, 64, hud_camera.gl);
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
+        
+    speechbubble_init(&bubble, (vec2){{80,220}}, "C>E=f\n\na\nC=H");
 
     e_window_main_loop(main_loop);
 
@@ -79,6 +84,7 @@ static void main_loop(float delta_time) {
 
     // render
     level_render();
+    speechbubble_render(&bubble);
     
     // fps + load
     {
