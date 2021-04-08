@@ -10,6 +10,7 @@
 #include "goal.h"
 #include "carrot.h"
 #include "flag.h"
+#include "speechbubble.h"
 #include "butterfly.h"
 #include "dirt_particles.h"
 #include "dead.h"
@@ -24,12 +25,16 @@ const static Color_s GOAL_CODE = {{0, 0, 1, 8}};
 const static Color_s CARROT_CODE = {{0, 0, 1, 1}};
 const static Color_s FLAG_CODE = {{0, 0, 1, 2}};
 const static Color_s BUTTERFLY_CODE = {{0, 0, 1, 3}};
-
+const static Color_s SPEECHBUBBLE_0_CODE = {{0, 0, 1, 4}};
+const static Color_s SPEECHBUBBLE_1_CODE = {{0, 0, 1, 5}};
+const static Color_s SPEECHBUBBLE_2_CODE = {{0, 0, 1, 6}};
 
 
 static struct {
     rRoBatch borders_ro;
     int current_lvl;
+    SpeechBubble bubbles[3];
+    int bubbles_size;
     int state;
 } L;
 
@@ -114,6 +119,18 @@ void level_init(int lvl) {
     vec2 flag_pos[64];
     int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, CODE_LAYER);
     flag_init(flag_pos, flags);
+    
+    L.bubbles_size=0;
+    vec2 bubble_pos;
+    if(tilemap_get_positions(&bubble_pos, 1, SPEECHBUBBLE_0_CODE, CODE_LAYER)) {
+        speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "HsF");
+    }
+    if(tilemap_get_positions(&bubble_pos, 1, SPEECHBUBBLE_1_CODE, CODE_LAYER)) {
+        speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "a\nC>H");
+    }
+    if(tilemap_get_positions(&bubble_pos, 1, SPEECHBUBBLE_2_CODE, CODE_LAYER)) {
+        speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "HBZ");
+    }
 
     dead_init(dead_callback, NULL);
     controller_init();
@@ -155,6 +172,9 @@ void level_kill() {
     goal_kill();
     carrot_kill();
     flag_kill();
+    for(int i=0; i<L.bubbles_size; i++) {
+        speechbubble_kill(&L.bubbles[i]);
+    }
     dead_kill();
     controller_kill();
     unload_game();
@@ -170,6 +190,9 @@ void level_update(float dtime) {
         tilemap_update(dtime);
         carrot_update(dtime);
         flag_update(dtime);
+        for(int i=0; i<L.bubbles_size; i++) {
+            speechbubble_update(&L.bubbles[i], dtime);
+        }
         hare_update(dtime);
         airstroke_update(dtime);
         butterfly_update(dtime);
@@ -187,6 +210,9 @@ void level_render() {
     flag_render();
     goal_render();
     tilemap_render_back();
+    for(int i=0; i<L.bubbles_size; i++) {
+        speechbubble_render(&L.bubbles[i]);
+    }
     carrot_render();
     dirt_particles_render();
     airstroke_render();

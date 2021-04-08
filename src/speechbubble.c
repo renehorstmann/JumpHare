@@ -3,8 +3,13 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "camera.h"
+#include "hare.h"
 #include "speechbubble.h"
 
+
+#define OFFSET_Y 64
+#define MAX_DIST 60.0
+#define MIN_DIST 20.0
 
 static bool emojifont_uv_cb(mat4 *uv, char c) {
     static const int cols = 16*6;
@@ -63,13 +68,15 @@ void emojifont_init(rRoText *self, int max, const float *vp) {
 
 
 
-void speechbubble_init(SpeechBubble *self, vec2 center, const char *emojitext) {
+void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext) {
+    self->position = position;
+    
     int len = strlen(emojitext);
     emojifont_init(&self->text, len, camera.gl_main);
     vec2 size = r_ro_text_set_text(&self->text, emojitext);
     
-    float text_x = center.x - size.x/2;
-    float text_y = center.y + size.y/2;
+    float text_x = position.x - size.x/2;
+    float text_y = position.y + OFFSET_Y + size.y/2;
     u_pose_set_xy(&self->text.pose, text_x, text_y);
     
     int rows = floorf(size.y/16)+2;
@@ -115,7 +122,30 @@ void speechbubble_kill(SpeechBubble *self) {
 }
 
 void speechbubble_update(SpeechBubble *self, float dtime) {
+    if(sca_isnan(self->position.x))
+        return;
+        
+    vec2 hare_pos = hare_position();
+    float dist = vec2_distance(hare_pos, self->position);
     
+    float alpha;
+    if(dist < MIN_DIST) {
+        alpha = 1;
+    } else {
+        float t = dist / MAX_DIST;
+        alpha = sca_clamp(sca_mix(1, 0, t), 0, 1);
+    }
+    
+    for(int i=0;i<self->text.ro.num;i++) {
+        self->text.ro.rects[i].color.a = alpha;
+    }
+    for(int i=0;i<self->bubble.num;i++) {
+        self->bubble.rects[i].color.a = alpha;
+    }
+    
+    
+    r_ro_batch_update(&self->text.ro);
+    r_ro_batch_update(&self->bubble);
 }
 
 void speechbubble_render(SpeechBubble *self) {

@@ -6,9 +6,10 @@
 typedef struct {
     rRoText text;
     rRoBatch bubble;    
+    vec2 position;    // reset to NAN, to ignore alpha blend (or just dont call update)
 } SpeechBubble;
 
-void speechbubble_init(SpeechBubble *self, vec2 center, const char *emojitext);
+void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext);
 
 void speechbubble_kill(SpeechBubble *self);
 
