@@ -32,8 +32,6 @@
 #define JUMP_FALL_TIME 0.2
 #define DOUBLE_JUMP_START_TIME 0.25
 
-#define COLL_DISTANCE 10
-
 #define COLL_OFFSET_Y -3.0
 #define COLL_RADIUS_X 7.0
 #define COLL_RADIUS_Y 11.0
@@ -64,13 +62,40 @@ static struct {
 } L;
 
 
-static void check_state_change() {
-    if (L.state == HARE_DOUBLE_JUMP && L.prev_state != HARE_DOUBLE_JUMP) {
-        airstroke_add(L.pos.x, L.pos.y);
+
+static void check_jumping(float dtime) {
+    if (L.set_jump_time <= 0) {
+        if (L.state == HARE_GROUNDED) {
+            L.state = HARE_JUMPING;
+            L.jump_time = 0;
+            L.set_jump_time = 1;
+        }
+
+        if (L.state == HARE_FALLING && L.jump_time > DOUBLE_JUMP_START_TIME) {
+            L.speed.y = sca_max(L.speed.y, DOUBLE_JUMP_SPEED_Y);
+            
+#ifndef GOD_MODE 
+            L.state = HARE_DOUBLE_JUMP;
+#endif
+        }
+        L.set_jump_time += dtime;
+    }
+
+    L.jump_time += dtime;
+
+    if (L.state == HARE_JUMPING) {
+        if (L.jump_time >= JUMP_START_TIME && L.speed.y <= 0) {
+            L.speed.y = JUMP_SPEED;
+        }
+        if (L.jump_time >= JUMP_FALL_TIME) {
+            L.state = HARE_FALLING;
+        }
     }
 }
 
-static vec2 apply_speed(float dtime) {
+
+
+static void apply_speed(float dtime) {
     vec2 pos = L.pos;
 
     float set_speed_x = L.state == HARE_DOUBLE_JUMP ?
@@ -95,15 +120,16 @@ static vec2 apply_speed(float dtime) {
     pos.x += actual_speed * dtime;
 
     // y
-    if (L.state == HARE_GROUNDED)
-        return pos;
-
-    L.speed.y += GRAVITY * dtime;
-    L.speed.y = sca_clamp(L.speed.y, -MAX_SPEED_Y, MAX_SPEED_Y);
-    pos.y += L.speed.y * dtime;
-
-    return pos;
+    if (L.state != HARE_GROUNDED) {
+        L.speed.y += GRAVITY * dtime;
+        L.speed.y = sca_clamp(L.speed.y, -MAX_SPEED_Y, MAX_SPEED_Y);
+        pos.y += L.speed.y * dtime;
+    }
+    
+    L.pos = pos;
 }
+
+
 
 static void collision_callback(vec2 delta, enum collision_state state, void *ud) {
     if(state == COLLISION_FALLING && L.state == HARE_GROUNDED) {
@@ -111,7 +137,9 @@ static void collision_callback(vec2 delta, enum collision_state state, void *ud)
         L.speed.y = 0;
         return;
     } else if(state == COLLISION_KILL) {
+#ifndef GOD_MODE
         dead_set_dead(L.pos.x, L.pos.y);
+#endif
         return;
     }
     
@@ -131,6 +159,28 @@ static void collision_callback(vec2 delta, enum collision_state state, void *ud)
         L.speed.x = 0;
     }
 }
+
+static void check_collision() {
+    Collision_s coll = {collision_callback};
+    vec2 center = {{L.pos.x, L.pos.y+COLL_OFFSET_Y}};
+    vec2 radius = {{COLL_RADIUS_X, COLL_RADIUS_Y}};
+    vec2 speed = L.speed;
+
+    switch (L.state) {
+        case HARE_GROUNDED:
+        case HARE_JUMPING:
+            collision_tilemap_grounded(coll, center, radius, speed);
+            break;
+        case HARE_FALLING:
+        case HARE_DOUBLE_JUMP:
+            collision_tilemap_falling(coll, center, radius, speed);
+            break;
+        default:
+            assert(0 && "invalid hare state");
+    }
+}
+
+
 
 static void animate(float dtime) {
     int frame;
@@ -176,6 +226,8 @@ static void animate(float dtime) {
         L.ro.rect.uv = u_pose_new((1 + frame) * w, v * h, -w, h);
 }
 
+
+
 static void emit_dirt(float dtime) {
     if (L.state != HARE_GROUNDED
         || sca_abs(L.speed.x) < 10) {
@@ -208,6 +260,13 @@ static void emit_dirt(float dtime) {
 }
 
 
+static void check_state_change() {
+    if (L.state == HARE_DOUBLE_JUMP && L.prev_state != HARE_DOUBLE_JUMP) {
+        airstroke_add(L.pos.x, L.pos.y);
+    }
+}
+
+
 void hare_init(float pos_x, float pos_y) {
     L.state = L.prev_state = HARE_FALLING;
     
@@ -235,82 +294,13 @@ void hare_update(float dtime) {
     L.prev_state = L.state;
     L.prev_pos = L.pos;
 
-    // check jumping
-    if (L.set_jump_time <= 0) {
-        if (L.state == HARE_GROUNDED) {
-            L.state = HARE_JUMPING;
-            L.jump_time = 0;
-            L.set_jump_time = 1;
-        }
+    check_jumping(dtime);
 
-        if (L.state == HARE_FALLING && L.jump_time > DOUBLE_JUMP_START_TIME) {
-            L.speed.y = sca_max(L.speed.y, DOUBLE_JUMP_SPEED_Y);
-            
-#ifndef GOD_MODE 
-            L.state = HARE_DOUBLE_JUMP;
-#endif
-        }
-        L.set_jump_time += dtime;
-    }
+    apply_speed(dtime);
 
-    L.jump_time += dtime;
-
-    if (L.state == HARE_JUMPING) {
-        if (L.jump_time >= JUMP_START_TIME && L.speed.y <= 0) {
-            L.speed.y = JUMP_SPEED;
-        }
-        if (L.jump_time >= JUMP_FALL_TIME) {
-            L.state = HARE_FALLING;
-        }
-    }
-
-
-    vec2 dst_pos = apply_speed(dtime);
-
-    // collision checks
-    float dist = vec2_distance(L.pos, dst_pos);
-    int checks = ceilf(dist / COLL_DISTANCE);
-    for (int i = 1; i <= checks; i++) {
-        L.pos = vec2_mix(L.prev_pos, dst_pos, (float) i / checks);
-        
-        Collision_s coll = {collision_callback};
-        vec2 center = {{L.pos.x, L.pos.y+COLL_OFFSET_Y}};
-        vec2 radius = {{COLL_RADIUS_X, COLL_RADIUS_Y}};
-        vec2 speed = L.speed;
-
-        switch (L.state) {
-            case HARE_GROUNDED:
-            case HARE_JUMPING:
-                collision_tilemap_grounded(coll, center, radius, speed);
-                break;
-            case HARE_FALLING:
-            case HARE_DOUBLE_JUMP:
-                collision_tilemap_falling(coll, center, radius, speed);
-                break;
-            default:
-                assert(0 && "invalid hare state");
-        }
-    }
-
-    if (L.state == HARE_GROUNDED) {
-        /*
-        Color_s state;
-        float dist = tilemap_ground(L.pos.x, L.pos.y, &state);
-        if (dist > L.pos.y-17 && tiles_get_state(state) == TILES_PIXEL_KILL)
-            dead_set_dead(L.pos.x, L.pos.y);
-        */
-    }
-
-    if (L.pos.y < tilemap_border_bottom()) {
-#ifdef GOD_MODE
-        L.pos.y = tilemap_border_bottom();
-#else
-        dead_set_dead(L.pos.x, L.pos.y);
-#endif
-    }
+    check_collision();
 
     u_pose_set_xy(&L.ro.rect.pose, L.pos.x, L.pos.y);
-
     animate(dtime);
 
     emit_dirt(dtime);
