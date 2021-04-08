@@ -31,10 +31,17 @@ In active developmemt
     - collision_with_hare_callback
     - visualization
     - carrots + butterflies
-- level object init module (positions)
+- emoji text font
+  - hare
+  - stars
   - carrot
-  - butterfly
-  - ...
+  - airstrike
+  - goal
+  - heart
+- speech bubble
+  - uses emoji text
+  - speech, think, scream
+  - tilemap bubble 1, 2, 3
 - hare double jump animation
 - non final sound effects?
 - enemies
