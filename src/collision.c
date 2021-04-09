@@ -126,6 +126,20 @@ void collision_tilemap_grounded(Collision_s self, vec2 center, vec2 radius, vec2
 
 void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 speed) {
     
+    if(speed.y<0) {
+        if(center.y < tilemap_border_bottom()) {
+            self.cb((vec2){{0}}, COLLISION_KILL, self.cb_user_data);
+           return;
+        }
+        
+        if(scan_bottom_falling(self, center.x-radius.x*SCANNER_DISTANCE, center.y - radius.y, speed.y))
+            return;
+            
+        if(scan_bottom_falling(self, center.x+radius.x*SCANNER_DISTANCE, center.y - radius.y, speed.y))
+            return;
+    }
+    
+    
     if(speed.y>0) {
         if(scan_top(self, 
                 center.x-radius.x*SCANNER_DISTANCE,
@@ -152,18 +166,4 @@ void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 
     if(scan_right(self, center.x+radius.x, center.y + radius.y*SCANNER_DISTANCE))
         return;
        
-       
-    if(speed.y>0)
-        return;
-        
-    if(center.y < tilemap_border_bottom()) {
-       self.cb((vec2){{0}}, COLLISION_KILL, self.cb_user_data);
-       return;
-    }
-        
-    if(scan_bottom_falling(self, center.x-radius.x*SCANNER_DISTANCE, center.y - radius.y, speed.y))
-        return;
-            
-    if(scan_bottom_falling(self, center.x+radius.x*SCANNER_DISTANCE, center.y - radius.y, speed.y))
-        return;
 }
