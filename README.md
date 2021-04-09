@@ -34,6 +34,11 @@ In active developmemt
 - hare double jump animation
 - non final sound effects?
 - enemies
+- some update:
+  - last frame texture
+    - created on r init, but empty
+    - blit framebuffer function
+  - ro refraction single, batch
 
 
 ## Compiling for Web
