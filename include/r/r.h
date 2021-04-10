@@ -11,5 +11,6 @@
 #include "ro_particle.h"
 #include "ro_text.h"
 #include "ro_ttftext.h"
+#include "ro_refract_single.h"
 
 #endif //R_R_H
