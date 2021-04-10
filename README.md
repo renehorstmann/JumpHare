@@ -35,10 +35,7 @@ In active developmemt
 - non final sound effects?
 - enemies
 - some update:
-  - last frame texture
-    - created on r init, but empty
-    - blit framebuffer function
-  - ro refraction single, batch
+  - ro refract single, batch, particle?
 
 
 ## Compiling for Web
