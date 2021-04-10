@@ -12,7 +12,6 @@
 
 
 static rRoText fps_ro;
-static rRoSingle fbo;
 
 static float current_time() {
     return SDL_GetTicks() / 1000.0f;
@@ -42,10 +41,7 @@ int main(int argc, char **argv) {
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
-    r_ro_single_init(&fbo, camera.gl_main, r_render.framebuffer_tex);
-    fbo.owns_tex = false;
-    fbo.rect.pose = u_pose_new(60, 180, 64, 64);
- 
+
     e_window_main_loop(main_loop);
 
     e_gui_kill();
@@ -109,9 +105,7 @@ static void main_loop(float delta_time) {
         r_ro_text_render(&fps_ro);
     }
 
-    fbo.tex = r_render.framebuffer_tex;
-    r_ro_single_render(&fbo);
-
+    
     // nuklear debug windows
     e_gui_render();
 
