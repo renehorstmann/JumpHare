@@ -1,6 +1,7 @@
 #ifndef R_RENDER_H
 #define R_RENDER_H
 
+#include "mathc/types/int.h"
 #include "mathc/types/float.h"
 #include "core.h"
 
@@ -8,6 +9,7 @@ struct rRenderGolabals_s {
     vec4 clear_color;
     SDL_Window *window;
     GLuint framebuffer_tex;
+    ivec2 framebuffer_tex_size;
 };
 extern struct rRenderGolabals_s r_render;
 
