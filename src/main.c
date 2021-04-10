@@ -7,11 +7,14 @@
 #include "tiles.h"
 #include "level.h"
 
+#include "utilc/assume.h"
+#include "io.h"
 
 #define UPDATES_PER_SECOND 200
 
 
 static rRoText fps_ro;
+static rRoRefractSingle refract;
 
 static float current_time() {
     return SDL_GetTicks() / 1000.0f;
@@ -41,6 +44,12 @@ int main(int argc, char **argv) {
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
+    Image *img = io_load_image("res/ice_block.png", 2);
+    assume(img, "wtf");
+    GLuint tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
+    GLuint tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
+    r_ro_refract_single_init(&refract, camera.gl_main, tex_main, tex_refract, &r_render.framebuffer_tex);
+    refract.rect.pose = u_pose_new(60, 128, 16, 32);
 
     e_window_main_loop(main_loop);
 
@@ -105,6 +114,7 @@ static void main_loop(float delta_time) {
         r_ro_text_render(&fps_ro);
     }
 
+    r_ro_refract_single_render(&refract);
     
     // nuklear debug windows
     e_gui_render();

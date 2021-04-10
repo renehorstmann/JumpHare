@@ -8,5 +8,8 @@ uniform sampler2D tex_refract;
 uniform sampler2D tex_framebuffer;
 
 void main() {
-    out_frag_color = texture(tex_main, v_tex_coord) * v_color;
+    out_frag_color = texture(tex_main, v_tex_coord)
+            * texture(tex_refract, v_tex_coord)
+            * texture(tex_framebuffer, v_tex_coord)
+            * v_color;
 }
