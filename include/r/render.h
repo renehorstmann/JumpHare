@@ -7,15 +7,20 @@
 struct rRenderGolabals_s {
     vec4 clear_color;
     SDL_Window *window;
+    GLuint framebuffer_tex;
 };
 extern struct rRenderGolabals_s r_render;
 
 
 void r_render_init(SDL_Window *window);
 
+// cols and rows of the current screen, see e_window
 void r_render_begin_frame(int cols, int rows);
 
 void r_render_end_frame();
+
+// cols and rows of the current screen, see e_window
+void r_render_blit_framebuffer(int cols, int rows);
 
 void r_render_error_check();
 

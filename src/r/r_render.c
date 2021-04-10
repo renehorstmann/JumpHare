@@ -1,3 +1,4 @@
+#include "r/texture.h"
 #include "r/render.h"
 
 struct rRenderGolabals_s r_render;
@@ -14,6 +15,9 @@ void r_render_init(SDL_Window *window) {
         SDL_LogWarn(SDL_LOG_CATEGORY_RENDER, "OpenGL failed: only has %d/16 vertex attributes", max_vertex_attributes);
         //exit(EXIT_FAILURE);
     }
+    
+    // startup "empty" texture
+    r_render.framebuffer_tex = r_texture_new_white_pixel();
 }
 
 void r_render_begin_frame(int cols, int rows) {
@@ -30,6 +34,25 @@ void r_render_end_frame() {
     SDL_GL_SwapWindow(r_render.window);
 }
 
+void r_render_blit_framebuffer(int cols, int rows) {
+    GLuint fbo;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    
+    GLuint tex = r_texture_new_empty(cols, rows);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0); 
+    
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+    glBlitFramebuffer(0, 0, cols, rows, 0, 0, cols, rows, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &fbo);
+    
+    // todo: swap n delete
+    GLuint tmp = r_render.framebuffer_tex;
+    r_render.framebuffer_tex = tex;
+    glDeleteTextures(1, &tmp);
+}
 
 void r_render_error_check() {
     static GLenum errs[32];

@@ -108,6 +108,9 @@ static void main_loop(float delta_time) {
     // nuklear debug windows
     e_gui_render();
 
+    // blit current frame to texture
+    r_render_blit_framebuffer(e_window.size.x, e_window.size.y);
+
     // swap buffers
     r_render_end_frame();
 
