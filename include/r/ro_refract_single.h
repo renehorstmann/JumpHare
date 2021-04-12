@@ -25,7 +25,8 @@ typedef struct {
     bool owns_tex_refraction;
 } rRoRefractSingle;
 
-void r_ro_refract_single_init(rRoRefractSingle *self, const float *vp, const float *scale_ptr,
+void r_ro_refract_single_init(rRoRefractSingle *self,
+        const float *vp, const float *scale_ptr,
         GLuint tex_main_sink, GLuint tex_refraction_sink);
 
 void r_ro_refract_single_kill(rRoRefractSingle *self);

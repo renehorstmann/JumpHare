@@ -50,6 +50,7 @@ int main(int argc, char **argv) {
     GLuint tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
     r_ro_refract_single_init(&refract, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     refract.rect.pose = u_pose_new(260, 100, 32, 64);
+    refract.rect.color.a=0.8;
     refract.view_aabb = camera.gl_view_aabb;
 
     e_window_main_loop(main_loop);
