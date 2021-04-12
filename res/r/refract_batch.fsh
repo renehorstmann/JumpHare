@@ -27,16 +27,26 @@ float space_distance(vec2 pos, vec4 space) {
 
 void main() {
     
-    vec2 size = vec2(textureSize(tex_framebuffer, 0));
+    vec2 tex_refraction_size = vec2(textureSize(tex_refraction, 0));
+    vec2 tex_framebuffer_size = vec2(textureSize(tex_framebuffer, 0));
     
     vec4 refract = texture(tex_refraction, v_tex_coord);
     
-    vec2 offset = (refract.xy - 0.5f) * 256.0f * scale;
+    vec2 stretch = vec2(
+            mod(refract.z*255.0f,  16.0f)-8.0f,
+            floor(refract.z*255.0f/16.0f)-8.0f
+    );
+    stretch = stretch / 4.0f - 1.0f;
+    
+        
+    vec2 offset = (refract.xy - 0.5f) * 255.0f;
+    offset = offset + stretch * v_tex_coord * tex_refraction_size;
+    offset = offset * scale;
     
     vec2 r_coord;
-    r_coord.x = (gl_FragCoord.x + offset.x) / size.x;
-    r_coord.y = 1.0f - (gl_FragCoord.y + offset.y) / size.y;
-    
+    r_coord.x = (gl_FragCoord.x + offset.x) / tex_framebuffer_size.x;
+    r_coord.y = 1.0f - (gl_FragCoord.y + offset.y) / tex_framebuffer_size.y;
+        
     float alpha = mix(refract.a, 0.0f, 
             max(0.0f, 1.0f-5.0f*space_distance(r_coord, view_aabb)));
     

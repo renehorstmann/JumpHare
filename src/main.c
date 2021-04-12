@@ -14,7 +14,8 @@
 
 
 static rRoText fps_ro;
-static rRoRefractParticle refract;
+static rRoRefractSingle ice;
+static rRoRefractSingle mirror;
 
 static float current_time() {
     return SDL_GetTicks() / 1000.0f;
@@ -48,11 +49,19 @@ int main(int argc, char **argv) {
     assume(img, "wtf");
     GLuint tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
     GLuint tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
-    r_ro_refract_particle_init(&refract, 1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
-    refract.rects[0].pose = u_pose_new(260, 100, 32, 64);
-    refract.rects[0].color.a=0.8;
-    refract.view_aabb = camera.gl_view_aabb;
-    r_ro_refract_particle_update(&refract);
+    r_ro_refract_single_init(&ice, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
+    ice.rect.pose = u_pose_new(260, 100, 32, 64);
+    ice.rect.color.a=0.8;
+    ice.view_aabb = camera.gl_view_aabb;
+    
+    
+    img = io_load_image("res/mirror.png", 2);
+    assume(img, "wtf");
+    tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
+    tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
+    r_ro_refract_single_init(&mirror, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
+    mirror.rect.pose = u_pose_new(120, 100, 32, 64);
+    mirror.view_aabb = camera.gl_view_aabb;
 
     e_window_main_loop(main_loop);
 
@@ -117,7 +126,8 @@ static void main_loop(float delta_time) {
         r_ro_text_render(&fps_ro);
     }
 
-    r_ro_refract_particle_render(&refract, 0);
+    r_ro_refract_single_render(&ice);
+    r_ro_refract_single_render(&mirror);
     
     // nuklear debug windows
     e_gui_render();
