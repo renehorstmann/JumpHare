@@ -1,6 +1,7 @@
 #ifndef R_RECT_H
 #define R_RECT_H
 
+#include <stddef.h> // offsetof
 #include "mathc/types/float.h"
 
 typedef struct {
