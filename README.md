@@ -34,8 +34,6 @@ In active developmemt
 - hare double jump animation
 - non final sound effects?
 - enemies
-- some update:
-  - ro refract single, batch, particle?
 
 
 ## Compiling for Web
