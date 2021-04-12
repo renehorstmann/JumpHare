@@ -1,5 +1,5 @@
 #include "r/ro_batch.h"
-#include "r/ro_refract_single.h"
+#include "r/ro_refract_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
@@ -40,7 +40,7 @@ static struct {
     int state;
 
     // test
-    RoRefractSingle ice, mirror;
+    RoRefractBatch ice, mirror;
 } L;
 
 static void load_game() {
@@ -178,19 +178,25 @@ void level_init(int lvl) {
     assume(img, "wtf");
     tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
     tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
-    ro_refract_single_init(&L.ice, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
-    L.ice.rect.pose = u_pose_new(260, 100, 32, 64);
-    L.ice.rect.color.a=0.8;
+    ro_refract_batch_init(&L.ice, 1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.ice.view_aabb = camera.gl_view_aabb;
+    for(int i=0; i<L.ice.num; i++) {
+        L.ice.rects[i].pose = u_pose_new(260+32*i, 100, 32, 64);
+        L.ice.rects[i].color.a=0.8;
+    }
+    ro_refract_batch_update(&L.ice);
 
 
     img = io_load_image("res/mirror.png", 2);
     assume(img, "wtf");
     tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
     tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
-    ro_refract_single_init(&L.mirror, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
-    L.mirror.rect.pose = u_pose_new(120, 100, 32, 64);
+    ro_refract_batch_init(&L.mirror, 1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.mirror.view_aabb = camera.gl_view_aabb;
+    for(int i=0; i<L.mirror.num; i++) {
+        L.mirror.rects[i].pose = u_pose_new(120+32*i, 100, 32, 64);
+    }
+    ro_refract_batch_update(&L.mirror);
 
     image_delete(img);
 }
@@ -211,8 +217,8 @@ void level_kill() {
     ro_batch_kill(&L.borders_ro);
 
     // test
-    ro_refract_single_kill(&L.ice);
-    ro_refract_single_kill(&L.mirror);
+    ro_refract_batch_kill(&L.ice);
+    ro_refract_batch_kill(&L.mirror);
 }
 
 void level_update(float dtime) {  
@@ -245,8 +251,8 @@ void level_render() {
     tilemap_render_back();
 
     // test
-    ro_refract_single_render(&L.ice);
-    ro_refract_single_render(&L.mirror);
+    ro_refract_batch_render(&L.ice);
+    ro_refract_batch_render(&L.mirror);
 
     for(int i=0; i<L.bubbles_size; i++) {
         speechbubble_render(&L.bubbles[i]);
