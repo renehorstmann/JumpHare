@@ -5,7 +5,7 @@ project(jumphare C)
 # USING_GLES            for OpenGLES3.0 instead of OpenGL3.3
 # USING_GLEW            if GLEW is available
 # -not used- USING_GYRO            if gyro sensor is available
-# -not used- USING_TTF             to use r_ro_ttftext
+# -not used- USING_TTF             to use ro_ttftext
 # NUKLEAR_SCALE=3.0     for small hd screens (smartphones)
 
 set(CMAKE_C_STANDARD 11)

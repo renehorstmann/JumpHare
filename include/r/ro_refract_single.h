@@ -35,19 +35,19 @@ typedef struct {
     const GLuint *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
     bool owns_tex_main;
     bool owns_tex_refraction;
-} rRoRefractSingle;
+} RoRefractSingle;
 
-void r_ro_refract_single_init(rRoRefractSingle *self,
+void ro_refract_single_init(RoRefractSingle *self,
         const float *vp, const float *scale_ptr,
         GLuint tex_main_sink, GLuint tex_refraction_sink);
 
-void r_ro_refract_single_kill(rRoRefractSingle *self);
+void ro_refract_single_kill(RoRefractSingle *self);
 
-void r_ro_refract_single_render(rRoRefractSingle *self);
+void ro_refract_single_render(RoRefractSingle *self);
 
-void r_ro_refract_single_set_texture_main(rRoRefractSingle *self, GLuint tex_main_sink);
+void ro_refract_single_set_texture_main(RoRefractSingle *self, GLuint tex_main_sink);
 
-void r_ro_refract_single_set_texture_refraction(rRoRefractSingle *self, GLuint tex_refraction_sink);
+void ro_refract_single_set_texture_refraction(RoRefractSingle *self, GLuint tex_refraction_sink);
 
 
 #endif //R_RO_REFRACT_SINGLE_H

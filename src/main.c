@@ -13,7 +13,7 @@
 #define UPDATES_PER_SECOND 200
 
 
-static rRoText fps_ro;
+static RoText fps_ro;
 
 static float current_time() {
     return SDL_GetTicks() / 1000.0f;
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
     tiles_init();       // loads all tile textures
     level_init(1);      // manages the gameplay (tilemap, hare, background, ...)
 
-    r_ro_text_init_font55(&fps_ro, 64, hud_camera.gl);
+    ro_text_init_font55(&fps_ro, 64, hud_camera.gl);
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
@@ -97,14 +97,14 @@ static void main_loop(float delta_time) {
         if(time>0.25) {
             char text[64];
             sprintf(text, "%7.2f %3.0f%%", cnt/time, load*100);
-            vec2 size = r_ro_text_set_text(&fps_ro, text);
+            vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
                           hud_camera_right() - size.x-2,
                           hud_camera_top()-2);
             time -= 0.25;
             cnt = 0;
         }
-        r_ro_text_render(&fps_ro);
+        ro_text_render(&fps_ro);
     }
     
     // nuklear debug windows

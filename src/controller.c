@@ -19,7 +19,7 @@
 #define BACKGROUND_SIZE 512
 
 static struct {
-    rRoBatch background_ro;
+    RoBatch background_ro;
     ePointer_s pointer[2];
     bvec2 pointer_down_map;
     int pointer_down;
@@ -155,13 +155,13 @@ void controller_init() {
     L.pointer[1].action = E_POINTER_UP;
     e_input_register_pointer_event(pointer_event, NULL);
 
-    r_ro_batch_init(&L.background_ro, 2, hud_camera.gl, r_texture_new_file("res/hud_background.png", NULL));
+    ro_batch_init(&L.background_ro, 2, hud_camera.gl, r_texture_new_file("res/hud_background.png", NULL));
     //L.background_ro.rect.color.a = 0.0;
 }
 
 void controller_kill() {
     e_input_unregister_pointer_event(pointer_event);
-    r_ro_batch_kill(&L.background_ro);
+    ro_batch_kill(&L.background_ro);
     memset(&L, 0, sizeof(L));
 }
 
@@ -182,9 +182,9 @@ void controller_update(float dtime) {
         L.background_ro.rects[1].pose = pose;
     }
     
-    r_ro_batch_update(&L.background_ro);
+    ro_batch_update(&L.background_ro);
 }
 
 void controller_render() {
-    r_ro_batch_render(&L.background_ro);
+    ro_batch_render(&L.background_ro);
 }

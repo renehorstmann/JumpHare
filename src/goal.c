@@ -25,8 +25,8 @@
 
 
 static struct {
-    rRoSingle goal_ro;
-    rRoParticle particle_ro;
+    RoSingle goal_ro;
+    RoParticle particle_ro;
     float time;
 } L;
 
@@ -51,7 +51,7 @@ static void emit_particles(float x, float y) {
         
         r->start_time = L.time;
     }
-    r_ro_particle_update(&L.particle_ro);
+    ro_particle_update(&L.particle_ro);
 }
 
 static void activate() {
@@ -67,7 +67,7 @@ static void activate() {
 
 void goal_init(vec2 position) {
     
-    r_ro_single_init(&L.goal_ro, camera.gl_main,
+    ro_single_init(&L.goal_ro, camera.gl_main,
                     r_texture_new_file("res/goal_flag.png", NULL));
     L.goal_ro.rect.pose = u_pose_new(
             position.x,
@@ -77,7 +77,7 @@ void goal_init(vec2 position) {
     u_pose_set_size(&L.goal_ro.rect.uv, 1.0/FRAMES, 0.5);
     u_pose_set_y(&L.goal_ro.rect.uv, 0.5);   
     
-    r_ro_particle_init(&L.particle_ro, MAX_PARTICLES,
+    ro_particle_init(&L.particle_ro, MAX_PARTICLES,
             camera.gl_main, r_texture_new_white_pixel());
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
@@ -85,13 +85,13 @@ void goal_init(vec2 position) {
         L.particle_ro.rects[i].color_speed.a = 
             (float)-PARTICLE_ALPHA/PARTICLE_TIME;
     }
-    r_ro_particle_update(&L.particle_ro);
+    ro_particle_update(&L.particle_ro);
     
 }
 
 void goal_kill() {
-    r_ro_single_kill(&L.goal_ro);
-    r_ro_particle_kill(&L.particle_ro);
+    ro_single_kill(&L.goal_ro);
+    ro_particle_kill(&L.particle_ro);
 }
 
 void goal_update(float dtime) {
@@ -121,8 +121,8 @@ void goal_update(float dtime) {
 
 void goal_render() {
     if(goal_reached())
-        r_ro_particle_render(&L.particle_ro, L.time);
-    r_ro_single_render(&L.goal_ro);
+        ro_particle_render(&L.particle_ro, L.time);
+    ro_single_render(&L.goal_ro);
 }
 
 bool goal_reached() {

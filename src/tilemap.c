@@ -14,9 +14,9 @@
 #define MAP_LAYERS 3
 
 static struct {
-    rRoBatch ro_back[MAX_TILES];
-    rRoBatch ro_main[MAX_TILES];
-//    rRoBatch ro_front[MAX_TILES];
+    RoBatch ro_back[MAX_TILES];
+    RoBatch ro_main[MAX_TILES];
+//    RoBatch ro_front[MAX_TILES];
     bool ro_back_active[MAX_TILES];
     bool ro_main_active[MAX_TILES];
     Image *map;
@@ -97,13 +97,13 @@ void tilemap_init(const char *file) {
     for (int i = 0; i < tiles.size; i++) {
         L.ro_back_active[i] = tile_back_nums[i] > 0;
         if(L.ro_back_active[i]) {
-            r_ro_batch_init(&L.ro_back[i], tile_back_nums[i], camera.gl_main, tiles.textures[i]);
+            ro_batch_init(&L.ro_back[i], tile_back_nums[i], camera.gl_main, tiles.textures[i]);
             L.ro_back[i].owns_tex = false;
         }
         
         L.ro_main_active[i] = tile_main_nums[i] > 0;
         if(L.ro_main_active[i]) {
-            r_ro_batch_init(&L.ro_main[i], tile_main_nums[i], camera.gl_main, tiles.textures[i]);
+            ro_batch_init(&L.ro_main[i], tile_main_nums[i], camera.gl_main, tiles.textures[i]);
             L.ro_main[i].owns_tex = false;
         }
     }
@@ -140,10 +140,10 @@ void tilemap_init(const char *file) {
 
     for (int i = 0; i < tiles.size; i++) {
         if(L.ro_back_active[i])
-            r_ro_batch_update(&L.ro_back[i]);
+            ro_batch_update(&L.ro_back[i]);
         if(L.ro_main_active[i])
-            r_ro_batch_update(&L.ro_main[i]);
-//        r_ro_batch_update(&L.ro_front[i]);
+            ro_batch_update(&L.ro_main[i]);
+//        ro_batch_update(&L.ro_front[i]);
     }
 }
 
@@ -151,10 +151,10 @@ void tilemap_kill() {
     image_delete(L.map);
     for (int i = 0; i < tiles.size; i++) {
         if(L.ro_back_active[i])
-            r_ro_batch_kill(&L.ro_back[i]);
+            ro_batch_kill(&L.ro_back[i]);
         if(L.ro_main_active[i])
-            r_ro_batch_kill(&L.ro_main[i]);
-//        r_ro_batch_kill(&L.ro_front[i]);
+            ro_batch_kill(&L.ro_main[i]);
+//        ro_batch_kill(&L.ro_front[i]);
     }
     memset(&L, 0, sizeof(L));
 }
@@ -166,17 +166,17 @@ void tilemap_update(float dtime) {
 void tilemap_render_back() {
     for (int i = 0; i < tiles.size; i++) {
         if(L.ro_back_active[i])
-            r_ro_batch_render(&L.ro_back[i]);
+            ro_batch_render(&L.ro_back[i]);
     }
     for (int i = 0; i < tiles.size; i++) {
         if(L.ro_main_active[i])
-            r_ro_batch_render(&L.ro_main[i]);
+            ro_batch_render(&L.ro_main[i]);
     }
 }
 
 void tilemap_render_front() {
     for (int i = 0; i < tiles.size; i++) {
-//        r_ro_batch_render(&L.ro_front[i]);
+//        ro_batch_render(&L.ro_front[i]);
     }
 }
 

@@ -12,7 +12,7 @@
 #define PIXEL_SIZE 2.0
 
 static struct {
-    rRoBatch ro[CAMERA_BACKGROUNDS];
+    RoBatch ro[CAMERA_BACKGROUNDS];
 } L;
 
 
@@ -32,7 +32,7 @@ void background_init(float level_width, float level_height,
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
         GLuint tex = r_texture_new(img->cols, img->rows, image_layer(img, i));
-        r_ro_batch_init(&L.ro[i], size_h*size_v, camera.gl_background[i], tex);
+        ro_batch_init(&L.ro[i], size_h*size_v, camera.gl_background[i], tex);
 
         for (int v = 0; v < size_v; v++) {
             for(int h = 0; h < size_h; h++) {
@@ -42,14 +42,14 @@ void background_init(float level_width, float level_height,
                         cols, rows);
             }
         }
-        r_ro_batch_update(&L.ro[i]);
+        ro_batch_update(&L.ro[i]);
     }
 }
 
 
 void background_kill() {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
-        r_ro_batch_kill(&L.ro[i]);
+        ro_batch_kill(&L.ro[i]);
     }
     memset(&L, 0, sizeof(L));
 }
@@ -61,6 +61,6 @@ void background_update(float dtime) {
 
 void background_render() {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
-        r_ro_batch_render(&L.ro[i]);
+        ro_batch_render(&L.ro[i]);
 }
 

@@ -28,9 +28,9 @@
 
 
 static struct {
-    rRoBatch flag_ro;
-    rRoBatch btn_ro;
-    rRoParticle particle_ro;
+    RoBatch flag_ro;
+    RoBatch btn_ro;
+    RoParticle particle_ro;
     float time;
     vec2 active_pos;
 } L;
@@ -55,7 +55,7 @@ static void emit_particles(float x, float y) {
         r->color.a = PARTICLE_ALPHA;
         r->start_time = L.time;
     }
-    r_ro_particle_update(&L.particle_ro);
+    ro_particle_update(&L.particle_ro);
 }
 
 static void activate(int flag_index) {
@@ -112,7 +112,7 @@ void flag_init(const vec2 *positions, int num) {
 
     L.active_pos = (vec2) {{NAN, NAN}};
 
-    r_ro_batch_init(&L.flag_ro, num, camera.gl_main,
+    ro_batch_init(&L.flag_ro, num, camera.gl_main,
                     r_texture_new_file("res/flag.png", NULL));
     for(int i=0; i<num; i++) {
         L.flag_ro.rects[i].pose = u_pose_new(
@@ -123,10 +123,10 @@ void flag_init(const vec2 *positions, int num) {
         u_pose_set_size(&L.flag_ro.rects[i].uv, 1.0/FRAMES, 0.5);
         u_pose_set_y(&L.flag_ro.rects[i].uv, 0.5);   
     }
-    r_ro_batch_update(&L.flag_ro);
+    ro_batch_update(&L.flag_ro);
     
     
-    r_ro_batch_init(&L.btn_ro, num, camera.gl_main,
+    ro_batch_init(&L.btn_ro, num, camera.gl_main,
                     r_texture_new_file("res/carrot_btn.png", NULL));
     for(int i=0; i<num; i++) {
         
@@ -137,9 +137,9 @@ void flag_init(const vec2 *positions, int num) {
         button_init_uv(&L.btn_ro.rects[i]);
         L.btn_ro.rects[i].color.a = 1;
     }
-    r_ro_batch_update(&L.btn_ro);
+    ro_batch_update(&L.btn_ro);
     
-    r_ro_particle_init(&L.particle_ro, MAX_PARTICLES,
+    ro_particle_init(&L.particle_ro, MAX_PARTICLES,
             camera.gl_main, r_texture_new_white_pixel());
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
@@ -147,15 +147,15 @@ void flag_init(const vec2 *positions, int num) {
         L.particle_ro.rects[i].color_speed.a = 
             (float)-PARTICLE_ALPHA/PARTICLE_TIME;
     }
-    r_ro_particle_update(&L.particle_ro);
+    ro_particle_update(&L.particle_ro);
 }
 
 void flag_kill() {
     e_input_unregister_pointer_event(
             pointer_callback);
-    r_ro_batch_kill(&L.flag_ro);
-    r_ro_batch_kill(&L.btn_ro);
-    r_ro_particle_kill(&L.particle_ro);
+    ro_batch_kill(&L.flag_ro);
+    ro_batch_kill(&L.btn_ro);
+    ro_particle_kill(&L.particle_ro);
 }
 
 void flag_update(float dtime) {
@@ -169,7 +169,7 @@ void flag_update(float dtime) {
     for(int i=0; i<L.flag_ro.num; i++)
         u_pose_set_x(&L.flag_ro.rects[i].uv, u);
     
-    r_ro_batch_update(&L.flag_ro);
+    ro_batch_update(&L.flag_ro);
     
     
     vec2 hare_pos = hare_position();
@@ -193,13 +193,13 @@ void flag_update(float dtime) {
         }
     }
     
-    r_ro_batch_update(&L.btn_ro);
+    ro_batch_update(&L.btn_ro);
 }
 
 void flag_render() {
-    r_ro_particle_render(&L.particle_ro, L.time);
-    r_ro_batch_render(&L.flag_ro);
-    r_ro_batch_render(&L.btn_ro);
+    ro_particle_render(&L.particle_ro, L.time);
+    ro_batch_render(&L.flag_ro);
+    ro_batch_render(&L.btn_ro);
 }
 
 vec2 flag_active_position() {

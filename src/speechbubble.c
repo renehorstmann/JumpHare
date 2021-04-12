@@ -60,8 +60,8 @@ static bool emojifont_uv_cb(mat4 *uv, char c) {
     return nl;
 }
 
-void emojifont_init(rRoText *self, int max, const float *vp) {
-    r_ro_text_init(self, max, emojifont_uv_cb, vp, r_texture_new_file("res/emojifont.png", NULL));
+void emojifont_init(RoText *self, int max, const float *vp) {
+    ro_text_init(self, max, emojifont_uv_cb, vp, r_texture_new_file("res/emojifont.png", NULL));
     self->size = (vec2) {16, 16};
     self->offset = (vec2) {18, 18};
 }
@@ -73,7 +73,7 @@ void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext)
     
     int len = strlen(emojitext);
     emojifont_init(&self->text, len, camera.gl_main);
-    vec2 size = r_ro_text_set_text(&self->text, emojitext);
+    vec2 size = ro_text_set_text(&self->text, emojitext);
     
     float text_x = position.x - size.x/2;
     float text_y = position.y + OFFSET_Y + size.y/2;
@@ -85,7 +85,7 @@ void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext)
     float bubbly_x = text_x-18/2;
     float bubble_y = text_y+18/2;
     
-    r_ro_batch_init(&self->bubble, rows*cols, camera.gl_main, r_texture_new_file("res/speechbubble.png", NULL));
+    ro_batch_init(&self->bubble, rows*cols, camera.gl_main, r_texture_new_file("res/speechbubble.png", NULL));
     
     for(int r=0; r<rows; r++) {
         for(int c=0; c<cols;c++) {
@@ -113,12 +113,12 @@ void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext)
         }
     }
     
-    r_ro_batch_update(&self->bubble);
+    ro_batch_update(&self->bubble);
 }
 
 void speechbubble_kill(SpeechBubble *self) {
-    r_ro_text_kill(&self->text);
-    r_ro_batch_kill(&self->bubble);
+    ro_text_kill(&self->text);
+    ro_batch_kill(&self->bubble);
 }
 
 void speechbubble_update(SpeechBubble *self, float dtime) {
@@ -144,11 +144,11 @@ void speechbubble_update(SpeechBubble *self, float dtime) {
     }
     
     
-    r_ro_batch_update(&self->text.ro);
-    r_ro_batch_update(&self->bubble);
+    ro_batch_update(&self->text.ro);
+    ro_batch_update(&self->bubble);
 }
 
 void speechbubble_render(SpeechBubble *self) {
-    r_ro_batch_render(&self->bubble);
-    r_ro_text_render(&self->text);
+    ro_batch_render(&self->bubble);
+    ro_text_render(&self->text);
 }

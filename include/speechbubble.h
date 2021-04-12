@@ -4,8 +4,8 @@
 #include "r/ro_text.h"
 
 typedef struct {
-    rRoText text;
-    rRoBatch bubble;    
+    RoText text;
+    RoBatch bubble;
     vec2 position;    // reset to NAN, to ignore alpha blend (or just dont call update)
 } SpeechBubble;
 

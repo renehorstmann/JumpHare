@@ -20,23 +20,23 @@ typedef struct {
 } Stroke;
 
 static struct {
-    rRoBatch ro;
+    RoBatch ro;
     Stroke strokes[AIRSTROKE_MAX];
 } L;
 
 void airstroke_init() {
-    r_ro_batch_init(&L.ro, AIRSTROKE_MAX, camera.gl_main, r_texture_new_file("res/airstroke.png", NULL));
+    ro_batch_init(&L.ro, AIRSTROKE_MAX, camera.gl_main, r_texture_new_file("res/airstroke.png", NULL));
 
     for (int i = 0; i < AIRSTROKE_MAX; i++) {
         L.ro.rects[i].pose = u_pose_new_hidden();
         L.strokes[i].rect = &L.ro.rects[i];
         L.strokes[i].time = -1;
     }
-    r_ro_batch_update(&L.ro);
+    ro_batch_update(&L.ro);
 }
 
 void airstroke_kill() {
-    r_ro_batch_kill(&L.ro);
+    ro_batch_kill(&L.ro);
     memset(&L, 0, sizeof(L));
 }
 
@@ -80,11 +80,11 @@ void airstroke_update(float dtime) {
         }
     }
 
-    r_ro_batch_update(&L.ro);
+    ro_batch_update(&L.ro);
 }
 
 void airstroke_render() {
-    r_ro_batch_render(&L.ro);
+    ro_batch_render(&L.ro);
 }
 
 void airstroke_add(float x, float y) {

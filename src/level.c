@@ -33,14 +33,14 @@ const static Color_s SPEECHBUBBLE_2_CODE = {{0, 0, 1, 6}};
 
 
 static struct {
-    rRoBatch borders_ro;
+    RoBatch borders_ro;
     int current_lvl;
     SpeechBubble bubbles[3];
     int bubbles_size;
     int state;
 
     // test
-    rRoRefractSingle ice, mirror;
+    RoRefractSingle ice, mirror;
 } L;
 
 static void load_game() {
@@ -143,7 +143,7 @@ void level_init(int lvl) {
 
     load_game();
 
-    r_ro_batch_init(&L.borders_ro, 4, camera.gl_main, r_texture_new_white_pixel());
+    ro_batch_init(&L.borders_ro, 4, camera.gl_main, r_texture_new_white_pixel());
 
     // black borders
     for (int i = 0; i < 4; i++) {
@@ -168,7 +168,7 @@ void level_init(int lvl) {
                 l - 1024, b, w + 2048, 1024);
 
     }
-    r_ro_batch_update(&L.borders_ro);
+    ro_batch_update(&L.borders_ro);
 
 
     // test
@@ -178,7 +178,7 @@ void level_init(int lvl) {
     assume(img, "wtf");
     tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
     tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
-    r_ro_refract_single_init(&L.ice, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
+    ro_refract_single_init(&L.ice, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.ice.rect.pose = u_pose_new(260, 100, 32, 64);
     L.ice.rect.color.a=0.8;
     L.ice.view_aabb = camera.gl_view_aabb;
@@ -188,7 +188,7 @@ void level_init(int lvl) {
     assume(img, "wtf");
     tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
     tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
-    r_ro_refract_single_init(&L.mirror, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
+    ro_refract_single_init(&L.mirror, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.mirror.rect.pose = u_pose_new(120, 100, 32, 64);
     L.mirror.view_aabb = camera.gl_view_aabb;
 
@@ -208,11 +208,11 @@ void level_kill() {
     controller_kill();
     unload_game();
 
-    r_ro_batch_kill(&L.borders_ro);
+    ro_batch_kill(&L.borders_ro);
 
     // test
-    r_ro_refract_single_kill(&L.ice);
-    r_ro_refract_single_kill(&L.mirror);
+    ro_refract_single_kill(&L.ice);
+    ro_refract_single_kill(&L.mirror);
 }
 
 void level_update(float dtime) {  
@@ -245,8 +245,8 @@ void level_render() {
     tilemap_render_back();
 
     // test
-    r_ro_refract_single_render(&L.ice);
-    r_ro_refract_single_render(&L.mirror);
+    ro_refract_single_render(&L.ice);
+    ro_refract_single_render(&L.mirror);
 
     for(int i=0; i<L.bubbles_size; i++) {
         speechbubble_render(&L.bubbles[i]);
@@ -259,7 +259,7 @@ void level_render() {
     tilemap_render_front();
     dead_render();
 
-    r_ro_batch_render(&L.borders_ro);
+    ro_batch_render(&L.borders_ro);
 
     carrot_render_hud();
 

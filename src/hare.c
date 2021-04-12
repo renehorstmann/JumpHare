@@ -41,8 +41,8 @@
 #define SET_JUMP_TIME -0.05
 
 static struct {
-    rRoSingle ro;
-    rRoText input_text;
+    RoSingle ro;
+    RoText input_text;
 
     enum hare_state state, prev_state;
 
@@ -273,20 +273,20 @@ void hare_init(float pos_x, float pos_y) {
     L.pos.x = pos_x;
     L.pos.y = pos_y;
 
-    r_ro_single_init(&L.ro, camera.gl_main, r_texture_new_file("res/hare.png", NULL));
+    ro_single_init(&L.ro, camera.gl_main, r_texture_new_file("res/hare.png", NULL));
 
     u_pose_set_size(&L.ro.rect.pose, 32, 32);
 
 
-    r_ro_text_init_font55(&L.input_text, 64, hud_camera.gl);
+    ro_text_init_font55(&L.input_text, 64, hud_camera.gl);
     for (int i = 0; i < 64; i++) {
         L.input_text.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
     }
 }
 
 void hare_kill() {
-    r_ro_single_kill(&L.ro);
-    r_ro_text_kill(&L.input_text);
+    ro_single_kill(&L.ro);
+    ro_text_kill(&L.input_text);
     memset(&L, 0, sizeof(L));
 }
 
@@ -313,13 +313,13 @@ void hare_update(float dtime) {
             L.state,
             L.set_speed_x, L.set_jump_time,
             L.speed.x, L.speed.y);
-    r_ro_text_set_text(&L.input_text, text);
+    ro_text_set_text(&L.input_text, text);
     u_pose_set_xy(&L.input_text.pose, camera_left(), camera_top());
 }
 
 void hare_render() {
-    r_ro_single_render(&L.ro);
-    //r_ro_text_render(&L.input_text);
+    ro_single_render(&L.ro);
+    //ro_text_render(&L.input_text);
 }
 
 enum hare_state hare_state() {

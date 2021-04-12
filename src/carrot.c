@@ -24,9 +24,9 @@ static const vec3 PARTICLE_COLOR = {{1, 0.65, 0}};
 
 
 static struct {
-    rRoBatch carrot_ro;
-    rRoBatch cnt_ro;
-    rRoParticle particle_ro;
+    RoBatch carrot_ro;
+    RoBatch cnt_ro;
+    RoParticle particle_ro;
     bool collected[3];
     int collected_cnt;
     float time;
@@ -53,7 +53,7 @@ static void emit_particles(float x, float y) {
         r->color.a = PARTICLE_ALPHA;
         r->start_time = L.time;
     }
-    r_ro_particle_update(&L.particle_ro);
+    ro_particle_update(&L.particle_ro);
 }
 
 static void update_cnt() {
@@ -74,14 +74,14 @@ static void update_cnt() {
     for(int i=L.collected_cnt; i<3; i++) {
         L.cnt_ro.rects[i].pose = u_pose_new_hidden();
     }
-    r_ro_batch_update(&L.cnt_ro);
+    ro_batch_update(&L.cnt_ro);
 }
 
 
 void carrot_init(const vec2 *positions_3) {
     
     // in game carrots
-    r_ro_batch_init(&L.carrot_ro, 3, camera.gl_main,
+    ro_batch_init(&L.carrot_ro, 3, camera.gl_main,
                     r_texture_new_file("res/carrot.png", NULL));
             
     for(int i=0; i<3; i++) {
@@ -92,17 +92,17 @@ void carrot_init(const vec2 *positions_3) {
                 
        u_pose_set_w(&L.carrot_ro.rects[i].uv, 1.0/FRAMES); 
     }
-    r_ro_batch_update(&L.carrot_ro);
+    ro_batch_update(&L.carrot_ro);
 
     
     // mini hud carrot
-    r_ro_batch_init(&L.cnt_ro, 3, hud_camera.gl,
+    ro_batch_init(&L.cnt_ro, 3, hud_camera.gl,
                     r_texture_new_file("res/carrot_mini.png", NULL));
     update_cnt();
     
     
     // particles
-    r_ro_particle_init(&L.particle_ro, NUM_PARTICLES, camera.gl_main, r_texture_new_white_pixel());
+    ro_particle_init(&L.particle_ro, NUM_PARTICLES, camera.gl_main, r_texture_new_white_pixel());
 
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
@@ -111,11 +111,11 @@ void carrot_init(const vec2 *positions_3) {
                 (float)-PARTICLE_ALPHA/PARTICLE_TIME;
     }
 
-    r_ro_particle_update(&L.particle_ro);
+    ro_particle_update(&L.particle_ro);
 }
 
 void carrot_kill() {
-    r_ro_batch_kill(&L.carrot_ro);
+    ro_batch_kill(&L.carrot_ro);
     memset(&L, 0, sizeof(L));
 }
 
@@ -137,17 +137,17 @@ void carrot_update(float dtime) {
         u_pose_set_size(&L.carrot_ro.rects[i].pose, h/2, h);
     }
     
-    r_ro_batch_update(&L.carrot_ro);
+    ro_batch_update(&L.carrot_ro);
     update_cnt();
 }
 
 void carrot_render() {
-    r_ro_particle_render(&L.particle_ro, L.time);
-    r_ro_batch_render(&L.carrot_ro);
+    ro_particle_render(&L.particle_ro, L.time);
+    ro_batch_render(&L.carrot_ro);
 }
 
 void carrot_render_hud() {
-    r_ro_batch_render(&L.cnt_ro);
+    ro_batch_render(&L.cnt_ro);
 }
 
 bool carrot_collect(vec2 position) {
@@ -194,7 +194,7 @@ void carrot_load() {
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
     }
-    r_ro_particle_update(&L.particle_ro);
+    ro_particle_update(&L.particle_ro);
     
     // in game carrots
     for(int i=0; i<3; i++) {
@@ -204,7 +204,7 @@ void carrot_load() {
             u_pose_set_size_angle(&L.carrot_ro.rects[i].pose, 16, 32, 0);
         }
     }
-    r_ro_batch_update(&L.carrot_ro);
+    ro_batch_update(&L.carrot_ro);
     
     // hud carrots
     update_cnt();

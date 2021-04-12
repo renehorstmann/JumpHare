@@ -19,7 +19,7 @@
 static const float RESET_TIME = 5.0 * FRAMES / CHILL_FPS;
 
 static struct {
-    rRoParticle ro;
+    RoParticle ro;
     float time;
     float reset_time;
 } L;
@@ -44,12 +44,12 @@ static void fly_away(int i) {
     L.ro.rects[i].acc.y = sca_random_range(0, FLY_ACC_Y);
     
     L.ro.rects[i].start_time = L.time;
-    r_ro_particle_update_sub(&L.ro, i, 1);
+    ro_particle_update_sub(&L.ro, i, 1);
 }
 
 void butterfly_init(const vec2 *positions, int num) {
     assume(num>0, "atleast one butterfly in a level?");
-    r_ro_particle_init(&L.ro, num, camera.gl_main, 
+    ro_particle_init(&L.ro, num, camera.gl_main,
             r_texture_new_file("res/butterfly.png", NULL));
             
     for(int i=0; i<num; i++) {
@@ -73,11 +73,11 @@ void butterfly_init(const vec2 *positions, int num) {
         L.ro.rects[i].color.rgb = vec3_hsv2rgb(hsv);
     }
     
-    r_ro_particle_update(&L.ro);
+    ro_particle_update(&L.ro);
 }
 
 void butterfly_kill() {
-    r_ro_particle_kill(&L.ro);
+    ro_particle_kill(&L.ro);
     memset(&L, 0, sizeof(L));
 }
 
@@ -92,12 +92,12 @@ void butterfly_update(float dtime) {
                 continue;
             L.ro.rects[i].start_time = L.time;
         }
-        r_ro_particle_update(&L.ro);
+        ro_particle_update(&L.ro);
     }
 }
 
 void butterfly_render() {
-    r_ro_particle_render(&L.ro, L.time);
+    ro_particle_render(&L.ro, L.time);
 }
 
 

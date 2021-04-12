@@ -38,29 +38,29 @@ typedef struct {
     const GLuint *tex_framebuffer_ptr;  // init as &r_render.framebuffer_tex
     bool owns_tex_main;
     bool owns_tex_refraction;
-} rRoRefractParticle;
+} RoRefractParticle;
 
-void r_ro_refract_particle_init(rRoRefractParticle *self, int num, 
+void ro_refract_particle_init(RoRefractParticle *self, int num,
         const float *vp, const float *scale_ptr,
         GLuint tex_main_sink, GLuint tex_refraction_sink);
 
-void r_ro_refract_particle_kill(rRoRefractParticle *self);
+void ro_refract_particle_kill(RoRefractParticle *self);
 
-void r_ro_refract_particle_update_sub(rRoRefractParticle *self, int offset, int size);
+void ro_refract_particle_update_sub(RoRefractParticle *self, int offset, int size);
 
-void r_ro_refract_particle_render_sub(rRoRefractParticle *self, float time, int num);
+void ro_refract_particle_render_sub(RoRefractParticle *self, float time, int num);
 
-void r_ro_refract_particle_set_texture_main(rRoRefractParticle *self, GLuint tex_main_sink);
+void ro_refract_particle_set_texture_main(RoRefractParticle *self, GLuint tex_main_sink);
 
-void r_ro_refract_particle_set_texture_refraction(rRoRefractParticle *self, GLuint tex_refraction_sink);
+void ro_refract_particle_set_texture_refraction(RoRefractParticle *self, GLuint tex_refraction_sink);
 
 
-static void r_ro_refract_particle_update(rRoRefractParticle *self) {
-    r_ro_refract_particle_update_sub(self, 0, self->num);
+static void ro_refract_particle_update(RoRefractParticle *self) {
+    ro_refract_particle_update_sub(self, 0, self->num);
 }
 
-static void r_ro_refract_particle_render(rRoRefractParticle *self, float time) {
-    r_ro_refract_particle_render_sub(self, time, self->num);
+static void ro_refract_particle_render(RoRefractParticle *self, float time) {
+    ro_refract_particle_render_sub(self, time, self->num);
 }
 
 #endif //R_RO_REFRACT_PARTICLE_H

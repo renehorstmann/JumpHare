@@ -14,13 +14,13 @@
 #define PARTICLE_ALPHA 1.0
 
 static struct {
-    rRoParticle ro;
+    RoParticle ro;
     float time;
     int next;
 } L;
 
 void dirt_particles_init() {
-    r_ro_particle_init(&L.ro, MAX_PARTCLES, camera.gl_main, r_texture_new_white_pixel());
+    ro_particle_init(&L.ro, MAX_PARTCLES, camera.gl_main, r_texture_new_white_pixel());
 
     for (int i = 0; i < L.ro.num; i++) {
         u_pose_set_size(&L.ro.rects[i].pose, SIZE, SIZE);
@@ -29,11 +29,11 @@ void dirt_particles_init() {
         L.ro.rects[i].color_speed.a = 
                 (float)-PARTICLE_ALPHA / LIFETIME;
     }
-    r_ro_particle_update(&L.ro);
+    ro_particle_update(&L.ro);
 }
 
 void dirt_particles_kill() {
-    r_ro_particle_kill(&L.ro);
+    ro_particle_kill(&L.ro);
     memset(&L, 0, sizeof(L));
 }
 
@@ -42,7 +42,7 @@ void dirt_particles_update(float dtime) {
 }
 
 void dirt_particles_render() {
-    r_ro_particle_render(&L.ro, L.time);
+    ro_particle_render(&L.ro, L.time);
 }
 
 void dirt_particles_add(vec2 pos, vec2 dir, Color_s color, int n) {
@@ -66,6 +66,6 @@ void dirt_particles_add(vec2 pos, vec2 dir, Color_s color, int n) {
         L.ro.rects[idx].start_time = L.time;
     }
 
-    r_ro_particle_update_sub(&L.ro, start_idx, n);
+    ro_particle_update_sub(&L.ro, start_idx, n);
 }
 
