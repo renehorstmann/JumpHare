@@ -12,5 +12,7 @@
 #include "ro_text.h"
 #include "ro_ttftext.h"
 #include "ro_refract_single.h"
+#include "ro_refract_batch.h"
+#include "ro_refract_particle.h"
 
 #endif //R_R_H

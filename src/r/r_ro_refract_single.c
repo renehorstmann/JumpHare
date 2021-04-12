@@ -3,6 +3,7 @@
 #include "r/shader.h"
 #include "r/ro_refract_single.h"
 
+
 static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
 
