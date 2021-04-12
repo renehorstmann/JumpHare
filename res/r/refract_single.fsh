@@ -44,9 +44,12 @@ void main() {
     offset = offset * scale;
     
     vec2 r_coord;
-    r_coord.x = (gl_FragCoord.x + offset.x) / tex_framebuffer_size.x;
-    r_coord.y = 1.0f - (gl_FragCoord.y + offset.y) / tex_framebuffer_size.y;    
-    
+    r_coord.x = -0.5f + (gl_FragCoord.x + offset.x) / tex_framebuffer_size.x;
+    r_coord.y = +0.5f - (gl_FragCoord.y + offset.y) / tex_framebuffer_size.y;
+
+    r_coord = r_coord * 1.1f;
+    r_coord = r_coord + 0.5f;
+
     float alpha = mix(refract.a, 0.0f, 
             max(0.0f, 1.0f-5.0f*space_distance(r_coord, view_aabb)));
     
