@@ -1,15 +1,21 @@
 #include "mathc/float.h"
+#include "r/render.h"
 #include "r/shader.h"
 #include "r/ro_refract_single.h"
 
+static const vec4 VIEW_AABB_FULLSCREEN = {{0.5, 0.5, 0.5, 0.5}};
 
-void r_ro_refract_single_init(rRoRefractSingle *self, const float *vp, 
-        GLuint tex_main_sink, GLuint tex_refraction_sink, const GLuint *tex_framebuffer_ptr){
+
+void r_ro_refract_single_init(rRoRefractSingle *self,
+        const float *vp, const float *scale_ptr,
+        GLuint tex_main_sink, GLuint tex_refraction_sink){
     self->rect.pose = mat4_eye();
     self->rect.uv = mat4_eye();
     self->rect.color = vec4_set(1);
 
     self->vp = vp;
+    self->scale = scale_ptr;
+    self->view_aabb = &VIEW_AABB_FULLSCREEN.v0;
 
     self->program = r_shader_compile_glsl_from_files((char *[]) {
             "res/r/refract_single.vsh",
@@ -19,9 +25,10 @@ void r_ro_refract_single_init(rRoRefractSingle *self, const float *vp,
 
     self->tex_main = tex_main_sink;
     self->tex_refraction = tex_refraction_sink;
-    self->tex_framebuffer_ptr = tex_framebuffer_ptr;
     self->owns_tex_main = true;
     self->owns_tex_refraction = true;
+    
+    self->tex_framebuffer_ptr = &r_render.framebuffer_tex;
 
     // vao scope
     {
@@ -60,6 +67,11 @@ void r_ro_refract_single_render(rRoRefractSingle *self) {
     glUniformMatrix4fv(glGetUniformLocation(self->program, "uv"), 1, GL_FALSE, &self->rect.uv.m00);
 
     glUniform4fv(glGetUniformLocation(self->program, "color"), 1, &self->rect.color.v0);
+    
+    // fragment shader
+    glUniform1f(glGetUniformLocation(self->program, "scale"), *self->scale);
+    
+    glUniform4fv(glGetUniformLocation(self->program, "view_aabb"), 1, self->view_aabb);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, self->tex_main);

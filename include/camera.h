@@ -30,6 +30,11 @@ struct CameraGlobals_s {
     
     const float *gl_background[CAMERA_BACKGROUNDS];
     const float *gl_main;
+    
+    const float *gl_scale;
+    // in texture space (origin is top left) [0:1]
+    // as center_x, _y, radius_x, _y
+    const float *gl_view_aabb;
 };
 extern struct CameraGlobals_s camera;
 

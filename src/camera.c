@@ -14,6 +14,7 @@ static struct {
     float real_pixel_per_pixel;
     float left, right, bottom, top;
     vec2 offset;
+    vec4 view_aabb;
 } L;
 
 static void camera_matrices_init(struct CameraMatrices_s *self) {
@@ -35,6 +36,9 @@ void camera_init() {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera.gl_background[i] = &camera.matrices_background[i].vp.m00;
     camera.gl_main = &camera.matrices_main.vp.m00;
+    
+    camera.gl_scale = &L.real_pixel_per_pixel;
+    camera.gl_view_aabb = &L.view_aabb.v0;
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera_matrices_init(&camera.matrices_background[i]);
@@ -54,34 +58,41 @@ void camera_update() {
     L.real_pixel_per_pixel = sca_floor(smaller_size / CAMERA_SIZE);
     L.real_pixel_per_pixel = isca_max(MIN_PIXEL_SIZE, L.real_pixel_per_pixel);
 
-    float width = (float)wnd_width / L.real_pixel_per_pixel;
-    float height = (float)wnd_height / L.real_pixel_per_pixel;
+    float cam_width = (float)wnd_width / L.real_pixel_per_pixel;
+    float cam_height = (float)wnd_height / L.real_pixel_per_pixel;
 
-    float width_2 = width / 2;
-    float height_2 = height / 2;
+    float cam_width_2 = cam_width / 2;
+    float cam_height_2 = cam_height / 2;
 
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
-    float left = -floorf(width_2);
-    float top = floorf(height_2);
-    float right = width_2 + (width_2 - floorf(width_2));
-    float bottom = -height_2 - (height_2 - floorf(height_2));
+    float cam_left = -floorf(cam_width_2);
+    float cam_top = floorf(cam_height_2);
+    float cam_right = cam_width_2 + (cam_width_2 - floorf(cam_width_2));
+    float cam_bottom = -cam_height_2 - (cam_height_2 - floorf(cam_height_2));
 
-    camera.matrices_p = mat4_camera_ortho(left, right, bottom, top, -1, 1);
+    camera.matrices_p = mat4_camera_ortho(
+            cam_left, cam_right, cam_bottom, cam_top,
+            -1, 1);
     camera.matrices_p_inv = mat4_inv(camera.matrices_p);
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         camera_matrices_update(&camera.matrices_background[i]);
     camera_matrices_update(&camera.matrices_main);
     
+    float left = cam_left;
+    float top = cam_top;
+    float right = cam_right;
+    float bottom = cam_bottom;
+    
     if (wnd_width < wnd_height) {
-        float screen = height * CAMERA_SCREEN_WEIGHT;
+        float screen = cam_height * CAMERA_SCREEN_WEIGHT;
         bottom = top - screen;
-        L.offset = (vec2) {{0, -(height - screen)/2}};
+        L.offset = (vec2) {{0, -(cam_height - screen)/2}};
     } else {
-        float screen = width * CAMERA_SCREEN_WEIGHT;
-        left += sca_floor((width-screen)/2);
-        right -= sca_ceil((width-screen)/2);
+        float screen = cam_width * CAMERA_SCREEN_WEIGHT;
+        left += sca_floor((cam_width-screen)/2);
+        right -= sca_ceil((cam_width-screen)/2);
         L.offset = (vec2) {{0, 0}};
     }
 
@@ -89,6 +100,16 @@ void camera_update() {
     L.right = right;
     L.top = top;
     L.bottom = bottom;
+   
+   
+    // view_aabb:
+    // center_x, _y        
+    L.view_aabb.x = (left - cam_left + (-left + right)/2) / cam_width;
+    L.view_aabb.y = -(top - cam_top + (-top + bottom)/2) / cam_height;
+    
+    // radius_x, _y
+    L.view_aabb.z = ((-left+right)/cam_width)/2;
+    L.view_aabb.w = ((-bottom+top)/cam_height)/2;
 }
 
 float camera_real_pixel_per_pixel() {
