@@ -6,14 +6,16 @@
 #include "rect.h"
 
 
-// Renders a single rect in a draw call
-// Enables refraction and reflection
+// Renders a single rect in a draw call, with refraction and reflection
+//
 // Uses 3 textures in total
 // 1: default texture
 // 2: refraction map
 //    r: 128+offset for x refraction
 //    g: 128+offset for y
-//    b: not used
+//    b: x_stretch_value + y_stretch_value * 16
+//          normal: 12+12*16    (8+4)
+//          mirror x: 4+12*16   (8-4)
 //    a: refraction alpha
 // 3: framebuffer texture, to grab pixels for the refraction
 //    defaults to r_render.framebuffer_tex

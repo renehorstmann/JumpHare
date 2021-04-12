@@ -7,21 +7,23 @@
 #include "rect.h"
 
 
-// Particle system
-// Enables refraction and reflection
-// Uses 3 textures in total
-// 1: default texture
-// 2: refraction map
-//    r: 128+offset for x refraction
-//    g: 128+offset for y
-//    b: not used
-//    a: refraction alpha
-// 3: framebuffer texture, to grab pixels for the refraction
-//    defaults to r_render.framebuffer_tex
-// view_aabb is the screen space in which the rect is rendered
-//    in texture space (origin is top left) [0:1]
-//    as center_x, _y, radius_x, _y
-//    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
+// Particle system, with refraction and reflection
+////
+//// Uses 3 textures in total
+//// 1: default texture
+//// 2: refraction map
+////    r: 128+offset for x refraction
+////    g: 128+offset for y
+////    b: x_stretch_value + y_stretch_value * 16
+////          normal: 12+12*16    (8+4)
+////          mirror x: 4+12*16   (8-4)
+////    a: refraction alpha
+//// 3: framebuffer texture, to grab pixels for the refraction
+////    defaults to r_render.framebuffer_tex
+//// view_aabb is the screen space in which the rect is rendered
+////    in texture space (origin is top left) [0:1]
+////    as center_x, _y, radius_x, _y
+////    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
 typedef struct {
     rParticleRect_s *rects;
     int num;
@@ -50,7 +52,7 @@ void r_ro_refract_particle_render_sub(rRoRefractParticle *self, float time, int 
 
 void r_ro_refract_particle_set_texture_main(rRoRefractParticle *self, GLuint tex_main_sink);
 
-void r_ro_refract_particle_set_texture_refracrion(rRoRefractParticle *self, GLuint tex_refraction_sink);
+void r_ro_refract_particle_set_texture_refraction(rRoRefractParticle *self, GLuint tex_refraction_sink);
 
 
 static void r_ro_refract_particle_update(rRoRefractParticle *self) {
