@@ -19,6 +19,7 @@
 // #define GOD_MODE
 
 #define MIN_SPEED_X 5
+#define RUN_SPEED_X 90
 #define MAX_SPEED_X 100
 #define MAX_SPEED_Y 250
 #define JUMP_SPEED 225
@@ -37,7 +38,8 @@
 #define COLL_RADIUS_X 7.0
 #define COLL_RADIUS_Y 11.0
 
-#define ANIMATION_GROUNDED_FPS 6
+#define ANIMATION_FRAMES 8
+#define ANIMATION_GROUNDED_FPS 12.0
 
 #define SET_JUMP_TIME -0.05
 
@@ -192,7 +194,7 @@ static void animate(float dtime) {
     int frame;
     if (L.state == HARE_GROUNDED) {
         float fps = ANIMATION_GROUNDED_FPS;
-        int frames = 4;
+        int frames = ANIMATION_FRAMES;
         L.animate_time = sca_mod(L.animate_time + dtime, frames / fps);
         frame = L.animate_time * fps;
     } else {
@@ -207,7 +209,7 @@ static void animate(float dtime) {
         }
     }
 
-    float w = 1.0 / 4.0;
+    float w = 1.0 / ANIMATION_FRAMES;
     float h = 1.0 / 5.0;
 
     if (L.speed.x < -MIN_SPEED_X)
@@ -218,7 +220,7 @@ static void animate(float dtime) {
     float v;
     if (L.state == HARE_GROUNDED) {
         v = sca_abs(L.speed.x) < MIN_SPEED_X ? 0 : 1;
-        if (sca_abs(L.speed.x) >= MAX_SPEED_X)
+        if (sca_abs(L.speed.x) >= RUN_SPEED_X)
             v++;
     } else if (L.state == HARE_DOUBLE_JUMP) {
         v = 4;
@@ -236,7 +238,7 @@ static void animate(float dtime) {
 
 static void emit_dirt(float dtime) {
     if (L.state != HARE_GROUNDED
-        || sca_abs(L.speed.x) < 10) {
+        || sca_abs(L.speed.x) < RUN_SPEED_X) {
         return;
     }
 
