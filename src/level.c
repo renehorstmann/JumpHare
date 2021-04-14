@@ -110,10 +110,13 @@ void level_init(int lvl) {
 
     L.current_lvl = lvl;
 
-    tilemap_init("res/levels/level_01.png");
+    tilemap_init("res/levels/level_00.png");
     background_init(tilemap_width(), tilemap_height(),
-            true, false,
-            "res/backgrounds/greenhills.png");
+            //true, false,
+            //"res/backgrounds/greenhills.png"
+            true, true,
+            "res/backgrounds/blueblocks.png"
+            );
             
     vec2 goal_pos;
     assume(tilemap_get_positions(&goal_pos, 1, GOAL_CODE, CODE_LAYER) == 1, "level needs 1 goal");
