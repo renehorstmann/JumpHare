@@ -25,6 +25,12 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- testlevel
+  - slope physics
+  - jump distance
+  - jump height
+  - cave
+  - one ways
 - collision module
   - object object
     - aabb
@@ -38,11 +44,6 @@ In active developmemt
   - each level has a emojifont name
   - carrot indicator
   - button
-- testlevel "0"
-  - jump distance
-  - jump height
-  - full and half blocks
-  - cave jumps?
 - non final sound effects?
 
 
