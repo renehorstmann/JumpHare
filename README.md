@@ -33,8 +33,18 @@ In active developmemt
         - dx, dy
     - visualization
     - carrots + butterflies
-- non final sound effects?
 - enemies
+- world map / level select
+  - each level has a emojifont name
+  - carrot indicator
+  - button
+- testlevel "0"
+  - jump distance
+  - jump height
+  - full and half blocks
+  - cave jumps?
+- non final sound effects?
+
 
 
 ## Compiling for Web
