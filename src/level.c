@@ -110,12 +110,12 @@ void level_init(int lvl) {
 
     L.current_lvl = lvl;
 
-    tilemap_init("res/levels/level_00.png");
+    tilemap_init("res/levels/level_01.png");
     background_init(tilemap_width(), tilemap_height(),
-            //true, false,
-            //"res/backgrounds/greenhills.png"
-            true, true,
-            "res/backgrounds/blueblocks.png"
+            true, false,
+            "res/backgrounds/greenhills.png"
+            //true, true,
+            //"res/backgrounds/blueblocks.png"
             );
             
     vec2 goal_pos;
