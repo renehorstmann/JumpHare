@@ -64,6 +64,24 @@ static bool pixel_collision(Color_s code, int pixel_c, int pixel_r) {
                          COLOR_TRANSPARENT);
 }
 
+static Color_s pixel_color(int map_layer, int tile_layer, float x, float y) {
+    assert(tile_layer >= 0 && tile_layer <= 1
+            && map_layer >= 0 && map_layer <= 2);
+
+    int c = tile_c(x);
+    int r = tile_r(y);
+
+    if (c < 0 || c >= L.map->cols
+        || r < 0 || r >= L.map->rows) {
+        return COLOR_TRANSPARENT;
+    }
+
+    Color_s tile = *image_pixel(L.map, map_layer, c, r);
+    int pc = tile_pixel_c(x);
+    int pr = tile_pixel_r(y);
+
+    return tiles_pixel(tile, tile_layer, pc, pr);
+}
 
 
 void tilemap_init(const char *file) {
@@ -311,20 +329,10 @@ float tilemap_wall_right(float x, float y, Color_s *opt_id) {
     return tile_x(L.map->cols);
 }
 
-Color_s tilemap_pixel(int layer, float x, float y) {
-    assert(layer >= 0 && layer <= 1);
+Color_s tilemap_pixel_back(int layer, float x, float y) {
+    return pixel_color(0, layer, x, y);
+}
 
-    int c = tile_c(x);
-    int r = tile_r(y);
-
-    if (c < 0 || c >= L.map->cols
-        || r < 0 || r >= L.map->rows) {
-        return COLOR_TRANSPARENT;
-    }
-
-    Color_s tile = *image_pixel(L.map, 0, c, r);
-    int pc = tile_pixel_c(x);
-    int pr = tile_pixel_r(y);
-
-    return tiles_pixel(tile, layer, pc, pr);
+Color_s tilemap_pixel_main(int layer, float x, float y) {
+    return pixel_color(1, layer, x, y);
 }

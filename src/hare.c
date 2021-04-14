@@ -251,7 +251,7 @@ static void emit_dirt(float dtime) {
     vec2 grab_pos = {{L.pos.x, ground}};
     grab_pos = vec2_random_noise_vec(grab_pos, vec2_set(5));
 
-    Color_s col = tilemap_pixel(1, grab_pos.x, grab_pos.y);
+    Color_s col = tilemap_pixel_main(0, grab_pos.x, grab_pos.y);
 
     vec2 particle_pos = L.pos;
     particle_pos.y -= 7;
@@ -272,6 +272,8 @@ void hare_init(float pos_x, float pos_y) {
     
     L.pos.x = pos_x;
     L.pos.y = pos_y;
+
+    L.emit_dirt_add = sca_random_noise(6, 2);
 
     ro_single_init(&L.ro, camera.gl_main, r_texture_new_file("res/hare.png", NULL));
 

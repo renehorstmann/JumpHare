@@ -30,7 +30,9 @@ float tilemap_wall_left(float x, float y, Color_s *opt_id);
 
 float tilemap_wall_right(float x, float y, Color_s *opt_id);
 
-Color_s tilemap_pixel(int layer, float x, float y);
+Color_s tilemap_pixel_back(int layer, float x, float y);
+
+Color_s tilemap_pixel_main(int layer, float x, float y);
 
 
 static float tilemap_border_left() {

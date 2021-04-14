@@ -181,7 +181,7 @@ void level_init(int lvl) {
     ro_refract_batch_init(&L.ice, 1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.ice.view_aabb = camera.gl_view_aabb;
     for(int i=0; i<L.ice.num; i++) {
-        L.ice.rects[i].pose = u_pose_new(260+32*i, 100, 32, 64);
+        L.ice.rects[i].pose = u_pose_new(260+16*i, 100, 32, 64);
         L.ice.rects[i].color.a=0.8;
     }
     ro_refract_batch_update(&L.ice);
@@ -270,5 +270,7 @@ void level_render() {
     carrot_render_hud();
 
     controller_render();
+    
+    dirt_particles_render();
 }
 

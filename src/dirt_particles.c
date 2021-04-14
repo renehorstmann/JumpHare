@@ -45,6 +45,8 @@ void dirt_particles_render() {
     ro_particle_render(&L.ro, L.time);
 }
 
+#include "mathc/uchar.h"
+
 void dirt_particles_add(vec2 pos, vec2 dir, Color_s color, int n) {
     vec4 col = vec4_cast_from_uchar_1(color.v);
     int start_idx = L.next;
