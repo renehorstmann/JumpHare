@@ -29,6 +29,8 @@ In active developmemt
   - object object
     - aabb
     - collision_with_hare_callback
+        - top left bottom right
+        - dx, dy
     - visualization
     - carrots + butterflies
 - hare double jump animation
