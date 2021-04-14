@@ -2,6 +2,7 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
+#include "mathc/int.h"
 #include "mathc/utils/random.h"
 #include "camera.h"
 #include "tilemap.h"
@@ -33,6 +34,7 @@
 #define JUMP_FALL_TIME 0.2
 #define DOUBLE_JUMP_START_TIME 0.25
 #define DOUBLE_JUMP_FREEZE_TIME 0.05
+#define AIRSTROKE_DELAY_TIME 0.1
 
 #define COLL_OFFSET_Y -3.0
 #define COLL_RADIUS_X 7.0
@@ -64,6 +66,8 @@ static struct {
 
     float emit_dirt_add;
     int emit_dirt_next_add;
+    
+    float add_airstroke_time;
 } L;
 
 
@@ -82,6 +86,7 @@ static void check_jumping(float dtime) {
 #ifndef GOD_MODE
             L.state = HARE_DOUBLE_JUMP;
             L.freeze_time = DOUBLE_JUMP_FREEZE_TIME;
+            L.jump_time = 0;
 #endif
         }
         L.set_jump_time += dtime;
@@ -197,15 +202,14 @@ static void animate(float dtime) {
         int frames = ANIMATION_FRAMES;
         L.animate_time = sca_mod(L.animate_time + dtime, frames / fps);
         frame = L.animate_time * fps;
-    } else {
-        frame = 3;
-        if (L.jump_time >= 0) {
-            if (L.jump_time < 0.1)
-                frame = 0;
-            else if (L.jump_time < 0.3)
-                frame = 1;
-            else if (L.jump_time < 0.5)
-                frame = 2;
+        
+    } else { 
+        // not grounded
+        frame = (int) sca_floor(L.jump_time*10);
+        frame = isca_clamp(frame, 0, 6);
+        
+        if(L.speed.y <0) {
+            frame = 7;
         }
     }
 
@@ -268,9 +272,15 @@ static void emit_dirt(float dtime) {
 }
 
 
-static void check_state_change() {
+static void check_state_change(float dtime) {
     if (L.state == HARE_DOUBLE_JUMP && L.prev_state != HARE_DOUBLE_JUMP) {
-        airstroke_add(L.pos.x, L.pos.y);
+        L.add_airstroke_time = AIRSTROKE_DELAY_TIME;
+    }
+    if(L.add_airstroke_time > 0) {
+        L.add_airstroke_time -= dtime;
+        if(L.add_airstroke_time <= 0) {
+            airstroke_add(L.pos.x, L.pos.y);
+        }
     }
 }
 
@@ -320,7 +330,7 @@ void hare_update(float dtime) {
 
     emit_dirt(dtime);
 
-    check_state_change();
+    check_state_change(dtime);
 
     // debug
     char text[64];

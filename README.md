@@ -33,7 +33,6 @@ In active developmemt
         - dx, dy
     - visualization
     - carrots + butterflies
-- hare double jump animation
 - non final sound effects?
 - enemies
 
