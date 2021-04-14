@@ -1,11 +1,16 @@
+#include "mathc/float.h"
 #include "tilemap.h"
 #include "tiles.h"
 #include "collision.h"
 
 
 #define SCAN_SIZE 4.0
+#define SCAN_SIZE_GROUNDED 8.0
 #define SCANNER_DISTANCE 0.66
 
+#define MAX_SLOPE_UP 1.5
+#define MAX_SLOPE_DOWN 2.5
+#define MAX_SLOPE_DOWN_DIFF 10.5
 
 static bool scan_left(Collision_s self, float x, float y) {
     Color_s id;
@@ -76,14 +81,32 @@ static bool scan_bottom_falling(Collision_s self, float x, float y, float speed_
     return true;
 }
 
-static void scan_bottom_grounded(Collision_s self, float x_a, float x_b, float y) {
+static bool scan_bottom_grounded(Collision_s self, float x_a, float x_b, float y) {
     Color_s id_a, id_b;
-    float pos_a = tilemap_ground(x_a, y + SCAN_SIZE, &id_a);
-    float pos_b = tilemap_ground(x_b, y + SCAN_SIZE, &id_b);
+    float pos_a = tilemap_ground(x_a, y + SCAN_SIZE_GROUNDED, &id_a);
+    float pos_b = tilemap_ground(x_b, y + SCAN_SIZE_GROUNDED, &id_b);
     
-    if(pos_a < y - SCAN_SIZE && pos_b < y - SCAN_SIZE) {
+    if(pos_a < y - MAX_SLOPE_DOWN 
+            && pos_b < y - MAX_SLOPE_DOWN) {
         self.cb((vec2){{0}}, COLLISION_FALLING, self.cb_user_data);
-        return;
+        return true;
+    }
+    
+    if ((pos_a - pos_b) > MAX_SLOPE_DOWN_DIFF) {
+        self.cb((vec2){{3, 0}}, COLLISION_LEFT, self.cb_user_data);
+        return true;
+    }
+    
+    if ((pos_b - pos_a) > MAX_SLOPE_DOWN_DIFF) {
+        self.cb((vec2){{-3, 0}}, COLLISION_RIGHT, self.cb_user_data);
+        return true;
+    }
+    
+    
+    
+    if(pos_a > y + MAX_SLOPE_UP
+            || pos_b > y + MAX_SLOPE_UP) {
+        return false;
     }
     
     enum collision_state state;
@@ -99,29 +122,31 @@ static void scan_bottom_grounded(Collision_s self, float x_a, float x_b, float y
     }
     
     self.cb(delta, state, self.cb_user_data);
+    return true;
 }
 
 
 
 
 void collision_tilemap_grounded(Collision_s self, vec2 center, vec2 radius, vec2 speed) {
-    
-    if(scan_left(self, center.x-radius.x, center.y))
-        return;
-        
-    if(scan_right(self, center.x+radius.x, center.y))
-        return;
-        
         
     if(center.y < tilemap_border_bottom()) {
        self.cb((vec2){{0}}, COLLISION_KILL, self.cb_user_data);
        return;
     }
     
-    scan_bottom_grounded(self, 
+    if(scan_bottom_grounded(self, 
             center.x-radius.x*SCANNER_DISTANCE,
             center.x+radius.x*SCANNER_DISTANCE,
-            center.y - radius.y);
+            center.y - radius.y))
+        return;
+            
+    
+    if(scan_left(self, center.x-radius.x, center.y))
+        return;
+        
+    if(scan_right(self, center.x+radius.x, center.y))
+        return;
 }
 
 void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 speed) {
@@ -152,7 +177,7 @@ void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 
             return;
     }
     
-    
+    /*
     if(scan_left(self, center.x-radius.x, center.y - radius.y*SCANNER_DISTANCE))
         return;
         
@@ -165,5 +190,5 @@ void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 
         
     if(scan_right(self, center.x+radius.x, center.y + radius.y*SCANNER_DISTANCE))
         return;
-       
+    */
 }
