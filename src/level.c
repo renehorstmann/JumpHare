@@ -251,8 +251,8 @@ void level_render() {
     tilemap_render_back();
 
     // test
-    ro_refract_batch_render(&L.ice);
-    ro_refract_batch_render(&L.mirror);
+    //ro_refract_batch_render(&L.ice);
+    //ro_refract_batch_render(&L.mirror);
 
     for(int i=0; i<L.bubbles_size; i++) {
         speechbubble_render(&L.bubbles[i]);
