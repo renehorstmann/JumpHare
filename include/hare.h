@@ -1,6 +1,7 @@
 #ifndef JUMPHARE_HARE_H
 #define JUMPHARE_HARE_H
 
+#include <stdbool.h>
 #include "mathc/types/float.h"
 
 enum hare_state {

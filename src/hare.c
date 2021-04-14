@@ -31,6 +31,7 @@
 #define JUMP_START_TIME 0.1
 #define JUMP_FALL_TIME 0.2
 #define DOUBLE_JUMP_START_TIME 0.25
+#define DOUBLE_JUMP_FREEZE_TIME 0.05
 
 #define COLL_OFFSET_Y -3.0
 #define COLL_RADIUS_X 7.0
@@ -53,6 +54,8 @@ static struct {
 
     float set_speed_x;
     float set_jump_time;
+    
+    float freeze_time;
 
     float animate_time;
     bool looking_left;
@@ -72,10 +75,11 @@ static void check_jumping(float dtime) {
         }
 
         if (L.state == HARE_FALLING && L.jump_time > DOUBLE_JUMP_START_TIME) {
-            L.speed.y = sca_max(L.speed.y, DOUBLE_JUMP_SPEED_Y);
             
-#ifndef GOD_MODE 
+            L.speed.y = sca_max(L.speed.y, DOUBLE_JUMP_SPEED_Y);
+#ifndef GOD_MODE
             L.state = HARE_DOUBLE_JUMP;
+            L.freeze_time = DOUBLE_JUMP_FREEZE_TIME;
 #endif
         }
         L.set_jump_time += dtime;
@@ -91,6 +95,7 @@ static void check_jumping(float dtime) {
             L.state = HARE_FALLING;
         }
     }
+    
 }
 
 
@@ -118,6 +123,7 @@ static void apply_speed(float dtime) {
     float actual_speed = sca_abs(L.speed.x) < MIN_SPEED_X ? 0 : L.speed.x;
 
     pos.x += actual_speed * dtime;
+
 
     // y
     if (L.state != HARE_GROUNDED) {
@@ -298,7 +304,12 @@ void hare_update(float dtime) {
 
     check_jumping(dtime);
 
-    apply_speed(dtime);
+    if(L.freeze_time > 0) {
+        L.freeze_time -= dtime;
+        apply_speed(dtime/4);
+    } else {
+        apply_speed(dtime);
+    }
 
     check_collision();
 
