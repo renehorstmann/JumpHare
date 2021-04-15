@@ -236,12 +236,13 @@ float tilemap_height() {
 float tilemap_ground(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
+    int pr_init = tile_pixel_r(y);
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
         Color_s tile = *image_pixel(L.map, 1, c, r);
         if (!color_equals(tile, COLOR_TRANSPARENT)) {
             int pc = tile_pixel_c(x);
-            for (int pr = 0; pr < TILES_SIZE; pr++) {
+            for (int pr = pr_init; pr < TILES_SIZE; pr++) {
                 Color_s id = tiles_pixel(tile, 1, pc, pr);
                 if (!color_equals(id, COLOR_TRANSPARENT)) {
                     if (opt_id)
@@ -251,6 +252,7 @@ float tilemap_ground(float x, float y, Color_s *opt_id) {
             }
         }
         r++;
+        pr_init = 0;
     }
     if (opt_id)
         *opt_id = COLOR_TRANSPARENT;
@@ -260,12 +262,13 @@ float tilemap_ground(float x, float y, Color_s *opt_id) {
 float tilemap_ceiling(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
+    int pr_init = tile_pixel_r(y);
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
         Color_s tile = *image_pixel(L.map, 1, c, r);
         if (!color_equals(tile, COLOR_TRANSPARENT)) {
             int pc = tile_pixel_c(x);
-            for (int pr = TILES_SIZE - 1; pr >= 0; pr--) {
+            for (int pr = pr_init; pr >= 0; pr--) {
                 Color_s id = tiles_pixel(tile, 1, pc, pr);
                 if (!color_equals(id, COLOR_TRANSPARENT)) {
                     if (opt_id)
@@ -275,6 +278,7 @@ float tilemap_ceiling(float x, float y, Color_s *opt_id) {
             }
         }
         r--;
+        pr_init = TILES_SIZE - 1;
     }
     if (opt_id)
         *opt_id = COLOR_TRANSPARENT;
@@ -284,12 +288,13 @@ float tilemap_ceiling(float x, float y, Color_s *opt_id) {
 float tilemap_wall_left(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
+    int pc_init = tile_pixel_c(x);
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
         Color_s tile = *image_pixel(L.map, 1, c, r);
         if (!color_equals(tile, COLOR_TRANSPARENT)) {
             int pr = tile_pixel_r(y);
-            for (int pc = TILES_SIZE - 1; pc >= 0; pc--) {
+            for (int pc = pc_init; pc >= 0; pc--) {
                 Color_s id = tiles_pixel(tile, 1, pc, pr);
                 if (!color_equals(id, COLOR_TRANSPARENT)) {
                     if (opt_id)
@@ -299,6 +304,7 @@ float tilemap_wall_left(float x, float y, Color_s *opt_id) {
             }
         }
         c--;
+        pc_init = TILES_SIZE-1;
     }
     if (opt_id)
         *opt_id = COLOR_TRANSPARENT;
@@ -308,12 +314,13 @@ float tilemap_wall_left(float x, float y, Color_s *opt_id) {
 float tilemap_wall_right(float x, float y, Color_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
+    int pc_init = tile_pixel_c(x);
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
         Color_s tile = *image_pixel(L.map, 1, c, r);
         if (!color_equals(tile, COLOR_TRANSPARENT)) {
             int pr = tile_pixel_r(y);
-            for (int pc = 0; pc < TILES_SIZE; pc++) {
+            for (int pc = pc_init; pc < TILES_SIZE; pc++) {
                 Color_s id = tiles_pixel(tile, 1, pc, pr);
                 if (!color_equals(id, COLOR_TRANSPARENT)) {
                     if (opt_id)
@@ -323,6 +330,7 @@ float tilemap_wall_right(float x, float y, Color_s *opt_id) {
             }
         }
         c++;
+        pc_init = 0;
     }
     if (opt_id)
         *opt_id = COLOR_TRANSPARENT;

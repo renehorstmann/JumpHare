@@ -30,6 +30,10 @@
 #define DEACC 240
 #define GRAVITY -400
 
+#define SLIP_BEGIN_SLOPE 3.0
+#define SLIP_END_SLOPE 0.5
+#define SLIP_SPEED 50
+
 #define JUMP_START_TIME 0.1
 #define JUMP_FALL_TIME 0.2
 #define DOUBLE_JUMP_START_TIME 0.25
@@ -70,7 +74,9 @@ static struct {
     float add_airstroke_time;
 } L;
 
-
+static bool on_ground() {
+    return L.state == HARE_GROUNDED || L.state == HARE_JUMPING || L.state == HARE_SLIPPING;
+}
 
 static void check_jumping(float dtime) {
     if (L.set_jump_time <= 0) {
@@ -110,22 +116,24 @@ static void check_jumping(float dtime) {
 static void apply_speed(float dtime) {
     vec2 pos = L.pos;
 
-    float set_speed_x = L.state == HARE_DOUBLE_JUMP ?
-                        L.set_speed_x * DOUBLE_JUMP_SPEED_X_FACTOR
-                                                    : L.set_speed_x;
-    // x
-    if (sca_sign(set_speed_x) * sca_sign(L.speed.x) == -1) {
-        L.speed.x = 0;
-    }
-    float diff = set_speed_x - L.speed.x;
-    if (diff > 0) {
-        L.speed.x = sca_min(L.speed.x
-                            + (L.speed.x < 0 ? DEACC : ACC)
-                              * dtime, set_speed_x);
-    } else if (diff < 0) {
-        L.speed.x = sca_max(L.speed.x
-                            - (L.speed.x > 0 ? DEACC : ACC)
-                              * dtime, set_speed_x);
+    if(L.state != HARE_SLIPPING) {
+        float set_speed_x = L.state == HARE_DOUBLE_JUMP ?
+                            L.set_speed_x * DOUBLE_JUMP_SPEED_X_FACTOR
+                                                        : L.set_speed_x;
+        // x
+        if (sca_sign(set_speed_x) * sca_sign(L.speed.x) == -1) {
+            L.speed.x = 0;
+        }
+        float diff = set_speed_x - L.speed.x;
+        if (diff > 0) {
+            L.speed.x = sca_min(L.speed.x
+                                + (L.speed.x < 0 ? DEACC : ACC)
+                                  * dtime, set_speed_x);
+        } else if (diff < 0) {
+            L.speed.x = sca_max(L.speed.x
+                                - (L.speed.x > 0 ? DEACC : ACC)
+                                  * dtime, set_speed_x);
+        }
     }
     float actual_speed = sca_abs(L.speed.x) < MIN_SPEED_X ? 0 : L.speed.x;
 
@@ -144,8 +152,8 @@ static void apply_speed(float dtime) {
 
 
 
-static void collision_callback(vec2 delta, enum collision_state state, void *ud) {
-    if(state == COLLISION_FALLING && L.state == HARE_GROUNDED) {
+static void collision_callback(vec3 delta, enum collision_state state, void *ud) {
+    if(state == COLLISION_FALLING && (L.state == HARE_GROUNDED || L.state == HARE_SLIPPING)) {
         L.state = HARE_FALLING;
         L.speed.y = 0;
         return;
@@ -155,11 +163,30 @@ static void collision_callback(vec2 delta, enum collision_state state, void *ud)
 #endif
         return;
     }
-    
+
+    // prevent gluing ground
     if(L.state==HARE_JUMPING && state==COLLISION_BOTTOM)
         delta.y = sca_max(delta.y, 0);
+
+    float slope = delta.z;
+
+    if(L.state==HARE_GROUNDED && sca_abs(slope) >= SLIP_BEGIN_SLOPE) {
+        L.state = HARE_SLIPPING;
+    }
+    if(L.state==HARE_SLIPPING && sca_abs(slope) < SLIP_END_SLOPE) {
+        L.state = HARE_GROUNDED;
+    }
+
+    // set slip speed
+    if(L.state == HARE_SLIPPING) {
+        L.speed.x = -sca_sign(slope) * SLIP_SPEED;
+    }
+
+    if(delta.x > 3.8) {
+        printf("delta x: %f\n", delta.x);
+    }
         
-    L.pos = vec2_add_vec(L.pos, delta);
+    L.pos = vec2_add_vec(L.pos, delta.xy);
     
     if(state == COLLISION_BOTTOM) {
         if(L.state != HARE_JUMPING)
@@ -182,6 +209,7 @@ static void check_collision() {
     switch (L.state) {
         case HARE_GROUNDED:
         case HARE_JUMPING:
+        case HARE_SLIPPING:
             collision_tilemap_grounded(coll, center, radius, speed);
             break;
         case HARE_FALLING:
@@ -241,8 +269,9 @@ static void animate(float dtime) {
 
 
 static void emit_dirt(float dtime) {
-    if (L.state != HARE_GROUNDED
-        || sca_abs(L.speed.x) < RUN_SPEED_X) {
+    if (!on_ground())
+        return;
+    if (L.state == HARE_GROUNDED && sca_abs(L.speed.x) < RUN_SPEED_X) {
         return;
     }
 
@@ -316,9 +345,9 @@ void hare_update(float dtime) {
 
     check_jumping(dtime);
 
-    if(L.freeze_time > 0) {
+    if (L.freeze_time > 0) {
         L.freeze_time -= dtime;
-        apply_speed(dtime/4);
+        apply_speed(dtime / 4);
     } else {
         apply_speed(dtime);
     }
