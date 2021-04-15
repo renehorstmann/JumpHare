@@ -118,12 +118,35 @@ void collision_tilemap_grounded(Collision_s self, vec2 center, vec2 radius, vec2
         return;
     }
 
+    // top
+    if (scan_top(self,
+                 center.x - radius.x * SCANNER_DISTANCE,
+                 center.y + radius.y))
+        return;
+
+    if (scan_top(self,
+                 center.x + radius.x * SCANNER_DISTANCE,
+                 center.y + radius.y))
+        return;
+
+
+    // left
     if (scan_left(self, center.x - radius.x, center.y))
         return;
 
+    if (scan_left(self, center.x - radius.x, center.y + radius.y * SCANNER_DISTANCE))
+        return;
+
+
+    // right
     if (scan_right(self, center.x + radius.x, center.y))
         return;
 
+    if (scan_right(self, center.x + radius.x, center.y + radius.y * SCANNER_DISTANCE))
+        return;
+
+
+    // bottom (always calls the callback)
     scan_bottom_grounded(self,
                          center.x - radius.x * SCANNER_DISTANCE,
                          center.x + radius.x * SCANNER_DISTANCE,
@@ -132,6 +155,7 @@ void collision_tilemap_grounded(Collision_s self, vec2 center, vec2 radius, vec2
 
 void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 speed) {
 
+    // bottom
     if (speed.y < 0) {
         if (center.y < tilemap_border_bottom()) {
             self.cb((vec2) {{0}}, COLLISION_KILL, self.cb_user_data);
@@ -146,6 +170,7 @@ void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 
     }
 
 
+    // top
     if (speed.y > 0) {
         if (scan_top(self,
                      center.x - radius.x * SCANNER_DISTANCE,
@@ -159,17 +184,19 @@ void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 
     }
 
 
-    if(scan_left(self, center.x-radius.x, center.y - radius.y*SCANNER_DISTANCE))
+    // left
+    if (scan_left(self, center.x - radius.x, center.y - radius.y * SCANNER_DISTANCE))
         return;
-        
-    if(scan_left(self, center.x-radius.x, center.y + radius.y*SCANNER_DISTANCE))
+
+    if (scan_left(self, center.x - radius.x, center.y + radius.y * SCANNER_DISTANCE))
         return;
-        
-        
-    if(scan_right(self, center.x+radius.x, center.y - radius.y*SCANNER_DISTANCE))
+
+
+    // right
+    if (scan_right(self, center.x + radius.x, center.y - radius.y * SCANNER_DISTANCE))
         return;
-        
-    if(scan_right(self, center.x+radius.x, center.y + radius.y*SCANNER_DISTANCE))
+
+    if (scan_right(self, center.x + radius.x, center.y + radius.y * SCANNER_DISTANCE))
         return;
 
 }

@@ -25,12 +25,6 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- testlevel
-  - slope physics
-  - jump distance
-  - jump height
-  - cave
-  - one ways
 - collision module
   - object object
     - aabb
