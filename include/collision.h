@@ -13,8 +13,8 @@ enum collision_state {
   COLLISION_KILL
 };
 
-// delta as x, y, slope = diff_y / diff_x
-typedef void (*collision_tilemap_cb_fn)(vec3 delta, enum collision_state state, void *user_data);
+
+typedef void (*collision_tilemap_cb_fn)(vec2 delta, enum collision_state state, void *user_data);
 
 typedef struct {
     collision_tilemap_cb_fn cb;

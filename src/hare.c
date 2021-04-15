@@ -62,7 +62,7 @@ static struct {
 
     float set_speed_x;
     float set_jump_time;
-    
+
     float freeze_time;
 
     float animate_time;
@@ -70,21 +70,21 @@ static struct {
 
     float emit_dirt_add;
     int emit_dirt_next_add;
-    
+
     float add_airstroke_time;
 } L;
 
 
 static void check_jumping(float dtime) {
     if (L.set_jump_time <= 0) {
-        if (L.state == HARE_GROUNDED || L.state == HARE_SLIPPING) {
+        if (L.state == HARE_GROUNDED) {
             L.state = HARE_JUMPING;
             L.jump_time = 0;
             L.set_jump_time = 1;
         }
 
         if (L.state == HARE_FALLING && L.jump_time > DOUBLE_JUMP_START_TIME) {
-            
+
             L.speed.y = sca_max(L.speed.y, DOUBLE_JUMP_SPEED_Y);
 #ifndef GOD_MODE
             L.state = HARE_DOUBLE_JUMP;
@@ -105,33 +105,31 @@ static void check_jumping(float dtime) {
             L.state = HARE_FALLING;
         }
     }
-    
-}
 
+}
 
 
 static void apply_speed(float dtime) {
     vec2 pos = L.pos;
 
-    if(L.state != HARE_SLIPPING) {
-        float set_speed_x = L.state == HARE_DOUBLE_JUMP ?
-                            L.set_speed_x * DOUBLE_JUMP_SPEED_X_FACTOR
-                                                        : L.set_speed_x;
-        // x
-        if (sca_sign(set_speed_x) * sca_sign(L.speed.x) == -1) {
-            L.speed.x = 0;
-        }
-        float diff = set_speed_x - L.speed.x;
-        if (diff > 0) {
-            L.speed.x = sca_min(L.speed.x
-                                + (L.speed.x < 0 ? DEACC : ACC)
-                                  * dtime, set_speed_x);
-        } else if (diff < 0) {
-            L.speed.x = sca_max(L.speed.x
-                                - (L.speed.x > 0 ? DEACC : ACC)
-                                  * dtime, set_speed_x);
-        }
+    float set_speed_x = L.state == HARE_DOUBLE_JUMP ?
+                        L.set_speed_x * DOUBLE_JUMP_SPEED_X_FACTOR
+                                                    : L.set_speed_x;
+    // x
+    if (sca_sign(set_speed_x) * sca_sign(L.speed.x) == -1) {
+        L.speed.x = 0;
     }
+    float diff = set_speed_x - L.speed.x;
+    if (diff > 0) {
+        L.speed.x = sca_min(L.speed.x
+                            + (L.speed.x < 0 ? DEACC : ACC)
+                              * dtime, set_speed_x);
+    } else if (diff < 0) {
+        L.speed.x = sca_max(L.speed.x
+                            - (L.speed.x > 0 ? DEACC : ACC)
+                              * dtime, set_speed_x);
+    }
+
     float actual_speed = sca_abs(L.speed.x) < MIN_SPEED_X ? 0 : L.speed.x;
 
     pos.x += actual_speed * dtime;
@@ -143,18 +141,17 @@ static void apply_speed(float dtime) {
         L.speed.y = sca_clamp(L.speed.y, -MAX_SPEED_Y, MAX_SPEED_Y);
         pos.y += L.speed.y * dtime;
     }
-    
+
     L.pos = pos;
 }
 
 
-
-static void collision_callback(vec3 delta, enum collision_state state, void *ud) {
-    if(state == COLLISION_FALLING && (L.state == HARE_GROUNDED || L.state == HARE_SLIPPING)) {
+static void collision_callback(vec2 delta, enum collision_state state, void *ud) {
+    if (state == COLLISION_FALLING && L.state == HARE_GROUNDED) {
         L.state = HARE_FALLING;
         L.speed.y = 0;
         return;
-    } else if(state == COLLISION_KILL) {
+    } else if (state == COLLISION_KILL) {
 #ifndef GOD_MODE
         dead_set_dead(L.pos.x, L.pos.y);
 #endif
@@ -162,51 +159,32 @@ static void collision_callback(vec3 delta, enum collision_state state, void *ud)
     }
 
     // prevent gluing ground
-    if(L.state==HARE_JUMPING && state==COLLISION_BOTTOM)
+    if (L.state == HARE_JUMPING && state == COLLISION_BOTTOM)
         delta.y = sca_max(delta.y, 0);
 
-    float slope = delta.v2;
+    L.pos = vec2_add_vec(L.pos, delta);
 
-    if(L.state==HARE_GROUNDED && sca_abs(slope) >= SLIP_BEGIN_SLOPE) {
-        L.state = HARE_SLIPPING;
-    }
-    if(L.state==HARE_SLIPPING && sca_abs(slope) < SLIP_END_SLOPE) {
-        L.state = HARE_GROUNDED;
-    }
-
-    // set slip speed
-    if(L.state == HARE_SLIPPING) {
-        L.speed.x = -sca_sign(slope) * SLIP_SPEED;
-    }
-
-    if(delta.x > 3.8) {
-        printf("delta x: %f\n", delta.x);
-    }
-        
-    L.pos = vec2_add_vec(L.pos, delta.xy);
-    
-    if(state == COLLISION_BOTTOM) {
-        if(L.state != HARE_JUMPING)
+    if (state == COLLISION_BOTTOM) {
+        if (L.state != HARE_JUMPING)
             L.speed.y = 0;
-        if(L.state == HARE_FALLING || L.state == HARE_DOUBLE_JUMP)
+        if (L.state == HARE_FALLING || L.state == HARE_DOUBLE_JUMP)
             L.state = HARE_GROUNDED;
-    } else if(state == COLLISION_TOP) {
+    } else if (state == COLLISION_TOP) {
         L.speed.y = 0;
-    } else if(state == COLLISION_LEFT || state == COLLISION_RIGHT){
+    } else if (state == COLLISION_LEFT || state == COLLISION_RIGHT) {
         L.speed.x = 0;
     }
 }
 
 static void check_collision() {
     Collision_s coll = {collision_callback};
-    vec2 center = {{L.pos.x, L.pos.y+COLL_OFFSET_Y}};
+    vec2 center = {{L.pos.x, L.pos.y + COLL_OFFSET_Y}};
     vec2 radius = {{COLL_RADIUS_X, COLL_RADIUS_Y}};
     vec2 speed = L.speed;
 
     switch (L.state) {
         case HARE_GROUNDED:
         case HARE_JUMPING:
-        case HARE_SLIPPING:
             collision_tilemap_grounded(coll, center, radius, speed);
             break;
         case HARE_FALLING:
@@ -219,7 +197,6 @@ static void check_collision() {
 }
 
 
-
 static void animate(float dtime) {
     int frame;
     if (L.state == HARE_GROUNDED) {
@@ -227,13 +204,13 @@ static void animate(float dtime) {
         int frames = ANIMATION_FRAMES;
         L.animate_time = sca_mod(L.animate_time + dtime, frames / fps);
         frame = L.animate_time * fps;
-        
-    } else { 
+
+    } else {
         // not grounded
-        frame = (int) sca_floor(L.jump_time*10);
+        frame = (int) sca_floor(L.jump_time * 10);
         frame = isca_clamp(frame, 0, 6);
-        
-        if(L.speed.y <0) {
+
+        if (L.speed.y < 0) {
             frame = 7;
         }
     }
@@ -264,11 +241,8 @@ static void animate(float dtime) {
 }
 
 
-
 static void emit_dirt(float dtime) {
-    if (L.state == HARE_FALLING || L.state == HARE_DOUBLE_JUMP)
-        return;
-    if (L.state == HARE_GROUNDED && sca_abs(L.speed.x) < RUN_SPEED_X) {
+    if (L.state != HARE_GROUNDED || sca_abs(L.speed.x) < RUN_SPEED_X) {
         return;
     }
 
@@ -278,10 +252,7 @@ static void emit_dirt(float dtime) {
         return;
     }
 
-    if(L.state == HARE_SLIPPING)
-        L.emit_dirt_add += sca_abs(L.speed.x) / 1.0 * dtime;
-    else
-        L.emit_dirt_add += sca_abs(L.speed.x) / 6.0 * dtime;
+    L.emit_dirt_add += sca_abs(L.speed.x) / 6.0 * dtime;
 
 
     int add = L.emit_dirt_add;
@@ -307,9 +278,9 @@ static void check_state_change(float dtime) {
     if (L.state == HARE_DOUBLE_JUMP && L.prev_state != HARE_DOUBLE_JUMP) {
         L.add_airstroke_time = AIRSTROKE_DELAY_TIME;
     }
-    if(L.add_airstroke_time > 0) {
+    if (L.add_airstroke_time > 0) {
         L.add_airstroke_time -= dtime;
-        if(L.add_airstroke_time <= 0) {
+        if (L.add_airstroke_time <= 0) {
             airstroke_add(L.pos.x, L.pos.y);
         }
     }
@@ -318,7 +289,7 @@ static void check_state_change(float dtime) {
 
 void hare_init(float pos_x, float pos_y) {
     L.state = L.prev_state = HARE_FALLING;
-    
+
     L.pos.x = pos_x;
     L.pos.y = pos_y;
 

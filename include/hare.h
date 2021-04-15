@@ -9,7 +9,6 @@ enum hare_state {
     HARE_FALLING,
     HARE_JUMPING,
     HARE_DOUBLE_JUMP,
-    HARE_SLIPPING,
     HARE_NUM_STATES
 };
 
