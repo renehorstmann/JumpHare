@@ -113,7 +113,7 @@ static void scan_bottom_grounded(Collision_s self, float x_a, float x_b, float y
 
         // check slope
         float p = tilemap_ground(x_b-SLOPE_CHECK_DISTANCE, y + SCAN_SIZE_GROUNDED, NULL);
-        delta.v2 = (p - pos_b) / SLOPE_CHECK_DISTANCE;
+        delta.v2 = (pos_b - p) / SLOPE_CHECK_DISTANCE;
     }
 
     if (sca_abs(delta.v2) > MAX_SLOPE_RATIO) {

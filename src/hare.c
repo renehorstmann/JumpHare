@@ -30,8 +30,8 @@
 #define DEACC 240
 #define GRAVITY -400
 
-#define SLIP_BEGIN_SLOPE 3.0
-#define SLIP_END_SLOPE 0.5
+#define SLIP_BEGIN_SLOPE 1.5
+#define SLIP_END_SLOPE 0.75
 #define SLIP_SPEED 50
 
 #define JUMP_START_TIME 0.1
