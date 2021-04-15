@@ -168,7 +168,7 @@ static void collision_callback(vec3 delta, enum collision_state state, void *ud)
     if(L.state==HARE_JUMPING && state==COLLISION_BOTTOM)
         delta.y = sca_max(delta.y, 0);
 
-    float slope = delta.z;
+    float slope = delta.v2;
 
     if(L.state==HARE_GROUNDED && sca_abs(slope) >= SLIP_BEGIN_SLOPE) {
         L.state = HARE_SLIPPING;

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "mathc/float.h"
 #include "tilemap.h"
 #include "tiles.h"
@@ -8,6 +9,7 @@
 #define SCAN_SIZE_GROUNDED 8.0
 #define SCANNER_DISTANCE 0.66
 
+#define SLOPE_CHECK_DISTANCE 2.0
 #define MAX_SLOPE_RATIO 4.5
 
 static bool scan_left(Collision_s self, float x, float y) {
@@ -80,6 +82,7 @@ static bool scan_bottom_falling(Collision_s self, float x, float y, float speed_
 }
 
 static void scan_bottom_grounded(Collision_s self, float x_a, float x_b, float y) {
+    assert(x_a < x_b);
     Color_s id_a, id_b;
     float pos_a = tilemap_ground(x_a, y + SCAN_SIZE_GROUNDED, &id_a);
     float pos_b = tilemap_ground(x_b, y + SCAN_SIZE_GROUNDED, &id_b);
@@ -91,26 +94,31 @@ static void scan_bottom_grounded(Collision_s self, float x_a, float x_b, float y
         return;
     }
 
-    float slope = (pos_b - pos_a) / (x_b - x_a);
-    if (sca_abs(slope) > MAX_SLOPE_RATIO) {
-        // standing on an edge
-        slope = 0;
-    }
-
-//    if(slope != 0) {
-//        printf("slope: %f\n", slope);
-//    }
 
     enum collision_state state;
-    vec3 delta = {{0, 0, slope}};
+    vec3 delta = {{0}};
     if (pos_a > pos_b) {
         enum tiles_pixel_state pixel = tiles_get_state(id_a);
         state = pixel == TILES_PIXEL_KILL ? COLLISION_KILL : COLLISION_BOTTOM;
         delta.y = pos_a - y;
+
+        // check slope
+        float p = tilemap_ground(x_a+SLOPE_CHECK_DISTANCE, y + SCAN_SIZE_GROUNDED, NULL);
+        delta.v2 = (p - pos_a) / SLOPE_CHECK_DISTANCE;
+
     } else {
         enum tiles_pixel_state pixel = tiles_get_state(id_b);
         state = pixel == TILES_PIXEL_KILL ? COLLISION_KILL : COLLISION_BOTTOM;
         delta.y = pos_b - y;
+
+        // check slope
+        float p = tilemap_ground(x_b-SLOPE_CHECK_DISTANCE, y + SCAN_SIZE_GROUNDED, NULL);
+        delta.v2 = (p - pos_b) / SLOPE_CHECK_DISTANCE;
+    }
+
+    if (sca_abs(delta.v2) > MAX_SLOPE_RATIO) {
+        // standing on an pixel?
+        delta.v2 = 0;
     }
 
     self.cb(delta, state, self.cb_user_data);
