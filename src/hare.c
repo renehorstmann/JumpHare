@@ -74,13 +74,10 @@ static struct {
     float add_airstroke_time;
 } L;
 
-static bool on_ground() {
-    return L.state == HARE_GROUNDED || L.state == HARE_JUMPING || L.state == HARE_SLIPPING;
-}
 
 static void check_jumping(float dtime) {
     if (L.set_jump_time <= 0) {
-        if (L.state == HARE_GROUNDED) {
+        if (L.state == HARE_GROUNDED || L.state == HARE_SLIPPING) {
             L.state = HARE_JUMPING;
             L.jump_time = 0;
             L.set_jump_time = 1;
@@ -269,7 +266,7 @@ static void animate(float dtime) {
 
 
 static void emit_dirt(float dtime) {
-    if (!on_ground())
+    if (L.state == HARE_FALLING || L.state == HARE_DOUBLE_JUMP)
         return;
     if (L.state == HARE_GROUNDED && sca_abs(L.speed.x) < RUN_SPEED_X) {
         return;
@@ -281,7 +278,12 @@ static void emit_dirt(float dtime) {
         return;
     }
 
-    L.emit_dirt_add += sca_abs(L.speed.x) / 6 * dtime;
+    if(L.state == HARE_SLIPPING)
+        L.emit_dirt_add += sca_abs(L.speed.x) / 1.0 * dtime;
+    else
+        L.emit_dirt_add += sca_abs(L.speed.x) / 6.0 * dtime;
+
+
     int add = L.emit_dirt_add;
     if (add < L.emit_dirt_next_add)
         return;
