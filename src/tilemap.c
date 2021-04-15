@@ -22,34 +22,43 @@ static struct {
     Image *map;
 } L;
 
+
+// coord to tile grid index
 static int tile_c(float x) {
     return x / TILES_SIZE;
 }
 
+// coord to tile grid index
 static int tile_r(float y) {
     return L.map->rows - y / TILES_SIZE;
 }
 
+// coord to tile pixel index within a tile
 static int tile_pixel_c(float x) {
     return (int) x % TILES_SIZE;
 }
 
+// coord to tile pixel index within a tile
 static int tile_pixel_r(float y) {
     return (int) (L.map->rows * TILES_SIZE - y) % TILES_SIZE;
 }
 
+// tile grid index to coord (left)
 static float tile_x(int c) {
     return c * TILES_SIZE;
 }
 
+// tile grid index to coord (top)
 static float tile_y(int r) {
     return (L.map->rows - r) * TILES_SIZE;
 }
 
+// tile grid index to coord pose
 static mat4 tile_pose(int c, int r) {
     return u_pose_new_aa(tile_x(c), tile_y(r), TILES_SIZE, TILES_SIZE);
 }
 
+// tile id to uv map
 static mat4 tile_uv(int id) {
     float w = 1.0 / TILES_COLS;
     float h = 1.0 / TILES_ROWS;
@@ -58,12 +67,13 @@ static mat4 tile_uv(int id) {
     return u_pose_new(u, v, w, h);
 }
 
-
+// returns true if a tile pixel is not transparent in the collision layer
 static bool pixel_collision(Color_s code, int pixel_c, int pixel_r) {
     return !color_equals(tiles_pixel(code, 1, pixel_c, pixel_r),
                          COLOR_TRANSPARENT);
 }
 
+// returns the color of a tile pixel
 static Color_s pixel_color(int map_layer, int tile_layer, float x, float y) {
     assert(tile_layer >= 0 && tile_layer <= 1
             && map_layer >= 0 && map_layer <= 2);
@@ -86,14 +96,6 @@ static Color_s pixel_color(int map_layer, int tile_layer, float x, float y) {
 
 void tilemap_init(const char *file) {
     L.map = io_load_image(file, MAP_LAYERS);
-    
-    /*
-    for(int r=0; r<L.map->rows; r++) {
-       for(int c=1; c<L.map->cols-1; c++) {
-           *image_pixel(L.map, 0, c, r) = COLOR_TRANSPARENT;
-       }
-    }
-    */
     
     int tile_back_nums[MAX_TILES] = {0};
     int tile_main_nums[MAX_TILES] = {0};
@@ -234,9 +236,14 @@ float tilemap_height() {
 }
 
 float tilemap_ground(float x, float y, Color_s *opt_id) {
+    // first tile to check
     int c = tile_c(x);
     int r = tile_r(y);
+
+    // first pixel row in the first tile
     int pr_init = tile_pixel_r(y);
+
+    // test all tiles and pixels of a tile, until a collision is found
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
         Color_s tile = *image_pixel(L.map, 1, c, r);
@@ -251,6 +258,8 @@ float tilemap_ground(float x, float y, Color_s *opt_id) {
                 }
             }
         }
+
+        // next row, test all pixels
         r++;
         pr_init = 0;
     }
