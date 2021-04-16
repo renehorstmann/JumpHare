@@ -25,6 +25,7 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- do not jump if position is far away (multitouch...)
 - collision module
   - object object
     - aabb
