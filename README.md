@@ -25,6 +25,9 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- real level 1 (beta)
+  - starshoot video animation
+  - begins asleep
 - do not jump if position is far away (multitouch...)
 - collision module
   - object object
