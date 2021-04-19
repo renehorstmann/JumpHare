@@ -25,6 +25,9 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- camera looking forward
+  - dkc style
+  - speed_x?
 - real level 1 (beta)
   - starshoot video animation
   - begins asleep
