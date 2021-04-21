@@ -251,8 +251,8 @@ void level_update(float dtime) {
 
 void level_render() {
     background_render();
-    flag_render();
-    goal_render();
+    //flag_render();
+    //goal_render();
     tilemap_render_back();
 
     // test
@@ -263,10 +263,10 @@ void level_render() {
         speechbubble_render(&L.bubbles[i]);
     }
     carrot_render();
-    dirt_particles_render();
+    //dirt_particles_render();
     airstroke_render();
     hare_render();
-    butterfly_render();
+    //butterfly_render();
     tilemap_render_front();
     dead_render();
 
@@ -276,6 +276,5 @@ void level_render() {
 
     controller_render();
     
-    dirt_particles_render();
 }
 
