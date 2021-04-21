@@ -55,12 +55,12 @@ static void load_game() {
     
     hare_init(start_pos.x, start_pos.y);
     airstroke_init();
-    dirt_particles_init();
+//    dirt_particles_init();
     camera_control_init();
     
     vec2 butterfly_pos[512];
     int butterflies = tilemap_get_positions(butterfly_pos, 512, BUTTERFLY_CODE, CODE_LAYER);
-    butterfly_init(butterfly_pos, butterflies);
+//    butterfly_init(butterfly_pos, butterflies);
 }
 
 static void unload_game() {
@@ -120,7 +120,7 @@ void level_init(int lvl) {
             
     vec2 goal_pos;
     assume(tilemap_get_positions(&goal_pos, 1, GOAL_CODE, CODE_LAYER) == 1, "level needs 1 goal");
-    goal_init(goal_pos);
+//    goal_init(goal_pos);
 
     vec2 carrot_pos[3];
     assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, CODE_LAYER) == 3, "level needs 3 carrots");
@@ -128,7 +128,7 @@ void level_init(int lvl) {
 
     vec2 flag_pos[64];
     int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, CODE_LAYER);
-    flag_init(flag_pos, flags);
+//    flag_init(flag_pos, flags);
     
     L.bubbles_size=0;
     vec2 bubble_pos;
@@ -175,7 +175,7 @@ void level_init(int lvl) {
     }
     ro_batch_update(&L.borders_ro);
 
-
+/*
     // test
     uImage *img;
     rTexture tex_main, tex_refract;
@@ -204,6 +204,7 @@ void level_init(int lvl) {
         L.mirror.rects[i].pose = u_pose_new(120+32*i, 100, 32, 64);
     }
     ro_batchrefract_update(&L.mirror);
+*/
 }
 
 void level_kill() {
@@ -227,24 +228,24 @@ void level_kill() {
 }
 
 void level_update(float dtime) {  
-    goal_update(dtime);
+//    goal_update(dtime);
     dead_update(dtime);
     if (!dead_is_dead()) {
         background_update(dtime);
         tilemap_update(dtime);
         carrot_update(dtime);
-        flag_update(dtime);
+//        flag_update(dtime);
         for(int i=0; i<L.bubbles_size; i++) {
             speechbubble_update(&L.bubbles[i], dtime);
         }
         hare_update(dtime);
         airstroke_update(dtime);
-        butterfly_update(dtime);
-        dirt_particles_update(dtime);
+//        butterfly_update(dtime);
+//        dirt_particles_update(dtime);
         controller_update(dtime);
 
-        check_carrot();
-        check_butterfly();
+//        check_carrot();
+//        check_butterfly();
     }
     camera_control_update(dtime);
 }

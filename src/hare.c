@@ -17,7 +17,7 @@
 #include "r/ro_text.h"
 #include "hud_camera.h"
 
-// #define GOD_MODE
+ #define GOD_MODE
 
 #define MIN_SPEED_X 5
 #define RUN_SPEED_X 90
@@ -270,7 +270,7 @@ static void emit_dirt(float dtime) {
     vec2 particle_pos = L.pos;
     particle_pos.y -= 7;
     vec2 particle_dir = {{-L.speed.x / 10, 12}};
-    dirt_particles_add(particle_pos, particle_dir, col, add);
+    // dirt_particles_add(particle_pos, particle_dir, col, add);
 }
 
 
