@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.0)
 project(jumphare C)
 
 # Optional definitions set:
-# USING_GLES            for OpenGLES3.0 instead of OpenGL3.3
-# USING_GLEW            if GLEW is available
-# -not used- USING_GYRO            if gyro sensor is available
-# -not used- USING_TTF             to use ro_ttftext
+# OPTION_GLES            for OpenGLES3.0 instead of OpenGL3.3
+# OPTION_GLEW            if GLEW is available
+# -not used- OPTION_GYRO            if gyro sensor is available
+# -not used- OPTION_TTF             to use ro_ttftext
 # OPTION_SDL            is set to let rhc code use SDL function
 # NUKLEAR_SCALE=3.0     for small hd screens (smartphones)
 
@@ -37,8 +37,8 @@ if (GL_LIB)
     target_link_libraries(jumphare ${GL_LIB})
 elseif (GLES_LIB)
     message("GLES found: Mobile mode")
-    add_definitions(-DUSING_GLES)
-    # -not used- add_definitions(-DUSING_GYRO)
+    add_definitions(-DOPTION_GLES)
+    # -not used- add_definitions(-DOPTION_GYRO)
     add_definitions(-DOPTION_SDL)
     add_definitions(-DNUKLEAR_SCALE=3.0)
     add_definitions(-DMATHC_NO_PRINT_COLOR)
@@ -50,12 +50,12 @@ endif ()
 # GLEW
 find_library(GLEW_LIB GLEW)
 if(GLEW_LIB)
-    add_definitions(-DUSING_GLEW)
+    add_definitions(-DOPTION_GLEW)
     target_link_libraries(jumphare ${GLEW_LIB})
 endif()
 
 # SDL
-# -not used- add_definitions(-DUSING_TTF)
+# -not used- add_definitions(-DOPTION_TTF)
 find_package(SDL2 REQUIRED)
 if (GL_LIB)
     find_library(SDL2_IMAGE_LIBRARIES SDL2_image)
