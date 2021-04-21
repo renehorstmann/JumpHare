@@ -2,17 +2,13 @@
 #include "button.h"
 
 
-void button_init_uv(rRect_s *self) {
-    
-    u_pose_set_size(&self->uv, 0.5, 1);
-}
 
 bool button_is_pressed(rRect_s *self) {
-    return u_pose_get_x(self->uv) > 0.25;
+    return self->sprite.x > 0.5;
 }
 
 void button_set_pressed(rRect_s *self, bool pressed) {
-    u_pose_set_x(&self->uv, pressed ? 0.5 : 0);
+    self->sprite.x = pressed? 1 : 0;
 }
 
 

@@ -2,7 +2,8 @@
 #define JUMPHARE_TILES_H
 
 #include "r/core.h"
-#include "image.h"
+#include "r/texture.h"
+#include "u/image.h"
 
 #define MAX_TILES 128
 #define TILES_COLS 8
@@ -19,8 +20,8 @@ enum tiles_pixel_state {
 };
 
 struct TilesGlobals_s {
-    Image *imgs[MAX_TILES];
-    GLuint textures[MAX_TILES];
+    uImage *imgs[MAX_TILES];
+    rTexture textures[MAX_TILES];
     int ids[MAX_TILES];
     int size;
 };
@@ -28,8 +29,8 @@ extern struct TilesGlobals_s tiles;
 
 void tiles_init();
 
-Color_s tiles_pixel(Color_s code, int layer, int pixel_c, int pixel_r);
+uColor_s tiles_pixel(uColor_s code, int pixel_c, int pixel_r, int layer);
 
-enum tiles_pixel_state tiles_get_state(Color_s id);
+enum tiles_pixel_state tiles_get_state(uColor_s id);
 
 #endif //JUMPHARE_TILES_H

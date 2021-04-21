@@ -5,7 +5,6 @@
 #include "mathc/utils/random.h"
 #include "camera.h"
 #include "hud_camera.h"
-#include "color.h"
 #include "dead.h"
 
 #define TIME 0.75
@@ -27,9 +26,9 @@ static struct {
 void dead_init(DeadFinishedFn callback, void *callback_user_data) {
     L.callback = callback;
     L.callback_user_data = callback_user_data;
-    ro_single_init(&L.strike_ro, camera.gl_main, r_texture_new_file("res/dead_overlay.png", NULL));
+    L.strike_ro = ro_single_new(camera.gl_main, r_texture_new_file(1, 1, "res/dead_overlay.png"));
 
-    ro_single_init(&L.blend_ro, hud_camera.gl, r_texture_new_white_pixel());
+    L.blend_ro = ro_single_new(hud_camera.gl, r_texture_new_white_pixel());
 
     u_pose_set_size(&L.blend_ro.rect.pose, 1024, 1024);
     L.time = -1;

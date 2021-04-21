@@ -5,7 +5,7 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
-#include "utilc/assume.h"
+#include "rhc/error.h"
 #include "camera.h"
 #include "hare.h"
 #include "goal.h"
@@ -55,7 +55,7 @@ static void emit_particles(float x, float y) {
 }
 
 static void activate() {
-    u_pose_set_y(&L.goal_ro.rect.uv, 0);
+    L.goal_ro.rect.sprite.y = 0;
 
     vec2 pos = u_pose_get_xy(L.goal_ro.rect.pose);
 
@@ -67,17 +67,16 @@ static void activate() {
 
 void goal_init(vec2 position) {
     
-    ro_single_init(&L.goal_ro, camera.gl_main,
-                    r_texture_new_file("res/goal_flag.png", NULL));
+    L.goal_ro = ro_single_new(camera.gl_main,
+                    r_texture_new_file(4, 2, "res/goal_flag.png"));
     L.goal_ro.rect.pose = u_pose_new(
             position.x,
             position.y+GOAL_OFFSET_Y,
             32, 48);
-                
-    u_pose_set_size(&L.goal_ro.rect.uv, 1.0/FRAMES, 0.5);
-    u_pose_set_y(&L.goal_ro.rect.uv, 0.5);   
+
+    L.goal_ro.rect.sprite.y = 1;
     
-    ro_particle_init(&L.particle_ro, MAX_PARTICLES,
+    L.particle_ro = ro_particle_new(MAX_PARTICLES,
             camera.gl_main, r_texture_new_white_pixel());
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
@@ -100,8 +99,7 @@ void goal_update(float dtime) {
 
     float animate_time = sca_mod(L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
-    float u = (float) frame / FRAMES;
-    u_pose_set_x(&L.goal_ro.rect.uv, u);
+    L.goal_ro.rect.sprite.x = frame;
     
     
     // check reached
@@ -126,5 +124,5 @@ void goal_render() {
 }
 
 bool goal_reached() {
-    return u_pose_get_y(L.goal_ro.rect.uv) < 0.25;
+    return L.goal_ro.rect.sprite.y < 0.5;
 }

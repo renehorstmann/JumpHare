@@ -6,6 +6,7 @@ project(jumphare C)
 # USING_GLEW            if GLEW is available
 # -not used- USING_GYRO            if gyro sensor is available
 # -not used- USING_TTF             to use ro_ttftext
+# OPTION_SDL            is set to let rhc code use SDL function
 # NUKLEAR_SCALE=3.0     for small hd screens (smartphones)
 
 set(CMAKE_C_STANDARD 11)
@@ -38,6 +39,7 @@ elseif (GLES_LIB)
     message("GLES found: Mobile mode")
     add_definitions(-DUSING_GLES)
     # -not used- add_definitions(-DUSING_GYRO)
+    add_definitions(-DOPTION_SDL)
     add_definitions(-DNUKLEAR_SCALE=3.0)
     add_definitions(-DMATHC_NO_PRINT_COLOR)
     target_link_libraries(jumphare ${GLES_LIB})

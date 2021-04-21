@@ -1,9 +1,10 @@
 #include "r/ro_batch.h"
-#include "r/ro_refract_batch.h"
+#include "r/ro_batchrefract.h"
 #include "r/texture.h"
 #include "u/pose.h"
+#include "u/image.h"
 #include "mathc/float.h"
-#include "utilc/assume.h"
+#include "rhc/error.h"
 #include "background.h"
 #include "tilemap.h"
 #include "hare.h"
@@ -18,20 +19,19 @@
 #include "controller.h"
 #include "camera_control.h"
 #include "camera.h"
-#include "io.h"
 #include "level.h"
 
 #define CODE_LAYER 2
 
 
-const static Color_s START_CODE = {{0, 0, 1, 0}};
-const static Color_s GOAL_CODE = {{0, 0, 1, 8}};
-const static Color_s CARROT_CODE = {{0, 0, 1, 1}};
-const static Color_s FLAG_CODE = {{0, 0, 1, 2}};
-const static Color_s BUTTERFLY_CODE = {{0, 0, 1, 3}};
-const static Color_s SPEECHBUBBLE_0_CODE = {{0, 0, 1, 4}};
-const static Color_s SPEECHBUBBLE_1_CODE = {{0, 0, 1, 5}};
-const static Color_s SPEECHBUBBLE_2_CODE = {{0, 0, 1, 6}};
+const static uColor_s START_CODE = {{0, 0, 1, 0}};
+const static uColor_s GOAL_CODE = {{0, 0, 1, 8}};
+const static uColor_s CARROT_CODE = {{0, 0, 1, 1}};
+const static uColor_s FLAG_CODE = {{0, 0, 1, 2}};
+const static uColor_s BUTTERFLY_CODE = {{0, 0, 1, 3}};
+const static uColor_s SPEECHBUBBLE_0_CODE = {{0, 0, 1, 4}};
+const static uColor_s SPEECHBUBBLE_1_CODE = {{0, 0, 1, 5}};
+const static uColor_s SPEECHBUBBLE_2_CODE = {{0, 0, 1, 6}};
 
 
 static struct {
@@ -42,7 +42,7 @@ static struct {
     int state;
 
     // test
-    RoRefractBatch ice, mirror;
+    RoBatchRefract ice, mirror;
 } L;
 
 static void load_game() {
@@ -148,11 +148,11 @@ void level_init(int lvl) {
 
     load_game();
 
-    ro_batch_init(&L.borders_ro, 4, camera.gl_main, r_texture_new_white_pixel());
+    L.borders_ro = ro_batch_new(4, camera.gl_main, r_texture_new_white_pixel());
 
     // black borders
     for (int i = 0; i < 4; i++) {
-        L.borders_ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
+        L.borders_ro.rects[i].color = R_COLOR_BLACK;
     }
 
     // border poses
@@ -177,33 +177,33 @@ void level_init(int lvl) {
 
 
     // test
-    Image *img;
-    GLuint tex_main, tex_refract;
-    img = io_load_image("res/ice_block.png", 2);
+    uImage *img;
+    rTexture tex_main, tex_refract;
+    img = u_image_new_file(2, "res/ice_block.png");
     assume(img, "wtf");
-    tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
-    tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
-    ro_refract_batch_init(&L.ice, 1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
+    tex_main = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, 0));
+    tex_refract = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, 1));
+    u_image_delete(img);
+    L.ice = ro_batchrefract_new(1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.ice.view_aabb = camera.gl_view_aabb;
     for(int i=0; i<L.ice.num; i++) {
         L.ice.rects[i].pose = u_pose_new(260+16*i, 100, 32, 64);
         L.ice.rects[i].color.a=0.8;
     }
-    ro_refract_batch_update(&L.ice);
+    ro_batchrefract_update(&L.ice);
 
 
-    img = io_load_image("res/mirror.png", 2);
+    img = u_image_new_file(2, "res/mirror.png");
     assume(img, "wtf");
-    tex_main = r_texture_new(img->cols, img->rows, image_layer(img, 0));
-    tex_refract = r_texture_new(img->cols, img->rows, image_layer(img, 1));
-    ro_refract_batch_init(&L.mirror, 1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
+    tex_main = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, 0));
+    tex_refract = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, 1));
+    u_image_delete(img);
+    L.mirror = ro_batchrefract_new(1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.mirror.view_aabb = camera.gl_view_aabb;
     for(int i=0; i<L.mirror.num; i++) {
         L.mirror.rects[i].pose = u_pose_new(120+32*i, 100, 32, 64);
     }
-    ro_refract_batch_update(&L.mirror);
-
-    image_delete(img);
+    ro_batchrefract_update(&L.mirror);
 }
 
 void level_kill() {
@@ -222,8 +222,8 @@ void level_kill() {
     ro_batch_kill(&L.borders_ro);
 
     // test
-    ro_refract_batch_kill(&L.ice);
-    ro_refract_batch_kill(&L.mirror);
+    ro_batchrefract_kill(&L.ice);
+    ro_batchrefract_kill(&L.mirror);
 }
 
 void level_update(float dtime) {  

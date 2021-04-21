@@ -215,9 +215,6 @@ static void animate(float dtime) {
         }
     }
 
-    float w = 1.0 / ANIMATION_FRAMES;
-    float h = 1.0 / 5.0;
-
     if (L.speed.x < -MIN_SPEED_X)
         L.looking_left = true;
     if (L.speed.x > MIN_SPEED_X)
@@ -234,10 +231,13 @@ static void animate(float dtime) {
         v = 3;
     }
 
+    L.ro.rect.sprite.x = frame;
+    L.ro.rect.sprite.y = v;
+
     if (!L.looking_left)
-        L.ro.rect.uv = u_pose_new(frame * w, v * h, w, h);
+        L.ro.rect.uv = u_pose_new(0, 0, 1, 1);
     else
-        L.ro.rect.uv = u_pose_new((1 + frame) * w, v * h, -w, h);
+        L.ro.rect.uv = u_pose_new(0, 0, -1, 1);
 }
 
 
@@ -246,7 +246,7 @@ static void emit_dirt(float dtime) {
         return;
     }
 
-    Color_s id;
+    uColor_s id;
     float ground = tilemap_ground(L.pos.x, L.pos.y, &id);
     if (tiles_get_state(id) != TILES_PIXEL_SOLID_DIRTY) {
         return;
@@ -265,7 +265,7 @@ static void emit_dirt(float dtime) {
     vec2 grab_pos = {{L.pos.x, ground}};
     grab_pos = vec2_random_noise_vec(grab_pos, vec2_set(5));
 
-    Color_s col = tilemap_pixel_main(0, grab_pos.x, grab_pos.y);
+    uColor_s col = tilemap_pixel_main(0, grab_pos.x, grab_pos.y);
 
     vec2 particle_pos = L.pos;
     particle_pos.y -= 7;
@@ -295,15 +295,13 @@ void hare_init(float pos_x, float pos_y) {
 
     L.emit_dirt_add = sca_random_noise(6, 2);
 
-    ro_single_init(&L.ro, camera.gl_main, r_texture_new_file("res/hare.png", NULL));
+    L.ro = ro_single_new(camera.gl_main, r_texture_new_file(8, 5, "res/hare.png"));
 
     u_pose_set_size(&L.ro.rect.pose, 32, 32);
 
 
-    ro_text_init_font55(&L.input_text, 64, hud_camera.gl);
-    for (int i = 0; i < 64; i++) {
-        L.input_text.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
-    }
+    L.input_text = ro_text_new_font55(64, hud_camera.gl);
+    ro_text_set_color(&L.input_text, R_COLOR_BLACK);
 }
 
 void hare_kill() {

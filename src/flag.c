@@ -5,7 +5,7 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
-#include "utilc/assume.h"
+#include "rhc/error.h"
 #include "camera.h"
 #include "hare.h"
 #include "carrot.h"
@@ -36,7 +36,7 @@ static struct {
 } L;
 
 static bool flag_reached(int index) {
-    return u_pose_get_y(L.flag_ro.rects[index].uv) < 0.25;
+    return L.flag_ro.rects[index].sprite.y < 0.5;
 }
 
 static void emit_particles(float x, float y) {
@@ -59,7 +59,7 @@ static void emit_particles(float x, float y) {
 }
 
 static void activate(int flag_index) {
-    u_pose_set_y(&L.flag_ro.rects[flag_index].uv, 0);
+    L.flag_ro.rects[flag_index].sprite.y = 0;
 
     vec2 pos = u_pose_get_xy(L.flag_ro.rects[flag_index].pose);
 
@@ -112,34 +112,32 @@ void flag_init(const vec2 *positions, int num) {
 
     L.active_pos = (vec2) {{NAN, NAN}};
 
-    ro_batch_init(&L.flag_ro, num, camera.gl_main,
-                    r_texture_new_file("res/flag.png", NULL));
+    L.flag_ro = ro_batch_new(num, camera.gl_main,
+                    r_texture_new_file(4, 2, "res/flag.png"));
     for(int i=0; i<num; i++) {
         L.flag_ro.rects[i].pose = u_pose_new(
                 positions[i].x,
                 positions[i].y+FLAG_OFFSET_Y,
                 32, 48);
-                
-        u_pose_set_size(&L.flag_ro.rects[i].uv, 1.0/FRAMES, 0.5);
-        u_pose_set_y(&L.flag_ro.rects[i].uv, 0.5);   
+
+        L.flag_ro.rects[i].sprite.y = 1;
     }
     ro_batch_update(&L.flag_ro);
     
     
-    ro_batch_init(&L.btn_ro, num, camera.gl_main,
-                    r_texture_new_file("res/carrot_btn.png", NULL));
+    L.btn_ro = ro_batch_new(num, camera.gl_main,
+                    r_texture_new_file(2, 1, "res/carrot_btn.png"));
     for(int i=0; i<num; i++) {
         
         L.btn_ro.rects[i].pose = u_pose_new(
                 positions[i].x,
                 positions[i].y+56,
                 32, 32);
-        button_init_uv(&L.btn_ro.rects[i]);
         L.btn_ro.rects[i].color.a = 1;
     }
     ro_batch_update(&L.btn_ro);
     
-    ro_particle_init(&L.particle_ro, MAX_PARTICLES,
+    L.particle_ro = ro_particle_new(MAX_PARTICLES,
             camera.gl_main, r_texture_new_white_pixel());
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
@@ -165,9 +163,8 @@ void flag_update(float dtime) {
 
     float animate_time = sca_mod(L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
-    float u = (float) frame / FRAMES;
     for(int i=0; i<L.flag_ro.num; i++)
-        u_pose_set_x(&L.flag_ro.rects[i].uv, u);
+        L.flag_ro.rects[i].sprite.x = frame;
     
     ro_batch_update(&L.flag_ro);
     

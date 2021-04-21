@@ -155,7 +155,7 @@ void controller_init() {
     L.pointer[1].action = E_POINTER_UP;
     e_input_register_pointer_event(pointer_event, NULL);
 
-    ro_batch_init(&L.background_ro, 2, hud_camera.gl, r_texture_new_file("res/hud_background.png", NULL));
+    L.background_ro = ro_batch_new(2, hud_camera.gl, r_texture_new_file(1, 1, "res/hud_background.png"));
     //L.background_ro.rect.color.a = 0.0;
 }
 

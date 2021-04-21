@@ -13,7 +13,7 @@
 #define MAX_SLOPE_RATIO 4.5
 
 static bool scan_left(Collision_s self, float x, float y) {
-    Color_s id;
+    uColor_s id;
     float pos = tilemap_wall_left(x + SCAN_SIZE, y, &id);
     if (pos <= x)
         return false;
@@ -31,7 +31,7 @@ static bool scan_left(Collision_s self, float x, float y) {
 }
 
 static bool scan_right(Collision_s self, float x, float y) {
-    Color_s id;
+    uColor_s id;
     float pos = tilemap_wall_right(x - SCAN_SIZE, y, &id);
     if (pos >= x)
         return false;
@@ -49,7 +49,7 @@ static bool scan_right(Collision_s self, float x, float y) {
 }
 
 static bool scan_top(Collision_s self, float x, float y) {
-    Color_s id;
+    uColor_s id;
     float pos = tilemap_ceiling(x, y - SCAN_SIZE, &id);
     if (pos >= y)
         return false;
@@ -67,7 +67,7 @@ static bool scan_top(Collision_s self, float x, float y) {
 }
 
 static bool scan_bottom_falling(Collision_s self, float x, float y, float speed_y) {
-    Color_s id;
+    uColor_s id;
     float pos = tilemap_ground(x, y + SCAN_SIZE, &id);
     if (pos <= y)
         return false;
@@ -83,7 +83,7 @@ static bool scan_bottom_falling(Collision_s self, float x, float y, float speed_
 
 static void scan_bottom_grounded(Collision_s self, float x_a, float x_b, float y) {
     assert(x_a < x_b);
-    Color_s id_a, id_b;
+    uColor_s id_a, id_b;
     float pos_a = tilemap_ground(x_a, y + SCAN_SIZE_GROUNDED, &id_a);
     float pos_b = tilemap_ground(x_b, y + SCAN_SIZE_GROUNDED, &id_b);
 

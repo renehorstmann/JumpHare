@@ -1,14 +1,12 @@
 #include "e/e.h"
 #include "r/r.h"
 #include "u/u.h"
+#include "rhc/rhc.h"
 
 #include "camera.h"
 #include "hud_camera.h"
 #include "tiles.h"
 #include "level.h"
-
-#include "utilc/assume.h"
-#include "io.h"
 
 #define UPDATES_PER_SECOND 200
 
@@ -22,7 +20,7 @@ static float current_time() {
 static void main_loop(float delta_time);
 
 int main(int argc, char **argv) {
-    SDL_Log("JumpHare");
+    log_info("JumpHare");
 
     // init e (environment)
     e_window_init("JumpHare");
@@ -39,7 +37,7 @@ int main(int argc, char **argv) {
     tiles_init();       // loads all tile textures
     level_init(1);      // manages the gameplay (tilemap, hare, background, ...)
 
-    ro_text_init_font55(&fps_ro, 64, hud_camera.gl);
+    fps_ro = ro_text_new_font55(64, hud_camera.gl);
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
@@ -117,7 +115,7 @@ static void main_loop(float delta_time) {
     r_render_end_frame();
 
     // check for opengl errors:
-    r_render_error_check();
+    r_render_error_check("main_loop_end");
 }
 
 

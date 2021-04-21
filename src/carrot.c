@@ -4,7 +4,7 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
-#include "utilc/assume.h"
+#include "rhc/error.h"
 #include "camera.h"
 #include "hud_camera.h"
 #include "carrot.h"
@@ -81,28 +81,26 @@ static void update_cnt() {
 void carrot_init(const vec2 *positions_3) {
     
     // in game carrots
-    ro_batch_init(&L.carrot_ro, 3, camera.gl_main,
-                    r_texture_new_file("res/carrot.png", NULL));
+    L.carrot_ro = ro_batch_new(3, camera.gl_main,
+                    r_texture_new_file(4, 1, "res/carrot.png"));
             
     for(int i=0; i<3; i++) {
         L.carrot_ro.rects[i].pose = u_pose_new(
                 positions_3[i].x,
                 positions_3[i].y,
                 16, 32);
-                
-       u_pose_set_w(&L.carrot_ro.rects[i].uv, 1.0/FRAMES); 
     }
     ro_batch_update(&L.carrot_ro);
 
     
     // mini hud carrot
-    ro_batch_init(&L.cnt_ro, 3, hud_camera.gl,
-                    r_texture_new_file("res/carrot_mini.png", NULL));
+    L.cnt_ro = ro_batch_new(3, hud_camera.gl,
+                    r_texture_new_file(1, 1, "res/carrot_mini.png"));
     update_cnt();
     
     
     // particles
-    ro_particle_init(&L.particle_ro, NUM_PARTICLES, camera.gl_main, r_texture_new_white_pixel());
+    L.particle_ro = ro_particle_new(NUM_PARTICLES, camera.gl_main, r_texture_new_white_pixel());
 
     for(int i=0; i<L.particle_ro.num; i++) {
         L.particle_ro.rects[i].pose = u_pose_new_hidden();
@@ -123,10 +121,9 @@ void carrot_update(float dtime) {
     L.time += dtime;
     float animate_time = sca_mod(L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
-    float u = (float) frame / FRAMES;
     for(int i=0; i<3; i++)
-        u_pose_set_x(&L.carrot_ro.rects[i].uv, u);
-          
+        L.carrot_ro.rects[i].sprite.x = frame;
+
     for(int i=0; i<3; i++) {
         if(!L.collected[i])
             continue;

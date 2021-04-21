@@ -3,10 +3,9 @@
 #include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
+#include "u/image.h"
 #include "mathc/float.h"
-#include "utilc/assume.h"
 #include "camera.h"
-#include "io.h"
 #include "background.h"
 
 #define PIXEL_SIZE 2.0
@@ -19,10 +18,10 @@ static struct {
 void background_init(float level_width, float level_height, 
         bool repeat_h, bool repeat_v, 
         const char *file) {
-    Image *img = io_load_image(file, CAMERA_BACKGROUNDS);
+    uImage *img = u_image_new_file(CAMERA_BACKGROUNDS, file);
 
     // top left pixel will be clear color
-    r_render.clear_color.rgb = vec3_cast_from_uchar_1(image_pixel(img, 0, 0, 0)->v);
+    r_render.clear_color.rgb = vec3_cast_from_uchar_1(u_image_pixel(img, 0, 0, 0)->v);
 
     float rows = img->rows * PIXEL_SIZE;
     float cols = img->cols * PIXEL_SIZE;
@@ -31,8 +30,8 @@ void background_init(float level_width, float level_height,
     int size_v = repeat_v? ceilf(level_height / rows) : 1;
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
-        GLuint tex = r_texture_new(img->cols, img->rows, image_layer(img, i));
-        ro_batch_init(&L.ro[i], size_h*size_v, camera.gl_background[i], tex);
+        rTexture tex = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, i));
+        L.ro[i] = ro_batch_new(size_h*size_v, camera.gl_background[i], tex);
 
         for (int v = 0; v < size_v; v++) {
             for(int h = 0; h < size_h; h++) {

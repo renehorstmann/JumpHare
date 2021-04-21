@@ -1,12 +1,12 @@
 #include <assert.h>
 #include "r/ro_batch.h"
 #include "u/pose.h"
+#include "u/image.h"
 #include "mathc/sca/int.h"
 #include "mathc/sca/float.h"
-#include "utilc/assume.h"
+#include "rhc/error.h"
 
 #include "tiles.h"
-#include "io.h"
 #include "camera.h"
 #include "tilemap.h"
 
@@ -19,7 +19,7 @@ static struct {
 //    RoBatch ro_front[MAX_TILES];
     bool ro_back_active[MAX_TILES];
     bool ro_main_active[MAX_TILES];
-    Image *map;
+    uImage *map;
 } L;
 
 
@@ -58,23 +58,21 @@ static mat4 tile_pose(int c, int r) {
     return u_pose_new_aa(tile_x(c), tile_y(r), TILES_SIZE, TILES_SIZE);
 }
 
-// tile id to uv map
-static mat4 tile_uv(int id) {
-    float w = 1.0 / TILES_COLS;
-    float h = 1.0 / TILES_ROWS;
-    float u = w * (id % TILES_COLS);
-    float v = h * (id / TILES_COLS);
-    return u_pose_new(u, v, w, h);
+// tile id to sprite map
+static vec2 tile_sprite(int id) {
+    float x = id % TILES_COLS;
+    float y = id / TILES_COLS;
+    return (vec2) {{x, y}};
 }
 
 // returns true if a tile pixel is not transparent in the collision layer
-static bool pixel_collision(Color_s code, int pixel_c, int pixel_r) {
-    return !color_equals(tiles_pixel(code, 1, pixel_c, pixel_r),
+static bool pixel_collision(uColor_s code, int pixel_c, int pixel_r) {
+    return !u_color_equals(tiles_pixel(code, pixel_c, pixel_r, 1),
                          COLOR_TRANSPARENT);
 }
 
 // returns the color of a tile pixel
-static Color_s pixel_color(int map_layer, int tile_layer, float x, float y) {
+static uColor_s pixel_color(int map_layer, int tile_layer, float x, float y) {
     assert(tile_layer >= 0 && tile_layer <= 1
             && map_layer >= 0 && map_layer <= 2);
 
@@ -86,29 +84,29 @@ static Color_s pixel_color(int map_layer, int tile_layer, float x, float y) {
         return COLOR_TRANSPARENT;
     }
 
-    Color_s tile = *image_pixel(L.map, map_layer, c, r);
+    uColor_s tile = *u_image_pixel(L.map, c, r, map_layer);
     int pc = tile_pixel_c(x);
     int pr = tile_pixel_r(y);
 
-    return tiles_pixel(tile, tile_layer, pc, pr);
+    return tiles_pixel(tile, pc, pr, tile_layer);
 }
 
 
 void tilemap_init(const char *file) {
-    L.map = io_load_image(file, MAP_LAYERS);
+    L.map = u_image_new_file(MAP_LAYERS, file);
     
     int tile_back_nums[MAX_TILES] = {0};
     int tile_main_nums[MAX_TILES] = {0};
     for (int r = 0; r < L.map->rows; r++) {
         for (int c = 0; c < L.map->cols; c++) {
-            Color_s code;
-            code = *image_pixel(L.map, 0, c, r);
-            if (!color_equals(code, COLOR_TRANSPARENT)) {
+            uColor_s code;
+            code = *u_image_pixel(L.map, c, r, 0);
+            if (!u_color_equals(code, COLOR_TRANSPARENT)) {
                 tile_back_nums[code.b - 1]++;
             }
             
-            code = *image_pixel(L.map, 1, c, r);
-            if (!color_equals(code, COLOR_TRANSPARENT)) {
+            code = *u_image_pixel(L.map, c, r, 1);
+            if (!u_color_equals(code, COLOR_TRANSPARENT)) {
                 tile_main_nums[code.b - 1]++;
             }
         }
@@ -117,13 +115,13 @@ void tilemap_init(const char *file) {
     for (int i = 0; i < tiles.size; i++) {
         L.ro_back_active[i] = tile_back_nums[i] > 0;
         if(L.ro_back_active[i]) {
-            ro_batch_init(&L.ro_back[i], tile_back_nums[i], camera.gl_main, tiles.textures[i]);
+            L.ro_back[i] = ro_batch_new(tile_back_nums[i], camera.gl_main, tiles.textures[i]);
             L.ro_back[i].owns_tex = false;
         }
         
         L.ro_main_active[i] = tile_main_nums[i] > 0;
         if(L.ro_main_active[i]) {
-            ro_batch_init(&L.ro_main[i], tile_main_nums[i], camera.gl_main, tiles.textures[i]);
+            L.ro_main[i] = ro_batch_new(tile_main_nums[i], camera.gl_main, tiles.textures[i]);
             L.ro_main[i].owns_tex = false;
         }
     }
@@ -134,24 +132,24 @@ void tilemap_init(const char *file) {
 
     for (int r = 0; r < L.map->rows; r++) {
         for (int c = 0; c < L.map->cols; c++) {
-            Color_s code;
-            code = *image_pixel(L.map, 0, c, r);
-            if (!color_equals(code, COLOR_TRANSPARENT)) {
+            uColor_s code;
+            code = *u_image_pixel(L.map, c, r, 0);
+            if (!u_color_equals(code, COLOR_TRANSPARENT)) {
                 int tile_id = code.b - 1;
                 int tile = code.a;
                 rRect_s *rect = &L.ro_back[tile_id].rects[tile_back_nums[tile_id]];
                 rect->pose = tile_pose(c, r);
-                rect->uv = tile_uv(tile);
+                rect->sprite = tile_sprite(tile);
                 tile_back_nums[tile_id]++;
             }
             
-            code = *image_pixel(L.map, 1, c, r);
-            if (!color_equals(code, COLOR_TRANSPARENT)) {
+            code = *u_image_pixel(L.map, c, r, 1);
+            if (!u_color_equals(code, COLOR_TRANSPARENT)) {
                 int tile_id = code.b - 1;
                 int tile = code.a;
                 rRect_s *rect = &L.ro_main[tile_id].rects[tile_main_nums[tile_id]];
                 rect->pose = tile_pose(c, r);
-                rect->uv = tile_uv(tile);
+                rect->sprite = tile_sprite(tile);
                 tile_main_nums[tile_id]++;
             }
         }
@@ -168,7 +166,7 @@ void tilemap_init(const char *file) {
 }
 
 void tilemap_kill() {
-    image_delete(L.map);
+    u_image_delete(L.map);
     for (int i = 0; i < tiles.size; i++) {
         if(L.ro_back_active[i])
             ro_batch_kill(&L.ro_back[i]);
@@ -200,13 +198,13 @@ void tilemap_render_front() {
     }
 }
 
-int tilemap_get_positions_aa(vec2 *out_positions, int max_positions, Color_s code, int layer) {
+int tilemap_get_positions_aa(vec2 *out_positions, int max_positions, uColor_s code, int layer) {
     assume(layer <= L.map->layers, "invalid layer");
     
     int idx = 0;
     for(int r=0; r<L.map->rows; r++) {
         for(int c=0; c<L.map->cols; c++) {
-            if(color_equals(code, *image_pixel(L.map, layer, c, r))) {
+            if(u_color_equals(code, *u_image_pixel(L.map, c, r, layer))) {
                 out_positions[idx].x = tile_x(c);
                 out_positions[idx].y = tile_y(r);
                 if(++idx>=max_positions)
@@ -217,7 +215,7 @@ int tilemap_get_positions_aa(vec2 *out_positions, int max_positions, Color_s cod
     return idx;
 }
 
-int tilemap_get_positions(vec2 *out_positions, int max_positions, Color_s code, int layer) {
+int tilemap_get_positions(vec2 *out_positions, int max_positions, uColor_s code, int layer) {
     int cnt = tilemap_get_positions_aa(out_positions, max_positions, code, layer);
     
     for(int i=0; i<cnt; i++) {
@@ -235,7 +233,7 @@ float tilemap_height() {
     return L.map->rows * TILES_SIZE;
 }
 
-float tilemap_ground(float x, float y, Color_s *opt_id) {
+float tilemap_ground(float x, float y, uColor_s *opt_id) {
     // first tile to check
     int c = tile_c(x);
     int r = tile_r(y);
@@ -246,12 +244,12 @@ float tilemap_ground(float x, float y, Color_s *opt_id) {
     // test all tiles and pixels of a tile, until a collision is found
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
-        Color_s tile = *image_pixel(L.map, 1, c, r);
-        if (!color_equals(tile, COLOR_TRANSPARENT)) {
+        uColor_s tile = *u_image_pixel(L.map, c, r, 1);
+        if (!u_color_equals(tile, COLOR_TRANSPARENT)) {
             int pc = tile_pixel_c(x);
             for (int pr = pr_init; pr < TILES_SIZE; pr++) {
-                Color_s id = tiles_pixel(tile, 1, pc, pr);
-                if (!color_equals(id, COLOR_TRANSPARENT)) {
+                uColor_s id = tiles_pixel(tile, pc, pr, 1);
+                if (!u_color_equals(id, COLOR_TRANSPARENT)) {
                     if (opt_id)
                         *opt_id = id;
                     return sca_min(tile_y(r) - pr, y);
@@ -268,18 +266,18 @@ float tilemap_ground(float x, float y, Color_s *opt_id) {
     return -FLT_MAX;
 }
 
-float tilemap_ceiling(float x, float y, Color_s *opt_id) {
+float tilemap_ceiling(float x, float y, uColor_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
     int pr_init = tile_pixel_r(y);
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
-        Color_s tile = *image_pixel(L.map, 1, c, r);
-        if (!color_equals(tile, COLOR_TRANSPARENT)) {
+        uColor_s tile = *u_image_pixel(L.map, c, r, 1);
+        if (!u_color_equals(tile, COLOR_TRANSPARENT)) {
             int pc = tile_pixel_c(x);
             for (int pr = pr_init; pr >= 0; pr--) {
-                Color_s id = tiles_pixel(tile, 1, pc, pr);
-                if (!color_equals(id, COLOR_TRANSPARENT)) {
+                uColor_s id = tiles_pixel(tile, pc, pr, 1);
+                if (!u_color_equals(id, COLOR_TRANSPARENT)) {
                     if (opt_id)
                         *opt_id = id;
                     return sca_max(tile_y(r) - pr - 1, y);
@@ -294,18 +292,18 @@ float tilemap_ceiling(float x, float y, Color_s *opt_id) {
     return FLT_MAX;
 }
 
-float tilemap_wall_left(float x, float y, Color_s *opt_id) {
+float tilemap_wall_left(float x, float y, uColor_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
     int pc_init = tile_pixel_c(x);
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
-        Color_s tile = *image_pixel(L.map, 1, c, r);
-        if (!color_equals(tile, COLOR_TRANSPARENT)) {
+        uColor_s tile = *u_image_pixel(L.map, c, r, 1);
+        if (!u_color_equals(tile, COLOR_TRANSPARENT)) {
             int pr = tile_pixel_r(y);
             for (int pc = pc_init; pc >= 0; pc--) {
-                Color_s id = tiles_pixel(tile, 1, pc, pr);
-                if (!color_equals(id, COLOR_TRANSPARENT)) {
+                uColor_s id = tiles_pixel(tile, pc, pr, 1);
+                if (!u_color_equals(id, COLOR_TRANSPARENT)) {
                     if (opt_id)
                         *opt_id = id;
                     return sca_min(tile_x(c) + pc + 1, x);
@@ -320,18 +318,18 @@ float tilemap_wall_left(float x, float y, Color_s *opt_id) {
     return tile_x(0);
 }
 
-float tilemap_wall_right(float x, float y, Color_s *opt_id) {
+float tilemap_wall_right(float x, float y, uColor_s *opt_id) {
     int c = tile_c(x);
     int r = tile_r(y);
     int pc_init = tile_pixel_c(x);
     while (c >= 0 && c < L.map->cols
            && r >= 0 && r < L.map->rows) {
-        Color_s tile = *image_pixel(L.map, 1, c, r);
-        if (!color_equals(tile, COLOR_TRANSPARENT)) {
+        uColor_s tile = *u_image_pixel(L.map, c, r, 1);
+        if (!u_color_equals(tile, COLOR_TRANSPARENT)) {
             int pr = tile_pixel_r(y);
             for (int pc = pc_init; pc < TILES_SIZE; pc++) {
-                Color_s id = tiles_pixel(tile, 1, pc, pr);
-                if (!color_equals(id, COLOR_TRANSPARENT)) {
+                uColor_s id = tiles_pixel(tile, pc, pr, 1);
+                if (!u_color_equals(id, COLOR_TRANSPARENT)) {
                     if (opt_id)
                         *opt_id = id;
                     return sca_max(tile_x(c) + pc, x);
@@ -346,10 +344,10 @@ float tilemap_wall_right(float x, float y, Color_s *opt_id) {
     return tile_x(L.map->cols);
 }
 
-Color_s tilemap_pixel_back(int layer, float x, float y) {
+uColor_s tilemap_pixel_back(int layer, float x, float y) {
     return pixel_color(0, layer, x, y);
 }
 
-Color_s tilemap_pixel_main(int layer, float x, float y) {
+uColor_s tilemap_pixel_main(int layer, float x, float y) {
     return pixel_color(1, layer, x, y);
 }

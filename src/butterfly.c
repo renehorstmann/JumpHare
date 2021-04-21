@@ -4,7 +4,7 @@
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
 #include "mathc/utils/color.h"
-#include "utilc/assume.h"
+#include "rhc/error.h"
 #include "camera.h"
 #include "hare.h"
 #include "butterfly.h"
@@ -25,19 +25,20 @@ static struct {
 } L;
 
 static bool is_flying(int i) {
-    return u_pose_get_y(L.ro.rects[i].uv) > 0.25;
+    return L.ro.rects[i].sprite.y > 0.5;
 }
 
 static void fly_away(int i) {
-    L.ro.rects[i].uv_time = 1.0/FLY_FPS;
+    L.ro.rects[i].sprite.y = 1;
+    L.ro.rects[i].sprite_speed.x = FLY_FPS;
     float angle = sca_random_range(0, 60);
     int flip = rand()%2;
-    float uv_w = -1.0/FRAMES;
+    float uv_w = -1;
     if(flip) {
         angle = 180 - angle;
-        uv_w = -uv_w;
+        uv_w = 1;
     }
-    L.ro.rects[i].uv = u_pose_new(0, 0.5, uv_w, 0.5);
+    L.ro.rects[i].uv = u_pose_new(0, 0, uv_w, 1);
     L.ro.rects[i].speed.x = sca_cos(sca_radians(angle)) * FLY_SPEED;
     L.ro.rects[i].speed.y = sca_sin(sca_radians(angle)) * FLY_SPEED;
     
@@ -49,22 +50,18 @@ static void fly_away(int i) {
 
 void butterfly_init(const vec2 *positions, int num) {
     assume(num>0, "atleast one butterfly in a level?");
-    ro_particle_init(&L.ro, num, camera.gl_main,
-            r_texture_new_file("res/butterfly.png", NULL));
+    L.ro = ro_particle_new(num, camera.gl_main,
+            r_texture_new_file(12, 2, "res/butterfly.png"));
             
     for(int i=0; i<num; i++) {
         L.ro.rects[i].pose = u_pose_new(
                 sca_random_noise(positions[i].x, 4),
                 sca_random_noise(positions[i].y, 4),
                 16, 16);
-        float uv_w = 1.0/FRAMES;
-        if(rand()%2==0)
-            uv_w = -uv_w;
-        L.ro.rects[i].uv = u_pose_new(
-                (float) (rand()%FRAMES) / FRAMES,
-                0, uv_w, 0.5);
-        L.ro.rects[i].uv_step.x = 1.0/FRAMES;
-        L.ro.rects[i].uv_time = 1.0/CHILL_FPS;
+        if(rand()%2==0) {
+            u_pose_set_w(&L.ro.rects[i].uv, -1);
+        }
+        L.ro.rects[i].sprite_speed.x = CHILL_FPS;
         vec3 hsv = {{
             sca_random_range(0, 360),
             sca_random_range(0.25, 0.75),

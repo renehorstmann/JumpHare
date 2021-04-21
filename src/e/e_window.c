@@ -5,6 +5,10 @@
 #include "e/window.h"
 #include "e/definitions.h"
 
+// rhc implementation source file, only once in a project
+#include "rhc/rhc_impl.h"
+
+
 struct eWindowGlobals_s e_window;
 
 static struct {
@@ -40,7 +44,7 @@ void e_window_init(const char *name) {
         exit(EXIT_FAILURE);
     }
 
-#ifdef USING_TTF
+#ifdef OPTION_TTF
     // initialize TTF
     if (TTF_Init() == -1) {
         SDL_Log("TTF_Init failed: %s", TTF_GetError());
@@ -75,7 +79,7 @@ void e_window_init(const char *name) {
     }
     SDL_GL_SetSwapInterval(1);  // (0=off, 1=V-Sync, -1=addaptive V-Sync)
 
-#ifdef USING_GLEW
+#ifdef OPTION_GLEW
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         /* Problem: glewInit failed, something is seriously wrong. */

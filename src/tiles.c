@@ -1,6 +1,5 @@
-#include "r/texture.h"
-#include "utilc/assume.h"
-#include "io.h"
+#include "u/image.h"
+#include "rhc/error.h"
 #include "tiles.h"
 
 struct TilesGlobals_s tiles;
@@ -12,7 +11,7 @@ void tiles_init() {
         char file[128];
         sprintf(file, "res/tiles/tile_%02i.png", tile_id);
 
-        Image *img = io_load_image(file, 2);
+        uImage *img = u_image_new_file(2, file);
         if (!img)
             break;
 
@@ -20,7 +19,7 @@ void tiles_init() {
                && img->rows == TILES_ROWS * TILES_SIZE,
                "wrong tiles size");
 
-        GLuint tex = r_texture_new(img->cols, img->rows, image_layer(img, 0));
+        rTexture tex = r_texture_new(img->cols, img->rows, TILES_COLS, TILES_ROWS, u_image_layer(img, 0));
 
         tiles.imgs[tiles.size] = img;
         tiles.textures[tiles.size] = tex;
@@ -34,25 +33,26 @@ void tiles_init() {
         SDL_Log("WARNING: 0 tiles loaded! Put some into tiles/tile_xx.png, starting with xx=01");
 }
 
-Color_s tiles_pixel(Color_s code, int layer, int pixel_c, int pixel_r) {
+uColor_s tiles_pixel(uColor_s code, int pixel_c, int pixel_r, int layer) {
     int tile_id = code.b;
     int tile = code.a;
 
     if (tile_id == 0)
         return COLOR_TRANSPARENT;
 
-    Image *img = tiles.imgs[tile_id - 1];
+    uImage *img = tiles.imgs[tile_id - 1];
 
     int tile_col = tile % TILES_COLS;
     int tile_row = tile / TILES_COLS;
 
-    return *image_pixel(img, layer,
+    return *u_image_pixel(img,
                         pixel_c + tile_col * TILES_SIZE,
-                        pixel_r + tile_row * TILES_SIZE);
+                        pixel_r + tile_row * TILES_SIZE,
+                        layer);
 }
 
-enum tiles_pixel_state tiles_get_state(Color_s id) {
-    if (color_equals(id, COLOR_TRANSPARENT))
+enum tiles_pixel_state tiles_get_state(uColor_s id) {
+    if (u_color_equals(id, COLOR_TRANSPARENT))
         return TILES_PIXEL_EMPTY;
 
     // todo: use...

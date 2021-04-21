@@ -11,11 +11,10 @@
 #define MAX_DIST 45.0
 #define MIN_DIST 15.0
 
-static bool emojifont_uv_cb(mat4 *uv, char c) {
-    static const int cols = 16*6;
-    static const int rows = 16*6;
-    static const int size_x = 16;
-    static const int size_y = 16;
+#define COLUMNS 6
+#define ROWS 6
+
+static bool emojifont_sprite_cb(vec2 *sprite, char c) {
 
     bool nl = false;
     if (c == '\n') {
@@ -52,16 +51,14 @@ static bool emojifont_uv_cb(mat4 *uv, char c) {
     if(c=='t') {row=3; col=4;} // top arrow
     if(c=='b') {row=3; col=5;} // bottom arrow
 
-    float w = (float) size_x / cols;
-    float h = (float) size_y / rows;
-
-    *uv = u_pose_new(col * w, row * h, w, h);
+    sprite->x = col;
+    sprite->y = row;
 
     return nl;
 }
 
 void emojifont_init(RoText *self, int max, const float *vp) {
-    ro_text_init(self, max, emojifont_uv_cb, vp, r_texture_new_file("res/emojifont.png", NULL));
+    *self = ro_text_new(max, emojifont_sprite_cb, vp, r_texture_new_file(COLUMNS, ROWS, "res/emojifont.png"));
     self->size = (vec2) {16, 16};
     self->offset = (vec2) {18, 18};
 }
@@ -85,7 +82,7 @@ void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext)
     float bubbly_x = text_x-18/2;
     float bubble_y = text_y+18/2;
     
-    ro_batch_init(&self->bubble, rows*cols, camera.gl_main, r_texture_new_file("res/speechbubble.png", NULL));
+    self->bubble = ro_batch_new(rows*cols, camera.gl_main, r_texture_new_file(1, 1, "res/speechbubble.png"));
     
     for(int r=0; r<rows; r++) {
         for(int c=0; c<cols;c++) {

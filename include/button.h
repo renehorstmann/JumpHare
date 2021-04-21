@@ -5,8 +5,6 @@
 #include "e/input.h"
 #include "r/rect.h"
 
-void button_init_uv(rRect_s *self);
-
 bool button_is_pressed(rRect_s *self);
 
 void button_set_pressed(rRect_s *self, bool pressed);

@@ -3,7 +3,6 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
-#include "color.h"
 #include "camera.h"
 #include "dirt_particles.h"
 
@@ -20,7 +19,7 @@ static struct {
 } L;
 
 void dirt_particles_init() {
-    ro_particle_init(&L.ro, MAX_PARTCLES, camera.gl_main, r_texture_new_white_pixel());
+    L.ro = ro_particle_new(MAX_PARTCLES, camera.gl_main, r_texture_new_white_pixel());
 
     for (int i = 0; i < L.ro.num; i++) {
         u_pose_set_size(&L.ro.rects[i].pose, SIZE, SIZE);
@@ -47,7 +46,7 @@ void dirt_particles_render() {
 
 #include "mathc/uchar.h"
 
-void dirt_particles_add(vec2 pos, vec2 dir, Color_s color, int n) {
+void dirt_particles_add(vec2 pos, vec2 dir, uColor_s color, int n) {
     vec4 col = vec4_cast_from_uchar_1(color.v);
     int start_idx = L.next;
     for (int i = 0; i < n; i++) {
