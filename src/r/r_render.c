@@ -54,7 +54,7 @@ void r_render_end_frame() {
 }
 
 void r_render_blit_framebuffer(int cols, int rows) {
-    r_render_error_check("r_render_blit_framebufferBEGIN");
+   return; r_render_error_check("r_render_blit_framebufferBEGIN");
   
     
     GLint current_fbo;
@@ -87,6 +87,7 @@ void r_render_blit_framebuffer(int cols, int rows) {
 }
 
 void r_render_error_check(const char *opt_tag) {
+    return;
     static GLenum errs[32];
     int errs_size = 0;
     GLenum err;
