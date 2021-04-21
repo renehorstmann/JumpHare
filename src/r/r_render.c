@@ -53,8 +53,7 @@ void r_render_end_frame() {
     SDL_GL_SwapWindow(r_render.window);
 }
 
-void r_render_blit_framebuffer(int cols, int rows) {
-   return; r_render_error_check("r_render_blit_framebufferBEGIN");
+void r_render_blit_framebuffer(int cols, int rows) { r_render_error_check("r_render_blit_framebufferBEGIN");
   
     
     GLint current_fbo;
