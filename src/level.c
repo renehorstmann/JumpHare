@@ -250,10 +250,10 @@ void level_update(float dtime) {
 }
 
 void level_render() {
-    background_render();
+    //background_render();
     //flag_render();
     //goal_render();
-    tilemap_render_back();
+    //tilemap_render_back();
 
     // test
     //ro_batchrefract_render(&L.ice);
