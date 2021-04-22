@@ -38,7 +38,7 @@ uColor_s tiles_pixel(uColor_s code, int pixel_c, int pixel_r, int layer) {
     int tile = code.a;
 
     if (tile_id == 0)
-        return COLOR_TRANSPARENT;
+        return U_COLOR_TRANSPARENT;
 
     uImage *img = tiles.imgs[tile_id - 1];
 
@@ -52,7 +52,7 @@ uColor_s tiles_pixel(uColor_s code, int pixel_c, int pixel_r, int layer) {
 }
 
 enum tiles_pixel_state tiles_get_state(uColor_s id) {
-    if (u_color_equals(id, COLOR_TRANSPARENT))
+    if (u_color_equals(id, U_COLOR_TRANSPARENT))
         return TILES_PIXEL_EMPTY;
 
     // todo: use...
