@@ -15,7 +15,7 @@
 
 // debug:
 #include "r/ro_text.h"
-#include "hud_camera.h"
+#include "hudcamera.h"
 
 // #define GOD_MODE
 
@@ -313,7 +313,7 @@ void hare_init(float pos_x, float pos_y) {
     u_pose_set_size(&L.ro.rect.pose, 32, 32);
 
 
-    L.input_text = ro_text_new_font55(64, hud_camera.gl);
+    L.input_text = ro_text_new_font55(64, hudcamera.gl);
     ro_text_set_color(&L.input_text, R_COLOR_BLACK);
 }
 

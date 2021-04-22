@@ -6,7 +6,7 @@
 #include "mathc/utils/random.h"
 #include "rhc/log.h"
 #include "camera.h"
-#include "hud_camera.h"
+#include "hudcamera.h"
 #include "carrot.h"
 
 #define FPS 3.0
@@ -94,7 +94,7 @@ void carrot_init(const vec2 *positions_3) {
 
     
     // mini hud carrot
-    L.cnt_ro = ro_batch_new(3, hud_camera.gl,
+    L.cnt_ro = ro_batch_new(3, hudcamera.gl,
                     r_texture_new_file(1, 1, "res/carrot_mini.png"));
     update_cnt();
     

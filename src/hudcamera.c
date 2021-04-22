@@ -3,11 +3,11 @@
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
 #include "mathc/utils/camera.h"
-#include "hud_camera.h"
+#include "hudcamera.h"
 
 #define MIN_PIXEL_SIZE 2
 
-struct HudCameraGlobals_s hud_camera;
+struct HudCameraGlobals_s hudcamera;
 
 static struct {
     float real_pixel_per_pixel;
@@ -15,16 +15,16 @@ static struct {
 } L;
 
 
-void hud_camera_init() {
+void hudcamera_init() {
     assert(HUD_CAMERA_SIZE % 2 == 0 && "HUD_CAMERA_SIZE must be even");
-    hud_camera.gl = &hud_camera.matrices.p.m00;
-    hud_camera.matrices.p = mat4_eye();
-    hud_camera.matrices.p_inv = mat4_eye();
+    hudcamera.gl = &hudcamera.matrices.p.m00;
+    hudcamera.matrices.p = mat4_eye();
+    hudcamera.matrices.p_inv = mat4_eye();
 
-    hud_camera_update();
+    hudcamera_update();
 }
 
-void hud_camera_update() {
+void hudcamera_update() {
     int wnd_width = e_window.size.x;
     int wnd_height = e_window.size.y;
 
@@ -43,26 +43,26 @@ void hud_camera_update() {
     L.right = width_2 + (width_2 - floorf(width_2));
     L.bottom = -height_2 - (height_2 - floorf(height_2));
 
-    hud_camera.matrices.p = mat4_camera_ortho(L.left, L.right, L.bottom, L.top, -1, 1);
-    hud_camera.matrices.p_inv = mat4_inv(hud_camera.matrices.p);
+    hudcamera.matrices.p = mat4_camera_ortho(L.left, L.right, L.bottom, L.top, -1, 1);
+    hudcamera.matrices.p_inv = mat4_inv(hudcamera.matrices.p);
 }
 
-float hud_camera_real_pixel_per_pixel() {
+float hudcamera_real_pixel_per_pixel() {
     return L.real_pixel_per_pixel;
 }
 
-float hud_camera_left() {
+float hudcamera_left() {
     return L.left;
 }
 
-float hud_camera_right() {
+float hudcamera_right() {
     return L.right;
 }
 
-float hud_camera_bottom() {
+float hudcamera_bottom() {
     return L.bottom;
 }
 
-float hud_camera_top() {
+float hudcamera_top() {
     return L.top;
 }

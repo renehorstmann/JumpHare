@@ -7,7 +7,7 @@
 #include "mathc/sca/int.h"
 #include "hare.h"
 #include "camera.h"
-#include "hud_camera.h"
+#include "hudcamera.h"
 #include "controller.h"
 
 #define UP_TIME 0.125
@@ -35,7 +35,7 @@ static void pointer_event(ePointer_s pointer, void *ud) {
     if (pointer.id < 0 || pointer.id > 1)
         return;
 
-    pointer.pos = mat4_mul_vec(hud_camera.matrices.p_inv, pointer.pos);
+    pointer.pos = mat4_mul_vec(hudcamera.matrices.p_inv, pointer.pos);
 
     if(in_control_area(pointer.pos.xy)) {
         if(pointer.action == E_POINTER_DOWN) {
@@ -121,14 +121,14 @@ static void pointer_ctrl(float dtime) {
 
     vec2 pos = L.pointer[L.main_pointer].pos.xy;
 
-    if(!hud_camera_is_portrait_mode()) {
+    if(!hudcamera_is_portrait_mode()) {
         float center;
         if(pos.x > 0) {
-            center = sca_mix(camera_right(), hud_camera_right(), 0.33);
-            center = sca_min(center, hud_camera_right()-DISTANCE*1.5);
+            center = sca_mix(camera_right(), hudcamera_right(), 0.33);
+            center = sca_min(center, hudcamera_right()-DISTANCE*1.5);
         } else {
-            center = sca_mix(camera_left(), hud_camera_left(), 0.33);
-            center = sca_max(center, hud_camera_left()+DISTANCE*1.5);
+            center = sca_mix(camera_left(), hudcamera_left(), 0.33);
+            center = sca_max(center, hudcamera_left()+DISTANCE*1.5);
         }
         
         pos.x -= center;
@@ -155,7 +155,7 @@ void controller_init() {
     L.pointer[1].action = E_POINTER_UP;
     e_input_register_pointer_event(pointer_event, NULL);
 
-    L.background_ro = ro_batch_new(2, hud_camera.gl, r_texture_new_file(1, 1, "res/hud_background.png"));
+    L.background_ro = ro_batch_new(2, hudcamera.gl, r_texture_new_file(1, 1, "res/hud_background.png"));
     //L.background_ro.rect.color.a = 0.0;
 }
 
@@ -170,7 +170,7 @@ void controller_update(float dtime) {
     key_ctrl();
 
     mat4 pose = u_pose_new(0, 0, BACKGROUND_SIZE, BACKGROUND_SIZE);
-    if (hud_camera_is_portrait_mode()) {
+    if (hudcamera_is_portrait_mode()) {
         u_pose_set_y(&pose, camera_bottom() - BACKGROUND_SIZE/2);
         L.background_ro.rects[0].pose = pose;
         

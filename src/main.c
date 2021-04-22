@@ -4,7 +4,7 @@
 #include "rhc/rhc.h"
 
 #include "camera.h"
-#include "hud_camera.h"
+#include "hudcamera.h"
 #include "tiles.h"
 #include "level.h"
 
@@ -33,11 +33,11 @@ int main(int argc, char **argv) {
 
     // init systems
     camera_init();      // camera for the level
-    hud_camera_init();  // camera for hud elements
+    hudcamera_init();  // camera for hud elements
     tiles_init();       // loads all tile textures
     level_init(1);      // manages the gameplay (tilemap, hare, background, ...)
 
-    fps_ro = ro_text_new_font55(64, hud_camera.gl);
+    fps_ro = ro_text_new_font55(64, hudcamera.gl);
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
@@ -75,7 +75,7 @@ static void main_loop(float delta_time) {
 
     // camera only need to be updated before rendering
     camera_update();
-    hud_camera_update();
+    hudcamera_update();
     
     // render
     level_render();
@@ -97,8 +97,8 @@ static void main_loop(float delta_time) {
             sprintf(text, "%7.2f %3.0f%%", cnt/time, load*100);
             vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
-                          hud_camera_right() - size.x-2,
-                          hud_camera_top()-2);
+                          hudcamera_right() - size.x-2,
+                          hudcamera_top()-2);
             time -= 0.25;
             cnt = 0;
         }
