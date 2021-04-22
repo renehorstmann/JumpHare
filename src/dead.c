@@ -3,6 +3,7 @@
 #include "u/pose.h"
 #include "mathc/sca/float.h"
 #include "mathc/utils/random.h"
+#include "rhc/log.h"
 #include "camera.h"
 #include "hud_camera.h"
 #include "dead.h"
@@ -82,6 +83,7 @@ void dead_render() {
 }
 
 void dead_set_dead(float x, float y) {
+    log_info("dead: dead");
     L.time = 0;
     L.callback_called = false;
     L.strike_ro.rect.pose = u_pose_new(x, y, START_SIZE, START_SIZE);

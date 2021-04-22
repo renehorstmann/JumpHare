@@ -7,7 +7,7 @@
 #include "camera.h"
 #include "tilemap.h"
 #include "airstroke.h"
-#include "dirt_particles.h"
+#include "dirtparticles.h"
 #include "dead.h"
 #include "tiles.h"
 #include "collision.h"
@@ -48,6 +48,15 @@
 #define ANIMATION_GROUNDED_FPS 12.0
 
 #define SET_JUMP_TIME -0.05
+
+
+const char *state_names[] = {
+    "HARE_GROUNDED",
+    "HARE_FALLING",
+    "HARE_JUMPING",
+    "HARE_DOUBLE_JUMP",
+    "HARE_NUM_STATES"
+};
 
 static struct {
     RoSingle ro;
@@ -153,6 +162,7 @@ static void collision_callback(vec2 delta, enum collision_state state, void *ud)
         return;
     } else if (state == COLLISION_KILL) {
 #ifndef GOD_MODE
+        log_info("hare: dead by tilemap");
         dead_set_dead(L.pos.x, L.pos.y);
 #endif
         return;
@@ -270,11 +280,14 @@ static void emit_dirt(float dtime) {
     vec2 particle_pos = L.pos;
     particle_pos.y -= 7;
     vec2 particle_dir = {{-L.speed.x / 10, 12}};
-    dirt_particles_add(particle_pos, particle_dir, col, add);
+    dirtparticles_add(particle_pos, particle_dir, col, add);
 }
 
 
 static void check_state_change(float dtime) {
+    if(L.state != L.prev_state) {
+        log_trace("hare: state changed from %s to %s", state_names[L.prev_state], state_names[L.state]);
+    }
     if (L.state == HARE_DOUBLE_JUMP && L.prev_state != HARE_DOUBLE_JUMP) {
         L.add_airstroke_time = AIRSTROKE_DELAY_TIME;
     }

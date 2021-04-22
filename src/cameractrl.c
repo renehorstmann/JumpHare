@@ -2,11 +2,11 @@
 #include "camera.h"
 #include "hare.h"
 #include "tilemap.h"
-#include "camera_control.h"
+#include "cameractrl.h"
 
 #define MAX_DIFF 20
 
-struct CameraControlGlobals_s camera_control;
+struct CameraControlGlobals_s cameractrl;
 
 static struct {
     vec2 pos;
@@ -33,30 +33,30 @@ static void check_limits() {
 }
 
 static void apply_pos(float dtime) {
-    L.pos = vec2_add_vec(camera_control.pos, camera_center_offset());
+    L.pos = vec2_add_vec(cameractrl.pos, camera_center_offset());
 }
 
 
-void camera_control_init() {
-    camera_control.pos = hare_position();
+void cameractrl_init() {
+    cameractrl.pos = hare_position();
 }
 
-void camera_control_kill() {
+void cameractrl_kill() {
 
 }
 
-void camera_control_update(float dtime) {
-//	vec2_println(camera_control.pos);
+void cameractrl_update(float dtime) {
+//	vec2_println(cameractrl.pos);
     vec2 h = hare_position();
-    vec2 delta = vec2_sub_vec(h, camera_control.pos);
+    vec2 delta = vec2_sub_vec(h, cameractrl.pos);
     vec2 diff = vec2_abs(delta);
     diff = vec2_sub(diff, MAX_DIFF);
 
     if (diff.x > 0) {
-        camera_control.pos.x += sca_sign(delta.x) * diff.x;
+        cameractrl.pos.x += sca_sign(delta.x) * diff.x;
     }
     if (diff.y > 0) {
-        camera_control.pos.y += sca_sign(delta.y) * diff.y;
+        cameractrl.pos.y += sca_sign(delta.y) * diff.y;
     }
 
     apply_pos(dtime);

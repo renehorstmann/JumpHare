@@ -152,6 +152,7 @@ bool carrot_collect(vec2 position) {
         if(L.collected[i])
             continue;
         if(u_pose_aa_contains(L.carrot_ro.rects[i].pose, position)) {
+            log_info("carrot: collected %i", i);
             L.collected[i] = true;
             vec2 cxy = u_pose_get_xy(L.carrot_ro.rects[i].pose);
             emit_particles(cxy.x, cxy.y);

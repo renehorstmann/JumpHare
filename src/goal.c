@@ -6,6 +6,7 @@
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
 #include "rhc/error.h"
+#include "rhc/log.h"
 #include "camera.h"
 #include "hare.h"
 #include "goal.h"
@@ -55,6 +56,7 @@ static void emit_particles(float x, float y) {
 }
 
 static void activate() {
+    log_info("goal: activated");
     L.goal_ro.rect.sprite.y = 0;
 
     vec2 pos = u_pose_get_xy(L.goal_ro.rect.pose);

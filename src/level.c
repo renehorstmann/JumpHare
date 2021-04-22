@@ -14,10 +14,10 @@
 #include "flag.h"
 #include "speechbubble.h"
 #include "butterfly.h"
-#include "dirt_particles.h"
+#include "dirtparticles.h"
 #include "dead.h"
 #include "controller.h"
-#include "camera_control.h"
+#include "cameractrl.h"
 #include "camera.h"
 #include "level.h"
 
@@ -55,8 +55,8 @@ static void load_game() {
     
     hare_init(start_pos.x, start_pos.y);
     airstroke_init();
-    dirt_particles_init();
-    camera_control_init();
+    dirtparticles_init();
+    cameractrl_init();
     
     vec2 butterfly_pos[512];
     int butterflies = tilemap_get_positions(butterfly_pos, 512, BUTTERFLY_CODE, CODE_LAYER);
@@ -66,8 +66,8 @@ static void load_game() {
 static void unload_game() {
     hare_kill();
     airstroke_kill();
-    dirt_particles_kill();
-    camera_control_kill();
+    dirtparticles_kill();
+    cameractrl_kill();
     
     butterfly_kill();
 }
@@ -106,6 +106,7 @@ static void dead_callback(void *ud) {
 }
 
 void level_init(int lvl) {
+    log_info("level: init lvl %i", lvl);
     assume(lvl == 1, "...");
 
     L.current_lvl = lvl;
@@ -241,13 +242,13 @@ void level_update(float dtime) {
         hare_update(dtime);
         airstroke_update(dtime);
         butterfly_update(dtime);
-        dirt_particles_update(dtime);
+        dirtparticles_update(dtime);
         controller_update(dtime);
 
         check_carrot();
         check_butterfly();
     }
-    camera_control_update(dtime);
+    cameractrl_update(dtime);
 }
 
 void level_render() {
@@ -264,7 +265,7 @@ void level_render() {
         speechbubble_render(&L.bubbles[i]);
     }
     carrot_render();
-    dirt_particles_render();
+    dirtparticles_render();
     airstroke_render();
     hare_render();
     butterfly_render();

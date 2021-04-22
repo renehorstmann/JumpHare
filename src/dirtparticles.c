@@ -4,7 +4,7 @@
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
 #include "camera.h"
-#include "dirt_particles.h"
+#include "dirtparticles.h"
 
 
 #define MAX_PARTCLES 64
@@ -18,7 +18,7 @@ static struct {
     int next;
 } L;
 
-void dirt_particles_init() {
+void dirtparticles_init() {
     L.ro = ro_particle_new(MAX_PARTCLES, camera.gl_main, r_texture_new_white_pixel());
 
     for (int i = 0; i < L.ro.num; i++) {
@@ -31,22 +31,23 @@ void dirt_particles_init() {
     ro_particle_update(&L.ro);
 }
 
-void dirt_particles_kill() {
+void dirtparticles_kill() {
     ro_particle_kill(&L.ro);
     memset(&L, 0, sizeof(L));
 }
 
-void dirt_particles_update(float dtime) {
+void dirtparticles_update(float dtime) {
     L.time += dtime;
 }
 
-void dirt_particles_render() {
+void dirtparticles_render() {
     ro_particle_render(&L.ro, L.time);
 }
 
 #include "mathc/uchar.h"
 
-void dirt_particles_add(vec2 pos, vec2 dir, uColor_s color, int n) {
+void dirtparticles_add(vec2 pos, vec2 dir, uColor_s color, int n) {
+    log_trace("dirtparticles: add %i", n);
     vec4 col = vec4_cast_from_uchar_1(color.v);
     int start_idx = L.next;
     for (int i = 0; i < n; i++) {
