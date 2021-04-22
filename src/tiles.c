@@ -28,9 +28,9 @@ void tiles_init() {
         tile_id++;
         tiles.size++;
     }
-    SDL_Log("tiles loaded: %i", tiles.size);
+    log_info("tiles: loaded: %i", tiles.size);
     if (tiles.size == 0)
-        SDL_Log("WARNING: 0 tiles loaded! Put some into tiles/tile_xx.png, starting with xx=01");
+        log_error("tiles: failed! 0 tiles loaded! Put some into tiles/tile_xx.png, starting with xx=01");
 }
 
 uColor_s tiles_pixel(uColor_s code, int pixel_c, int pixel_r, int layer) {

@@ -1,5 +1,10 @@
 #include "r/texture.h"
 #include "r/render.h"
+#include "rhc/log.h"
+
+#ifdef __EMSCRIPTEN__
+#define NO_GL_ERROR_CHECK
+#endif
 
 struct rRenderGolabals_s r_render;
 
@@ -9,22 +14,23 @@ static struct {
 
 void r_render_init(SDL_Window *window) {
     r_render_error_check("r_render_initBEGIN");
+
     r_render.window = window;
     r_render.clear_color = (vec4) {{0, 0, 0, 1}};
 
-    SDL_Log("OpenGL version: %s", glGetString(GL_VERSION));
+    log_info("r_render_init: OpenGL version: %s", glGetString(GL_VERSION));
 
     int max_vertex_attributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_vertex_attributes);
     if (max_vertex_attributes < 16) {
-        SDL_LogWarn(SDL_LOG_CATEGORY_RENDER, "OpenGL failed: only has %d/16 vertex attributes", max_vertex_attributes);
+        log_warn("r_render_init: OpenGL failed: only has %d/16 vertex attributes", max_vertex_attributes);
         //exit(EXIT_FAILURE);
     }
     
     int max_texture_units;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
     if (max_texture_units < 3) {
-        SDL_LogWarn(SDL_LOG_CATEGORY_RENDER, "OpenGL failed: only has %d/3 framebuffer texture units", max_texture_units);
+        log_warn("r_render_init: OpenGL failed: only has %d/3 framebuffer texture units", max_texture_units);
         //exit(EXIT_FAILURE);
     }
     
@@ -53,9 +59,9 @@ void r_render_end_frame() {
     SDL_GL_SwapWindow(r_render.window);
 }
 
-void r_render_blit_framebuffer(int cols, int rows) { r_render_error_check("r_render_blit_framebufferBEGIN");
-  
-    
+void r_render_blit_framebuffer(int cols, int rows) {
+    r_render_error_check("r_render_blit_framebufferBEGIN");
+
     GLint current_fbo;
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &current_fbo);
 
@@ -82,11 +88,10 @@ void r_render_blit_framebuffer(int cols, int rows) { r_render_error_check("r_ren
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, current_fbo);
     
     r_render_error_check("r_render_blit_framebuffer");
-  
 }
 
 void r_render_error_check(const char *opt_tag) {
-    return;
+#ifndef NO_GL_ERROR_CHECK
     static GLenum errs[32];
     int errs_size = 0;
     GLenum err;
@@ -131,12 +136,13 @@ void r_render_error_check(const char *opt_tag) {
         }
         
         if(opt_tag) {
-            SDL_Log("OpenGl error: 0x%04x %s @%s", err, name, opt_tag);
+            log_error("%s: OpenGl error: 0x%04x %s", opt_tag, err, name);
         } else {
-            SDL_Log("OpenGl error: 0x%04x %s", err, name);
+            log_error("OpenGl error: 0x%04x %s", err, name);
         }
         
         if (errs_size < 32)
             errs[errs_size++] = err;
     }
+#endif
 }

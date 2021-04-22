@@ -4,7 +4,7 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
-#include "rhc/error.h"
+#include "rhc/log.h"
 #include "camera.h"
 #include "hud_camera.h"
 #include "carrot.h"
@@ -59,10 +59,10 @@ static void emit_particles(float x, float y) {
 static void update_cnt() {
     if(L.collected_cnt<0) {
         L.collected_cnt = 0;
-        SDL_Log("carot cnt wtf < 0?");
+        log_wtf("carrot: collected_cnt < 0?");
     } else if(L.collected_cnt>3) {
         L.collected_cnt = 3;
-        SDL_Log("carot cnt wtf < 3?");
+        log_wtf("carrot: collected_cnt > 3?");
     }
     
     for(int i=0; i<L.collected_cnt; i++) {
@@ -170,7 +170,7 @@ int carrot_collected() {
 
 void carrot_eat() {
     if(L.collected_cnt <= 0) {
-        SDL_Log("carrot_eat failed");
+        log_error("carrot: failed to eat, collected_cnt <= 0");
         return;
     }
     L.collected_cnt--;
