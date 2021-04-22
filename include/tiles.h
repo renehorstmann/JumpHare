@@ -20,7 +20,7 @@ enum tiles_pixel_state {
 };
 
 struct TilesGlobals_s {
-    uImage *imgs[MAX_TILES];
+    uImage imgs[MAX_TILES];
     rTexture textures[MAX_TILES];
     int ids[MAX_TILES];
     int size;

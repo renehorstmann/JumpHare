@@ -178,13 +178,13 @@ void level_init(int lvl) {
 
 
     // test
-    uImage *img;
+    uImage img;
     rTexture tex_main, tex_refract;
     img = u_image_new_file(2, "res/ice_block.png");
-    assume(img, "wtf");
-    tex_main = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, 0));
-    tex_refract = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, 1));
-    u_image_delete(img);
+    assume(u_image_valid(img), "wtf");
+    tex_main = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 0));
+    tex_refract = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 1));
+    u_image_kill(&img);
     L.ice = ro_batchrefract_new(1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.ice.view_aabb = camera.gl_view_aabb;
     for(int i=0; i<L.ice.num; i++) {
@@ -195,10 +195,10 @@ void level_init(int lvl) {
 
 
     img = u_image_new_file(2, "res/mirror.png");
-    assume(img, "wtf");
-    tex_main = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, 0));
-    tex_refract = r_texture_new(img->cols, img->rows, 1, 1, u_image_layer(img, 1));
-    u_image_delete(img);
+    assume(u_image_valid(img), "wtf");
+    tex_main = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 0));
+    tex_refract = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 1));
+    u_image_kill(&img);
     L.mirror = ro_batchrefract_new(1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
     L.mirror.view_aabb = camera.gl_view_aabb;
     for(int i=0; i<L.mirror.num; i++) {
