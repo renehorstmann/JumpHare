@@ -2,10 +2,6 @@
 #include "r/render.h"
 #include "rhc/log.h"
 
-#ifdef __EMSCRIPTEN__
-#define NO_GL_ERROR_CHECK
-#endif
-
 struct rRenderGolabals_s r_render;
 
 static struct {
@@ -57,6 +53,9 @@ void r_render_begin_frame(int cols, int rows) {
 
 void r_render_end_frame() {
     SDL_GL_SwapWindow(r_render.window);
+
+    // only function that uses it directly, to call it once a frame
+    r_render_error_check_impl_("r_render_end_frame");
 }
 
 void r_render_blit_framebuffer(int cols, int rows) {
@@ -90,8 +89,7 @@ void r_render_blit_framebuffer(int cols, int rows) {
     r_render_error_check("r_render_blit_framebuffer");
 }
 
-void r_render_error_check(const char *opt_tag) {
-#ifndef NO_GL_ERROR_CHECK
+void r_render_error_check_impl_(const char *opt_tag) {
     static GLenum errs[32];
     int errs_size = 0;
     GLenum err;
@@ -144,5 +142,4 @@ void r_render_error_check(const char *opt_tag) {
         if (errs_size < 32)
             errs[errs_size++] = err;
     }
-#endif
 }

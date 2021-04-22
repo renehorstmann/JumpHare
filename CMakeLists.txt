@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.0)
 project(jumphare C)
 
 # Optional definitions set:
-# OPTION_GLES            for OpenGLES3.0 instead of OpenGL3.3
-# OPTION_GLEW            if GLEW is available
-# -not used- OPTION_GYRO            if gyro sensor is available
-# -not used- OPTION_TTF             to use ro_ttftext
+# OPTION_GLES           for OpenGLES3.0 instead of OpenGL3.3
+# OPTION_GLEW           if GLEW is available
 # OPTION_SDL            is set to let rhc code use SDL function
+# -not used- OPTION_TTF            to use ro_ttftext
+# -not used- OPTION_GYRO           if gyro sensor is available
+# -not used- OPTION_GL_ERROR       if set, functions use r_render_check_error (heavy op, if summed up)
+#
+# MATHC_NO_PRINT_COLOR  disable colored mathc prints
 # NUKLEAR_SCALE=3.0     for small hd screens (smartphones)
 
 set(CMAKE_C_STANDARD 11)
