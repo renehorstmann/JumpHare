@@ -55,7 +55,7 @@ void r_render_end_frame() {
     SDL_GL_SwapWindow(r_render.window);
 
     // only function that uses it directly, to call it once a frame
-    r_render_error_check_impl_("r_render_end_frame");
+    //r_render_error_check_impl_("r_render_end_frame");
 }
 
 void r_render_blit_framebuffer(int cols, int rows) {
