@@ -28,6 +28,16 @@ In active developmemt
 - camera looking forward
   - dkc style
   - speed_x?
+- hare state asleep
+  - on game start
+  - if doing nothing for 30 secs
+  - Zzz particles
+  - left right left right to wake up
+     - Zzz to exclamation marks
+- butterfly counter?
+  - reset on death
+  - lose some on death
+  - buy accesouires 
 - real level 1 (beta)
   - starshoot video animation
   - begins asleep
