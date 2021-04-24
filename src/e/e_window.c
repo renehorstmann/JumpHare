@@ -67,9 +67,12 @@ void e_window_init(const char *name) {
 
     // create window
     e_window.window = SDL_CreateWindow(name,
-                                       SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                       1920, 1080,
-                                       SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            1920, 1080,
+            SDL_WINDOW_OPENGL 
+            //| SDL_WINDOW_RESIZABLE
+            );
     SDL_SetWindowMinimumSize(e_window.window, 480, 320);
     if (!e_window.window) {
         log_error("e_window_init: SDL_CreateWindow failed: %s", SDL_GetError());
