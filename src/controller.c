@@ -15,6 +15,7 @@
 #define MULTI_TIME 0.125
 #define DISTANCE 30
 #define MIN_SPEED_X 0.2
+#define MAX_JUMP_TAP_DISTANCE 10
 
 #define BACKGROUND_SIZE 512
 
@@ -81,6 +82,7 @@ static void pointer_ctrl(float dtime) {
     static float up_time = FLT_MAX;
     static float multi_time = -1;
     static float single_time = 0;
+    static vec2 last_pointer_pos;
 
     // single time
     if (L.pointer_down == 0) {
@@ -106,7 +108,13 @@ static void pointer_ctrl(float dtime) {
 
     // jump tap
     if (up_time > 0 && up_time <= JUMP_TIME) {
-        hare_jump();
+        
+        // check distance
+        if(vec2_distance(L.pointer[L.main_pointer].pos.xy,
+                last_pointer_pos) 
+                <= MAX_JUMP_TAP_DISTANCE) {
+            hare_jump();
+        }
     }
 
     // multi tap to jump
@@ -148,6 +156,7 @@ static void pointer_ctrl(float dtime) {
 
     // reset up_time, cause we are moving
     up_time = 0;
+    last_pointer_pos = L.pointer[L.main_pointer].pos.xy;
 }
 
 void controller_init() {
