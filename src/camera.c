@@ -10,8 +10,8 @@
 
 
 // example: real_pixel_per_pixel    = 3.68
-//#define PIXEL_PERFECT            // = 3.0
-//#define ALLOW_HALF_PIXEL_SIZE  // = 3.5
+#define PIXEL_PERFECT            // = 3.0
+#define ALLOW_HALF_PIXEL_SIZE    // = 3.5
 
 struct CameraGlobals_s camera;
 
