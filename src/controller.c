@@ -16,6 +16,7 @@
 #define DISTANCE 30
 #define MIN_SPEED_X 0.2
 #define MAX_JUMP_TAP_DISTANCE 10
+#define LANDSCAPE_INGAME_AREA 30
 
 #define BACKGROUND_SIZE 512
 
@@ -28,8 +29,9 @@ static struct {
 } L;
 
 static bool in_control_area(vec2 pos) {
-    return pos.x < camera_left() || pos.x > camera_right()
-           || pos.y > camera_top() || pos.y < camera_bottom();
+    return pos.x < camera_left() + LANDSCAPE_INGAME_AREA 
+            || pos.x > camera_right() - LANDSCAPE_INGAME_AREA
+            || pos.y > camera_top() || pos.y < camera_bottom();
 }
 
 static void pointer_event(ePointer_s pointer, void *ud) {
@@ -42,9 +44,9 @@ static void pointer_event(ePointer_s pointer, void *ud) {
         if(pointer.action == E_POINTER_DOWN) {
             L.pointer_down_map.v[pointer.id] = true;
         }
-        if(pointer.action == E_POINTER_UP) {
-            L.pointer_down_map.v[pointer.id] = false;
-        }
+    } 
+    if(pointer.action == E_POINTER_UP) {
+        L.pointer_down_map.v[pointer.id] = false;
     }
     
     L.pointer_down = bvec2_sum(L.pointer_down_map);
