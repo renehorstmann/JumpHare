@@ -25,9 +25,8 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- camera looking forward
-  - dkc style
-  - speed_x?
+- controller landscape touch in game view
+- recheck none pixel perfect camera?
 - hare state asleep
   - on game start
   - if doing nothing for 30 secs
