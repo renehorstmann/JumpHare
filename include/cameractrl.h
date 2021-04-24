@@ -5,6 +5,8 @@
 
 struct CameraControlGlobals_s {
     vec2 pos;
+    vec2 max_diff;
+    vec2 diff_offset;
 };
 extern struct CameraControlGlobals_s cameractrl;
 

@@ -368,6 +368,10 @@ vec2 hare_position() {
     return (vec2) {{L.pos.x, L.pos.y}};
 }
 
+vec2 hare_speed() {
+    return (vec2) {{L.speed.x, L.speed.y}};
+}
+
 vec2 hare_prev_position() {
     return (vec2) {{L.prev_pos.x, L.prev_pos.y}};
 }

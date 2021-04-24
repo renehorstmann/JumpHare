@@ -4,7 +4,6 @@
 #include "tilemap.h"
 #include "cameractrl.h"
 
-#define MAX_DIFF 20
 
 struct CameraControlGlobals_s cameractrl;
 
@@ -39,6 +38,8 @@ static void apply_pos(float dtime) {
 
 void cameractrl_init() {
     cameractrl.pos = hare_position();
+    cameractrl.max_diff = vec2_set(20);
+    cameractrl.diff_offset = (vec2) {{-10, 0}};
 }
 
 void cameractrl_kill() {
@@ -49,14 +50,26 @@ void cameractrl_update(float dtime) {
 //	vec2_println(cameractrl.pos);
     vec2 h = hare_position();
     vec2 delta = vec2_sub_vec(h, cameractrl.pos);
-    vec2 diff = vec2_abs(delta);
-    diff = vec2_sub(diff, MAX_DIFF);
 
-    if (diff.x > 0) {
-        cameractrl.pos.x += sca_sign(delta.x) * diff.x;
+    float max_right = cameractrl.diff_offset.x + cameractrl.max_diff.x;
+    float max_left = cameractrl.diff_offset.x - cameractrl.max_diff.x;
+    float max_top = cameractrl.diff_offset.x + cameractrl.max_diff.y;
+    float max_bottom = cameractrl.diff_offset.x - cameractrl.max_diff.y;
+    
+    if (delta.x > max_right) {
+        delta.x -= max_right;
+        cameractrl.pos.x += delta.x;
+    } else if(delta.x < max_left) {
+        delta.x -= max_left;
+        cameractrl.pos.x += delta.x;
     }
-    if (diff.y > 0) {
-        cameractrl.pos.y += sca_sign(delta.y) * diff.y;
+    
+    if (delta.y > max_top) {
+        delta.y -= max_top;
+        cameractrl.pos.y += delta.y;
+    } else if (delta.y < max_bottom) {
+        delta.y -= max_bottom;
+        cameractrl.pos.y += delta.y;
     }
 
     apply_pos(dtime);
