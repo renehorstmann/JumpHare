@@ -8,6 +8,11 @@
 #define MIN_PIXEL_SIZE 2
 #define BACKGROUND_SPEED_FACTOR 0.2
 
+
+// example: real_pixel_per_pixel    = 3.68
+//#define PIXEL_PERFECT            // = 3.0
+//#define ALLOW_HALF_PIXEL_SIZE  // = 3.5
+
 struct CameraGlobals_s camera;
 
 static struct {
@@ -55,8 +60,18 @@ void camera_update() {
     int wnd_height = e_window.size.y;
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
-    L.real_pixel_per_pixel = sca_floor(smaller_size / CAMERA_SIZE);
-    L.real_pixel_per_pixel = isca_max(MIN_PIXEL_SIZE, L.real_pixel_per_pixel);
+    
+    L.real_pixel_per_pixel = smaller_size / CAMERA_SIZE;
+    
+#ifdef PIXEL_PERFECT
+#ifdef ALLOW_HALF_PIXEL_SIZE
+    L.real_pixel_per_pixel = sca_floor(L.real_pixel_per_pixel *2.0)/2.0;
+#else
+    L.real_pixel_per_pixel = sca_floor(L.real_pixel_per_pixel);
+#endif
+#endif
+    
+    L.real_pixel_per_pixel = sca_max(MIN_PIXEL_SIZE, L.real_pixel_per_pixel);
 
     float cam_width = (float)wnd_width / L.real_pixel_per_pixel;
     float cam_height = (float)wnd_height / L.real_pixel_per_pixel;

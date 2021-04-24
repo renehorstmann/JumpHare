@@ -9,8 +9,8 @@
 #include "mathc/types/float.h"
 
 
-#define HUD_CAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
-#define HUD_CAMERA_SCREEN_WEIGHT (2.0/5.0)
+#define HUDCAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
+#define HUDCAMERA_SCREEN_WEIGHT (2.0/5.0)
 
 struct HudCameraMatrices_s {
     mat4 p;
