@@ -25,6 +25,7 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
+- emscripten sleep mode?
 - controller landscape touch in game view
 - recheck none pixel perfect camera?
 - hare state asleep
