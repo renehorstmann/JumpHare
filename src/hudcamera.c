@@ -7,11 +7,6 @@
 
 #define MIN_PIXEL_SIZE 2
 
-
-// example: real_pixel_per_pixel    = 3.68
-#define PIXEL_PERFECT            // = 3.0
-#define ALLOW_HALF_PIXEL_SIZE    // = 3.5
-
 struct HudCameraGlobals_s hudcamera;
 
 static struct {
@@ -36,15 +31,10 @@ void hudcamera_update() {
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     
-   L.real_pixel_per_pixel = smaller_size / HUDCAMERA_SIZE;
+    L.real_pixel_per_pixel = smaller_size / HUDCAMERA_SIZE;
     
-#ifdef PIXEL_PERFECT
-#ifdef ALLOW_HALF_PIXEL_SIZE
-    L.real_pixel_per_pixel = sca_floor(L.real_pixel_per_pixel *2.0)/2.0;
-#else
+    // pixel perfect:
     L.real_pixel_per_pixel = sca_floor(L.real_pixel_per_pixel);
-#endif
-#endif
     
     L.real_pixel_per_pixel = sca_max(MIN_PIXEL_SIZE, L.real_pixel_per_pixel);
 
