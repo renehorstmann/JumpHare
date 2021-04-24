@@ -308,7 +308,7 @@ void hare_init(float pos_x, float pos_y) {
 
     L.emit_dirt_add = sca_random_noise(6, 2);
 
-    L.ro = ro_single_new(camera.gl_main, r_texture_new_file(8, 5, "res/hare.png"));
+    L.ro = ro_single_new(camera.gl_main, r_texture_new_file(8, 6, "res/hare.png"));
 
     u_pose_set_size(&L.ro.rect.pose, 32, 32);
 
