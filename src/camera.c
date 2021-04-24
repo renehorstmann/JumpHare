@@ -65,7 +65,7 @@ void camera_update() {
     L.real_pixel_per_pixel = sca_max(MIN_PIXEL_SIZE, L.real_pixel_per_pixel);
     
     // test
-    L.real_pixel_per_pixel = 7.5;
+    //L.real_pixel_per_pixel = 7.5;
 
     float cam_width = (float)wnd_width / L.real_pixel_per_pixel;
     float cam_height = (float)wnd_height / L.real_pixel_per_pixel;
