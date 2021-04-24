@@ -71,7 +71,7 @@ void e_window_init(const char *name) {
             SDL_WINDOWPOS_UNDEFINED,
             1920, 1080,
             SDL_WINDOW_OPENGL 
-            //| SDL_WINDOW_RESIZABLE
+            | SDL_WINDOW_RESIZABLE
             );
     SDL_SetWindowMinimumSize(e_window.window, 480, 320);
     if (!e_window.window) {
