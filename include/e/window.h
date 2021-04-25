@@ -32,10 +32,6 @@ void e_window_kill();
 // starts the main loop (emscripten needs a main loop function)
 void e_window_main_loop(e_window_main_loop_fn main_loop);
 
-void e_window_pause();
-
-void e_window_resume();
-
 void e_window_register_pause_callback(e_window_pause_callback_fn event, void *user_data);
 
 void e_window_unregister_pause_callback(e_window_pause_callback_fn event_to_unregister);

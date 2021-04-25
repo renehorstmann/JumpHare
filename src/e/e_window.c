@@ -11,6 +11,9 @@
 
 #define MAX_DELTA_TIME 5.0 // seconds
 
+// not declared in window.h
+void e_window_handle_window_event(const SDL_Event *event);
+
 
 struct eWindowGlobals_s e_window;
 
@@ -30,10 +33,19 @@ static struct {
     int reg_pause_e_size;
 } L;
 
+static void check_resume() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        e_window_handle_window_event(&event); 
+    }
+}
+
 static void loop() {
-    if(L.pause)
+    if(L.pause) {
+        check_resume();
         return;
-        
+    }
+                
     SDL_GetWindowSize(e_window.window, &e_window.size.x, &e_window.size.y);
 
     Uint32 time = SDL_GetTicks();
@@ -43,6 +55,34 @@ static void loop() {
     if(dtime < MAX_DELTA_TIME)
         L.main_loop_fn(dtime);
 }
+
+static void pause() {
+    log_info("e_window: pause");
+    if(L.pause) {
+        log_warn("e_window: pause failed");
+        return;
+    }
+    L.pause = true;
+    for(int i=0; i<L.reg_pause_e_size; i++) {
+        L.reg_pause_e[i].cb(false, L.reg_pause_e[i].ud);
+    }
+}
+
+static void resume() {
+    log_info("e_window: resume");
+    if(!L.pause) {
+        log_warn("e_window: resume failed");
+        return;
+    }
+    for(int i=0; i<L.reg_pause_e_size; i++) {
+        L.reg_pause_e[i].cb(true, L.reg_pause_e[i].ud);
+    }
+    
+    // delta_time should not be near infinity...
+    L.last_time = SDL_GetTicks();
+    L.pause = false;
+}
+
 
 
 void e_window_init(const char *name) {
@@ -148,38 +188,6 @@ void e_window_main_loop(e_window_main_loop_fn main_loop) {
     log_info("e_window_kill: killed");
 }
 
-void e_window_pause() {
-    log_info("e_window_pause");
-    if(L.pause) {
-        log_warn("e_window_pause failed");
-        return;
-    }
-    L.pause = true;
-#ifdef __EMSCRIPTEN__
-    emscripten_pause_main_loop();
-#endif
-    for(int i=0; i<L.reg_pause_e_size; i++) {
-        L.reg_pause_e[i].cb(false, L.reg_pause_e[i].ud);
-    }
-}
-
-void e_window_resume() {
-    log_info("e_window_resume");
-    if(!L.pause) {
-        log_warn("e_window_resume failed");
-        return;
-    }
-    for(int i=0; i<L.reg_pause_e_size; i++) {
-        L.reg_pause_e[i].cb(true, L.reg_pause_e[i].ud);
-    }
-    
-    // delta_time should not be near infinity...
-    L.last_time = SDL_GetTicks();
-    L.pause = false;
-#ifdef __EMSCRIPTEN__
-    emscripten_resume_main_loop();
-#endif
-}
 
 
 void e_window_register_pause_callback(e_window_pause_callback_fn event, void *user_data) {
@@ -202,6 +210,91 @@ void e_window_unregister_pause_callback(e_window_pause_callback_fn event_to_unre
     }
     if (!found) {
         log_warn("e_window_unregister_pause_callback failed: event not registered");
+    }
+}
+
+
+static void log_window_event(const SDL_Event *event);
+
+// not in the window.h header, used by e_input.c
+void e_window_handle_window_event(const SDL_Event *event) {
+    if (event->type == SDL_QUIT) {
+        e_window_kill();
+        return;
+    }
+    if(event->type == SDL_WINDOWEVENT) {
+        log_window_event(event);
+        switch (event->window.event) {
+//        case SDL_WINDOWEVENT_SHOWN:
+//        case SDL_WINDOWEVENT_RESTORED:
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            resume();
+            break;
+//        case SDL_WINDOWEVENT_HIDDEN:
+//        case SDL_WINDOWEVENT_MINIMIZED:
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            pause();
+            break;
+        }
+    }
+}
+
+
+static void log_window_event(const SDL_Event *event) {
+    if (event->type == SDL_WINDOWEVENT){
+        switch (event->window.event) {
+        case SDL_WINDOWEVENT_SHOWN:
+            log_info("Window %d shown", event->window.windowID);
+            break;       
+        case SDL_WINDOWEVENT_HIDDEN:
+            log_info("Window %d hidden", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_EXPOSED:
+            log_info("Window %d exposed", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            log_info("Window %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_RESIZED:
+            log_info("Window %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+            log_info("Window %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            log_info("Window %d minimized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            log_info("Window %d maximized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            log_info("Window %d restored", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_ENTER:
+            log_info("Mouse entered window %d", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            log_info("Mouse left window %d", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            log_info("Window %d gained keyboard focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            log_info("Window %d lost keyboard focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_CLOSE:
+            log_info("Window %d closed", event->window.windowID);
+            break;
+#if SDL_VERSION_ATLEAST(2, 0, 5) 
+            case SDL_WINDOWEVENT_TAKE_FOCUS : log_info("Window %d is offered a focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_HIT_TEST:
+            log_info("Window %d has a special hit test", event->window.windowID);
+            break;
+#endif 
+            default : log_info("Window %d got unknown event %d", event->window.windowID, event->window.event);
+            break;
+        }
     }
 }
 

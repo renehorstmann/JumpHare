@@ -5,6 +5,9 @@
 #include "e/gui.h"
 #include "e/input.h"
 
+// not declared in window.h
+void e_window_handle_window_event(const SDL_Event *event);
+
 struct eInputGlobals_s e_input;
 
 typedef struct {
@@ -149,20 +152,6 @@ static void input_handle_sensors(SDL_Event *event) {
 }
 #endif
 
-static void handle_window_event(const SDL_Event *event) {
-    switch (event->window.event) {
-//    case SDL_WINDOWEVENT_SHOWN:
-//    case SDL_WINDOWEVENT_RESTORED:
-    case SDL_WINDOWEVENT_FOCUS_GAINED:
-        e_window_resume();
-        break;
-//    case SDL_WINDOWEVENT_HIDDEN:
-//    case SDL_WINDOWEVENT_MINIMIZED:
-    case SDL_WINDOWEVENT_FOCUS_LOST:
-        e_window_pause();
-        break;
-    }
-}
 
 void e_input_init() {
 #ifdef OPTION_GYRO
@@ -185,7 +174,6 @@ void e_input_init() {
 }
 
 
-static void log_window_event(const SDL_Event *event);
 
 void e_input_update() {
     e_input.is_touch = SDL_GetNumTouchDevices() > 0;
@@ -197,14 +185,12 @@ void e_input_update() {
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
+        e_window_handle_window_event(&event);
+        
         if (e_gui.ctx)
             nk_sdl_handle_event(&event);
 
-        switch (event.type)
-        {
-        case SDL_QUIT:
-            e_window_kill();
-            return;
+        switch (event.type) {
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEMOTION:
         case SDL_MOUSEBUTTONUP:
@@ -225,11 +211,6 @@ void e_input_update() {
             input_handle_sensors(&event);
             break;
 #endif
-
-        case SDL_WINDOWEVENT:
-            log_window_event(&event);
-            handle_window_event(&event);
-            break;
         }
     }
 
@@ -283,60 +264,3 @@ void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister) {
     }
 }
 
-static void log_window_event(const SDL_Event *event) {
-    if (event->type == SDL_WINDOWEVENT){
-        switch (event->window.event) {
-        case SDL_WINDOWEVENT_SHOWN:
-            log_info("Window %d shown", event->window.windowID);
-            break;       
-        case SDL_WINDOWEVENT_HIDDEN:
-            log_info("Window %d hidden", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_EXPOSED:
-            log_info("Window %d exposed", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_MOVED:
-            log_info("Window %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
-            break;
-        case SDL_WINDOWEVENT_RESIZED:
-            log_info("Window %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
-            break;
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
-            log_info("Window %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
-            break;
-        case SDL_WINDOWEVENT_MINIMIZED:
-            log_info("Window %d minimized", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_MAXIMIZED:
-            log_info("Window %d maximized", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_RESTORED:
-            log_info("Window %d restored", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_ENTER:
-            log_info("Mouse entered window %d", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_LEAVE:
-            log_info("Mouse left window %d", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
-            log_info("Window %d gained keyboard focus", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_FOCUS_LOST:
-            log_info("Window %d lost keyboard focus", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_CLOSE:
-            log_info("Window %d closed", event->window.windowID);
-            break;
-#if SDL_VERSION_ATLEAST(2, 0, 5) 
-            case SDL_WINDOWEVENT_TAKE_FOCUS : log_info("Window %d is offered a focus", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_HIT_TEST:
-            log_info("Window %d has a special hit test", event->window.windowID);
-            break;
-#endif 
-            default : log_info("Window %d got unknown event %d", event->window.windowID, event->window.event);
-            break;
-        }
-    }
-}
