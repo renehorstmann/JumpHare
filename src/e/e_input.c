@@ -151,12 +151,14 @@ static void input_handle_sensors(SDL_Event *event) {
 
 static void handle_window_event(const SDL_Event *event) {
     switch (event->window.event) {
-    case SDL_WINDOWEVENT_SHOWN:
-    case SDL_WINDOWEVENT_RESTORED:
+//    case SDL_WINDOWEVENT_SHOWN:
+//    case SDL_WINDOWEVENT_RESTORED:
+    case SDL_WINDOWEVENT_FOCUS_GAINED:
         e_window_resume();
         break;
-    case SDL_WINDOWEVENT_HIDDEN:
-    case SDL_WINDOWEVENT_MINIMIZED:
+//    case SDL_WINDOWEVENT_HIDDEN:
+//    case SDL_WINDOWEVENT_MINIMIZED:
+    case SDL_WINDOWEVENT_FOCUS_LOST:
         e_window_pause();
         break;
     }
@@ -241,23 +243,21 @@ void e_input_register_pointer_event(ePointerEventFn event, void *user_data) {
 }
 
 void e_input_unregister_pointer_event(ePointerEventFn event_to_unregister) {
-    int idx = -1;
+    bool found = false;
     for (int i = 0; i < L.reg_pointer_e_size; i++) {
         if (L.reg_pointer_e[i].cb == event_to_unregister) {
-            idx = i;
-            break;
+            found = true;
+            // move to close hole
+            for (int j = i; j < L.reg_pointer_e_size - 1; j++) {
+                L.reg_pointer_e[j] = L.reg_pointer_e[j + 1];
+            }
+            L.reg_pointer_e_size--;
+            i--; // check moved
         }
     }
-    if (idx == -1) {
+    if (!found) {
         log_warn("e_input_unregister_pointer_event failed: event not registered");
-        return;
     }
-
-    // move to close hole
-    for (int i = idx; i < L.reg_pointer_e_size - 1; i++) {
-        L.reg_pointer_e[i] = L.reg_pointer_e[i + 1];
-    }
-    L.reg_pointer_e_size--;
 }
 
 void e_input_register_wheel_event(eWheelEventFn event, void *user_data) {
@@ -266,23 +266,21 @@ void e_input_register_wheel_event(eWheelEventFn event, void *user_data) {
 }
 
 void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister) {
-    int idx = -1;
+    bool found = false;
     for (int i = 0; i < L.reg_wheel_e_size; i++) {
         if (L.reg_wheel_e[i].cb == event_to_unregister) {
-            idx = i;
-            break;
+            found = true;
+            // move to close hole
+            for (int j = i; j < L.reg_wheel_e_size - 1; j++) {
+                L.reg_wheel_e[j] = L.reg_wheel_e[j + 1];
+            }
+            L.reg_wheel_e_size--;
+            i--; // check moved
         }
     }
-    if (idx == -1) {
+    if (!found) {
         log_warn("e_input_unregister_wheel_event failed: event not registered");
-        return;
     }
-
-    // move to close hole
-    for (int i = idx; i < L.reg_wheel_e_size - 1; i++) {
-        L.reg_wheel_e[i] = L.reg_wheel_e[i + 1];
-    }
-    L.reg_wheel_e_size--;
 }
 
 static void log_window_event(const SDL_Event *event) {

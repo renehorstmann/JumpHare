@@ -9,14 +9,25 @@
 #include "rhc/rhc_impl.h"
 
 
+#define MAX_DELTA_TIME 5.0 // seconds
+
+
 struct eWindowGlobals_s e_window;
+
+typedef struct {
+    e_window_pause_callback_fn cb;
+    void *ud;    
+} RegPause;
 
 static struct {
     bool pause;
     bool running;
 
-    eWindowMainLoopFn main_loop_fn;
+    e_window_main_loop_fn main_loop_fn;
     Uint32 last_time;
+    
+    RegPause reg_pause_e[E_WINDOW_MAX_PAUSE_EVENTS];
+    int reg_pause_e_size;
 } L;
 
 static void loop() {
@@ -29,7 +40,8 @@ static void loop() {
     float dtime = (time - L.last_time) / 1000.0f;
     L.last_time = time;
 
-    L.main_loop_fn(dtime);
+    if(dtime < MAX_DELTA_TIME)
+        L.main_loop_fn(dtime);
 }
 
 
@@ -113,7 +125,7 @@ void e_window_kill() {
 #endif
 }
 
-void e_window_main_loop(eWindowMainLoopFn main_loop) {
+void e_window_main_loop(e_window_main_loop_fn main_loop) {
     L.main_loop_fn = main_loop;
     L.pause = false;
     L.running = true;
@@ -142,10 +154,17 @@ void e_window_pause() {
 #ifdef __EMSCRIPTEN__
     emscripten_pause_main_loop();
 #endif
+    for(int i=0; i<L.reg_pause_e_size; i++) {
+        L.reg_pause_e[i].cb(false, L.reg_pause_e[i].ud);
+    }
 }
 
 void e_window_resume() {
     log_info("e_window_resume");
+    
+    for(int i=0; i<L.reg_pause_e_size; i++) {
+        L.reg_pause_e[i].cb(true, L.reg_pause_e[i].ud);
+    }
     
     // delta_time should not be near infinity...
     L.last_time = SDL_GetTicks();
@@ -153,5 +172,29 @@ void e_window_resume() {
 #ifdef __EMSCRIPTEN__
     emscripten_resume_main_loop();
 #endif
+}
+
+
+void e_window_register_pause_callback(e_window_pause_callback_fn event, void *user_data) {
+    assume(L.reg_pause_e_size < E_WINDOW_MAX_PAUSE_EVENTS, "too many registered pause events");
+    L.reg_pause_e[L.reg_pause_e_size++] = (RegPause){event, user_data};
+}
+
+void e_window_unregister_pause_callback(e_window_pause_callback_fn event_to_unregister) {
+    bool found = false;
+    for (int i = 0; i < L.reg_pause_e_size; i++) {
+        if (L.reg_pause_e[i].cb == event_to_unregister) {
+            found = true;
+            // move to close hole
+            for (int j = i; j < L.reg_pause_e_size - 1; j++) {
+                L.reg_pause_e[j] = L.reg_pause_e[j + 1];
+            }
+            L.reg_pause_e_size--;
+            i--; // check moved
+        }
+    }
+    if (!found) {
+        log_warn("e_window_unregister_pause_callback failed: event not registered");
+    }
 }
 
