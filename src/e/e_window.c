@@ -150,6 +150,10 @@ void e_window_main_loop(e_window_main_loop_fn main_loop) {
 
 void e_window_pause() {
     log_info("e_window_pause");
+    if(L.pause) {
+        log_warn("e_window_pause failed");
+        return;
+    }
     L.pause = true;
 #ifdef __EMSCRIPTEN__
     emscripten_pause_main_loop();
@@ -161,7 +165,10 @@ void e_window_pause() {
 
 void e_window_resume() {
     log_info("e_window_resume");
-    
+    if(!L.pause) {
+        log_warn("e_window_resume failed");
+        return;
+    }
     for(int i=0; i<L.reg_pause_e_size; i++) {
         L.reg_pause_e[i].cb(true, L.reg_pause_e[i].ud);
     }
