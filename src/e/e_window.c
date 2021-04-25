@@ -125,11 +125,12 @@ void e_window_init(const char *name) {
             SDL_WINDOW_OPENGL 
             | SDL_WINDOW_RESIZABLE
             );
-    SDL_SetWindowMinimumSize(e_window.window, 480, 320);
     if (!e_window.window) {
         log_error("e_window_init: SDL_CreateWindow failed: %s", SDL_GetError());
         exit(EXIT_FAILURE);
     }
+    SDL_SetWindowMinimumSize(e_window.window, 480, 320);
+    SDL_SetWindowFullscreen(e_window.window, SDL_WINDOW_FULLSCREEN);
 
     // Not necessary, but recommended to create a gl context:
     e_window.gl_context = SDL_GL_CreateContext(e_window.window);
