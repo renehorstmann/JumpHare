@@ -57,11 +57,9 @@ static void loop() {
 }
 
 static void pause() {
-    log_info("e_window: pause");
-    if(L.pause) {
-        log_warn("e_window: pause failed");
+    if(L.pause)
         return;
-    }
+    log_info("e_window: pause");
     L.pause = true;
     for(int i=0; i<L.reg_pause_e_size; i++) {
         L.reg_pause_e[i].cb(false, L.reg_pause_e[i].ud);
@@ -69,11 +67,9 @@ static void pause() {
 }
 
 static void resume() {
-    log_info("e_window: resume");
-    if(!L.pause) {
-        log_warn("e_window: resume failed");
+    if(!L.pause)
         return;
-    }
+    log_info("e_window: resume");
     for(int i=0; i<L.reg_pause_e_size; i++) {
         L.reg_pause_e[i].cb(true, L.reg_pause_e[i].ud);
     }
