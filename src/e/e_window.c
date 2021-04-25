@@ -12,6 +12,7 @@
 struct eWindowGlobals_s e_window;
 
 static struct {
+    bool pause;
     bool running;
 
     eWindowMainLoopFn main_loop_fn;
@@ -19,6 +20,9 @@ static struct {
 } L;
 
 static void loop() {
+    if(L.pause)
+        return;
+        
     SDL_GetWindowSize(e_window.window, &e_window.size.x, &e_window.size.y);
 
     Uint32 time = SDL_GetTicks();
@@ -69,7 +73,7 @@ void e_window_init(const char *name) {
     e_window.window = SDL_CreateWindow(name,
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
-            1920, 1080,
+            640, 480,
             SDL_WINDOW_OPENGL 
             | SDL_WINDOW_RESIZABLE
             );
@@ -111,6 +115,7 @@ void e_window_kill() {
 
 void e_window_main_loop(eWindowMainLoopFn main_loop) {
     L.main_loop_fn = main_loop;
+    L.pause = false;
     L.running = true;
     L.last_time = SDL_GetTicks();
 
@@ -129,5 +134,24 @@ void e_window_main_loop(eWindowMainLoopFn main_loop) {
     IMG_Quit();
     SDL_Quit();
     log_info("e_window_kill: killed");
+}
+
+void e_window_pause() {
+    log_info("e_window_pause");
+    L.pause = true;
+#ifdef __EMSCRIPTEN__
+    emscripten_pause_main_loop();
+#endif
+}
+
+void e_window_resume() {
+    log_info("e_window_resume");
+    
+    // delta_time should not be near infinity...
+    L.last_time = SDL_GetTicks();
+    L.pause = false;
+#ifdef __EMSCRIPTEN__
+    emscripten_resume_main_loop();
+#endif
 }
 

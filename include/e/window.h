@@ -26,4 +26,8 @@ void e_window_kill();
 // starts the main loop (emscripten needs a main loop function)
 void e_window_main_loop(eWindowMainLoopFn main_loop);
 
+void e_window_pause();
+
+void e_window_resume();
+
 #endif //E_WINDOW

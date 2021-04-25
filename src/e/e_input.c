@@ -149,6 +149,19 @@ static void input_handle_sensors(SDL_Event *event) {
 }
 #endif
 
+static void handle_window_event(const SDL_Event *event) {
+    switch (event->window.event) {
+    case SDL_WINDOWEVENT_SHOWN:
+    case SDL_WINDOWEVENT_RESTORED:
+        e_window_resume();
+        break;
+    case SDL_WINDOWEVENT_HIDDEN:
+    case SDL_WINDOWEVENT_MINIMIZED:
+        e_window_pause();
+        break;
+    }
+}
+
 void e_input_init() {
 #ifdef OPTION_GYRO
     int num_sensors = SDL_NumSensors();
@@ -169,9 +182,8 @@ void e_input_init() {
 #endif
 }
 
-void ignore_pointer(SDL_Event *event) {}
 
-static void wndevent(const SDL_Event *event);
+static void log_window_event(const SDL_Event *event);
 
 void e_input_update() {
     e_input.is_touch = SDL_GetNumTouchDevices() > 0;
@@ -213,7 +225,8 @@ void e_input_update() {
 #endif
 
         case SDL_WINDOWEVENT:
-            wndevent(&event);
+            log_window_event(&event);
+            handle_window_event(&event);
             break;
         }
     }
@@ -272,61 +285,59 @@ void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister) {
     L.reg_wheel_e_size--;
 }
 
-static void wndevent(const SDL_Event *event) {
-    if (event->type == SDL_WINDOWEVENT)
-    {
-        switch (event->window.event)
-        {
+static void log_window_event(const SDL_Event *event) {
+    if (event->type == SDL_WINDOWEVENT){
+        switch (event->window.event) {
         case SDL_WINDOWEVENT_SHOWN:
-            SDL_Log("Window %d shown", event->window.windowID);
-            break;
+            log_info("Window %d shown", event->window.windowID);
+            break;       
         case SDL_WINDOWEVENT_HIDDEN:
-            SDL_Log("Window %d hidden", event->window.windowID);
+            log_info("Window %d hidden", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            SDL_Log("Window %d exposed", event->window.windowID);
+            log_info("Window %d exposed", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MOVED:
-            SDL_Log("Window %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_info("Window %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_RESIZED:
-            SDL_Log("Window %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_info("Window %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_SIZE_CHANGED:
-            SDL_Log("Window %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            log_info("Window %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
-            SDL_Log("Window %d minimized", event->window.windowID);
+            log_info("Window %d minimized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
-            SDL_Log("Window %d maximized", event->window.windowID);
+            log_info("Window %d maximized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_RESTORED:
-            SDL_Log("Window %d restored", event->window.windowID);
+            log_info("Window %d restored", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_ENTER:
-            SDL_Log("Mouse entered window %d", event->window.windowID);
+            log_info("Mouse entered window %d", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_LEAVE:
-            SDL_Log("Mouse left window %d", event->window.windowID);
+            log_info("Mouse left window %d", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            SDL_Log("Window %d gained keyboard focus", event->window.windowID);
+            log_info("Window %d gained keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            SDL_Log("Window %d lost keyboard focus", event->window.windowID);
+            log_info("Window %d lost keyboard focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_CLOSE:
-            SDL_Log("Window %d closed", event->window.windowID);
+            log_info("Window %d closed", event->window.windowID);
             break;
 #if SDL_VERSION_ATLEAST(2, 0, 5) 
-            case SDL_WINDOWEVENT_TAKE_FOCUS : SDL_Log("Window %d is offered a focus", event->window.windowID);
+            case SDL_WINDOWEVENT_TAKE_FOCUS : log_info("Window %d is offered a focus", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_HIT_TEST:
-            SDL_Log("Window %d has a special hit test", event->window.windowID);
+            log_info("Window %d has a special hit test", event->window.windowID);
             break;
 #endif 
-            default : SDL_Log("Window %d got unknown event %d", event->window.windowID, event->window.event);
+            default : log_info("Window %d got unknown event %d", event->window.windowID, event->window.event);
             break;
         }
     }
