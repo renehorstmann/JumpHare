@@ -7,7 +7,6 @@
 
 struct eInputGlobals_s e_input;
 
-
 typedef struct {
     ePointerEventFn cb;
     void *ud;
@@ -67,40 +66,40 @@ static void emit_wheel_events(bool up) {
 
 static void input_handle_pointer_touch(SDL_Event *event) {
     switch (event->type) {
-        case SDL_FINGERDOWN:
-            emit_pointer_events(pointer_finger(E_POINTER_DOWN,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
-            break;
-        case SDL_FINGERMOTION:
-            emit_pointer_events(pointer_finger(E_POINTER_MOVE,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
-            break;
-        case SDL_FINGERUP:
-            emit_pointer_events(pointer_finger(E_POINTER_UP,
-                                               event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
-            break;
+    case SDL_FINGERDOWN:
+        emit_pointer_events(pointer_finger(E_POINTER_DOWN,
+                                           event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
+        break;
+    case SDL_FINGERMOTION:
+        emit_pointer_events(pointer_finger(E_POINTER_MOVE,
+                                           event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
+        break;
+    case SDL_FINGERUP:
+        emit_pointer_events(pointer_finger(E_POINTER_UP,
+                                           event->tfinger.x, event->tfinger.y, event->tfinger.fingerId));
+        break;
     }
 }
 
 static void input_handle_pointer_mouse(SDL_Event *event) {
     switch (event->type) {
-        case SDL_MOUSEBUTTONDOWN:
-            if (event->button.button <= 0 || event->button.button > 3)
-                break;
-            emit_pointer_events(pointer_mouse(
-                    E_POINTER_DOWN,
-                    1 - event->button.button));
+    case SDL_MOUSEBUTTONDOWN:
+        if (event->button.button <= 0 || event->button.button > 3)
             break;
-        case SDL_MOUSEMOTION:
-            emit_pointer_events(pointer_mouse(E_POINTER_MOVE, 0));
+        emit_pointer_events(pointer_mouse(
+            E_POINTER_DOWN,
+            1 - event->button.button));
+        break;
+    case SDL_MOUSEMOTION:
+        emit_pointer_events(pointer_mouse(E_POINTER_MOVE, 0));
+        break;
+    case SDL_MOUSEBUTTONUP:
+        if (event->button.button <= 0 || event->button.button > 3)
             break;
-        case SDL_MOUSEBUTTONUP:
-            if (event->button.button <= 0 || event->button.button > 3)
-                break;
-            emit_pointer_events(pointer_mouse(
-                    E_POINTER_UP,
-                    1 - event->button.button));
-            break;
+        emit_pointer_events(pointer_mouse(
+            E_POINTER_UP,
+            1 - event->button.button));
+        break;
     }
 }
 
@@ -114,32 +113,31 @@ static void input_handle_wheel(SDL_Event *event) {
 static void input_handle_keys(SDL_Event *event) {
     bool down = event->type == SDL_KEYDOWN;
     switch (event->key.keysym.sym) {
-        case SDLK_UP:
-            e_input.keys.up = down;
-            break;
-        case SDLK_LEFT:
-            e_input.keys.left = down;
-            break;
-        case SDLK_RIGHT:
-            e_input.keys.right = down;
-            break;
-        case SDLK_DOWN:
-            e_input.keys.down = down;
-            break;
-        case SDLK_RETURN:
-            e_input.keys.enter = down;
-            break;
-        case SDLK_SPACE:
-            e_input.keys.space = down;
-            break;
+    case SDLK_UP:
+        e_input.keys.up = down;
+        break;
+    case SDLK_LEFT:
+        e_input.keys.left = down;
+        break;
+    case SDLK_RIGHT:
+        e_input.keys.right = down;
+        break;
+    case SDLK_DOWN:
+        e_input.keys.down = down;
+        break;
+    case SDLK_RETURN:
+        e_input.keys.enter = down;
+        break;
+    case SDLK_SPACE:
+        e_input.keys.space = down;
+        break;
     }
 }
 
 #ifdef OPTION_GYRO
 static void input_handle_sensors(SDL_Event *event) {
     SDL_Sensor *sensor = SDL_SensorFromInstanceID(event->sensor.which);
-    if (!sensor
-        || SDL_SensorGetType(sensor) != SDL_SENSOR_ACCEL) {
+    if (!sensor || SDL_SensorGetType(sensor) != SDL_SENSOR_ACCEL) {
         log_warn("e_input_update: Couldn't get sensor for sensor event\n");
         return;
     }
@@ -150,7 +148,6 @@ static void input_handle_sensors(SDL_Event *event) {
     // log_trace("e_input_update: Gyro update: %.2f, %.2f, %.2f", data[0], data[1], data[2]);
 }
 #endif
-
 
 void e_input_init() {
 #ifdef OPTION_GYRO
@@ -172,57 +169,62 @@ void e_input_init() {
 #endif
 }
 
-
 void ignore_pointer(SDL_Event *event) {}
+
+static void wndevent(const SDL_Event *event);
 
 void e_input_update() {
     e_input.is_touch = SDL_GetNumTouchDevices() > 0;
 
-    if (e_gui.ctx) nk_input_begin(e_gui.ctx);
+    if (e_gui.ctx)
+        nk_input_begin(e_gui.ctx);
 
-    void (*input_handle_pointer)(SDL_Event *event) = e_input.is_touch ?
-                                                     input_handle_pointer_touch : input_handle_pointer_mouse;
-
+    void (*input_handle_pointer)(SDL_Event * event) = e_input.is_touch ? input_handle_pointer_touch : input_handle_pointer_mouse;
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if (e_gui.ctx) nk_sdl_handle_event(&event);
+        if (e_gui.ctx)
+            nk_sdl_handle_event(&event);
 
-        switch (event.type) {
-            case SDL_QUIT:
-                e_window_kill();
-                return;
-            case SDL_MOUSEBUTTONDOWN:
-            case SDL_MOUSEMOTION:
-            case SDL_MOUSEBUTTONUP:
-            case SDL_FINGERDOWN:
-            case SDL_FINGERMOTION:
-            case SDL_FINGERUP:
-                input_handle_pointer(&event);
-                break;
-            case SDL_MOUSEWHEEL:
-                input_handle_wheel(&event);
-                break;
-            case SDL_KEYDOWN:
-            case SDL_KEYUP:
-                input_handle_keys(&event);
-                break;
+        switch (event.type)
+        {
+        case SDL_QUIT:
+            e_window_kill();
+            return;
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEMOTION:
+        case SDL_MOUSEBUTTONUP:
+        case SDL_FINGERDOWN:
+        case SDL_FINGERMOTION:
+        case SDL_FINGERUP:
+            input_handle_pointer(&event);
+            break;
+        case SDL_MOUSEWHEEL:
+            input_handle_wheel(&event);
+            break;
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+            input_handle_keys(&event);
+            break;
 #ifdef OPTION_GYRO
-                case SDL_SENSORUPDATE:
-                    input_handle_sensors(&event);
-                    break;
+        case SDL_SENSORUPDATE:
+            input_handle_sensors(&event);
+            break;
 #endif
+
+        case SDL_WINDOWEVENT:
+            wndevent(&event);
+            break;
         }
     }
 
-    if (e_gui.ctx) nk_input_end(e_gui.ctx);
-
+    if (e_gui.ctx)
+        nk_input_end(e_gui.ctx);
 }
-
 
 void e_input_register_pointer_event(ePointerEventFn event, void *user_data) {
     assume(L.reg_pointer_e_size < E_MAX_POINTER_EVENTS, "too many registered pointer events");
-    L.reg_pointer_e[L.reg_pointer_e_size++] = (RegPointer) {event, user_data};
+    L.reg_pointer_e[L.reg_pointer_e_size++] = (RegPointer){event, user_data};
 }
 
 void e_input_unregister_pointer_event(ePointerEventFn event_to_unregister) {
@@ -247,7 +249,7 @@ void e_input_unregister_pointer_event(ePointerEventFn event_to_unregister) {
 
 void e_input_register_wheel_event(eWheelEventFn event, void *user_data) {
     assume(L.reg_wheel_e_size < E_MAX_WHEEL_EVENTS, "too many registered wheel events");
-    L.reg_wheel_e[L.reg_wheel_e_size++] = (RegWheel) {event, user_data};
+    L.reg_wheel_e[L.reg_wheel_e_size++] = (RegWheel){event, user_data};
 }
 
 void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister) {
@@ -268,4 +270,64 @@ void e_input_unregister_wheel_event(eWheelEventFn event_to_unregister) {
         L.reg_wheel_e[i] = L.reg_wheel_e[i + 1];
     }
     L.reg_wheel_e_size--;
+}
+
+static void wndevent(const SDL_Event *event) {
+    if (event->type == SDL_WINDOWEVENT)
+    {
+        switch (event->window.event)
+        {
+        case SDL_WINDOWEVENT_SHOWN:
+            SDL_Log("Window %d shown", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_HIDDEN:
+            SDL_Log("Window %d hidden", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_EXPOSED:
+            SDL_Log("Window %d exposed", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            SDL_Log("Window %d moved to %d,%d", event->window.windowID, event->window.data1, event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_RESIZED:
+            SDL_Log("Window %d resized to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+            SDL_Log("Window %d size changed to %dx%d", event->window.windowID, event->window.data1, event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            SDL_Log("Window %d minimized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            SDL_Log("Window %d maximized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            SDL_Log("Window %d restored", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_ENTER:
+            SDL_Log("Mouse entered window %d", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            SDL_Log("Mouse left window %d", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            SDL_Log("Window %d gained keyboard focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            SDL_Log("Window %d lost keyboard focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_CLOSE:
+            SDL_Log("Window %d closed", event->window.windowID);
+            break;
+#if SDL_VERSION_ATLEAST(2, 0, 5) 
+            case SDL_WINDOWEVENT_TAKE_FOCUS : SDL_Log("Window %d is offered a focus", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_HIT_TEST:
+            SDL_Log("Window %d has a special hit test", event->window.windowID);
+            break;
+#endif 
+            default : SDL_Log("Window %d got unknown event %d", event->window.windowID, event->window.event);
+            break;
+        }
+    }
 }

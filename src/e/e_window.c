@@ -101,8 +101,12 @@ void e_window_init(const char *name) {
 }
 
 void e_window_kill() {
-    log_info("e_window_kill: Window killed");
+    log_info("e_window_kill: killing...");
     L.running = false;
+    
+#ifdef __EMSCRIPTEN__
+    emscripten_cancel_main_loop();
+#endif
 }
 
 void e_window_main_loop(eWindowMainLoopFn main_loop) {
@@ -118,10 +122,12 @@ void e_window_main_loop(eWindowMainLoopFn main_loop) {
 #endif
 
 
-// ?
-#ifndef __EMSCRIPTEN__
     SDL_DestroyWindow(e_window.window);
+#ifdef OPTION_TTF
+    TTF_Quit();
+#endif 
+    IMG_Quit();
     SDL_Quit();
-#endif
+    log_info("e_window_kill: killed");
 }
 
