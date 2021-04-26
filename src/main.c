@@ -124,7 +124,7 @@ static void main_loop(float delta_time) {
             char text[64];
             sprintf(text, "%7.2f %3.0f%%\n  %i %i", cnt/time, load*100, e_window.size.x, e_window.size.y);
             
-            sprintf(text, "%i\n%i %i\n%i %i", callback_cnt, element.x, element.y, screen.x, screen.y);
+            sprintf(text, "%i\n%i %i\n%i %i\n%i %i", callback_cnt, element.x, element.y, screen.x, screen.y, e_window.size.x, e_window.size.y);
             
             vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
