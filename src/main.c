@@ -84,17 +84,19 @@ static void main_loop(float delta_time) {
     // fps + load
     {
         static float time = 0;
+        static float load_sum = 0;
         static int cnt = 0;
 
 
         float frame_time = current_time() - start_time;
         float load = frame_time / delta_time;
+        load_sum += load;
 
         time += delta_time;
         cnt++;
         if(time>0.25) {
             char text[64];
-            sprintf(text, "%7.2f %3.0f%%", cnt/time, load*100);
+            sprintf(text, "%7.2f %3.0f%%", cnt/time, load_sum/cnt*100);
             
             vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
@@ -102,6 +104,7 @@ static void main_loop(float delta_time) {
                           hudcamera_top()-2);
             time -= 0.25;
             cnt = 0;
+            load_sum = 0;
         }
         ro_text_render(&fps_ro);
     }
