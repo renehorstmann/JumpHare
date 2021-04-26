@@ -19,6 +19,12 @@ static float current_time() {
 
 static void main_loop(float delta_time);
 
+static int pcnt, rcnt;
+static void onpause(bool resume, void *ud) {
+    pcnt += resume? 0 : 1;
+    rcnt += resume? 1 : 0;
+}
+
 
 int main(int argc, char **argv) {
     log_info("JumpHare");
@@ -42,6 +48,7 @@ int main(int argc, char **argv) {
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
+    e_window_register_pause_callback(onpause, NULL);
 
     e_window_main_loop(main_loop);
 
@@ -95,7 +102,7 @@ static void main_loop(float delta_time) {
         cnt++;
         if(time>0.25) {
             char text[64];
-            sprintf(text, "%7.2f %3.0f%%\n  %i %i", cnt/time, load*100, e_window.size.x, e_window.size.y);
+            sprintf(text, "%7.2f %3.0f%%\n  %i %i\n%i %i", cnt/time, load*100, e_window.size.x, e_window.size.y, pcnt, rcnt);
             
             vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
