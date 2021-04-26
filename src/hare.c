@@ -201,6 +201,7 @@ static void apply_speed(float dtime) {
     if (sca_sign(set_speed_x) * sca_sign(L.speed.x) == -1) {
         L.speed.x = 0;
     }
+    
     float diff = set_speed_x - L.speed.x;
     if (diff > 0) {
         L.speed.x = sca_min(L.speed.x

@@ -137,7 +137,7 @@ void level_init(int lvl) {
         speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "HsF");
     }
     if(tilemap_get_positions(&bubble_pos, 1, SPEECHBUBBLE_1_CODE, CODE_LAYER)) {
-        speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "a\nC>H");
+        speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "Cf=EH");
     }
     if(tilemap_get_positions(&bubble_pos, 1, SPEECHBUBBLE_2_CODE, CODE_LAYER)) {
         speechbubble_init(&L.bubbles[L.bubbles_size++], bubble_pos, "TBZ");
@@ -260,8 +260,8 @@ void level_render() {
     tilemap_render_back();
 
     // test
-    ro_batchrefract_render(&L.ice);
-    ro_batchrefract_render(&L.mirror);
+    //ro_batchrefract_render(&L.ice);
+    //ro_batchrefract_render(&L.mirror);
 
     for(int i=0; i<L.bubbles_size; i++) {
         speechbubble_render(&L.bubbles[i]);
