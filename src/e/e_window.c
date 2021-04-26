@@ -139,7 +139,7 @@ void e_window_init(const char *name) {
     {
         EmscriptenFullscreenStrategy strategy = {
             .scaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF,
-            //.canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_HIDEF,
+            .canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF,
             .filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT
         };
     
