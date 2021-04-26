@@ -9,6 +9,7 @@ enum hare_state {
     HARE_FALLING,
     HARE_JUMPING,
     HARE_DOUBLE_JUMP,
+    HARE_SLEEPING,
     HARE_NUM_STATES
 };
 
@@ -34,5 +35,7 @@ bool hare_looking_left();
 void hare_set_speed(float dx);
 
 void hare_jump();
+
+void hare_set_sleep(bool instant);
 
 #endif //JUMPHARE_HARE_H

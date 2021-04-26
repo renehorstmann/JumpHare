@@ -148,6 +148,8 @@ void level_init(int lvl) {
     
 
     load_game();
+    
+    hare_set_sleep(true);
 
     L.borders_ro = ro_batch_new(4, camera.gl_main, r_texture_new_white_pixel());
 
