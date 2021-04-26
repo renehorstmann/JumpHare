@@ -19,6 +19,30 @@ static float current_time() {
 
 static void main_loop(float delta_time);
 
+static ivec2 element, screen;
+static int callback_cnt = 0;
+
+EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData){ 
+    printf("%s, isFullscreen: %d, fullscreenEnabled: %d, fs element nodeName: \"%s\", fs element id: \"%s\". New size: %dx%d pixels. Screen size: %dx%d pixels.\n",
+        emscripten_event_type_to_string(eventType),
+        e->isFullscreen, 
+        e->fullscreenEnabled, 
+        e->nodeName, 
+        e->id, 
+        e->elementWidth, 
+        e->elementHeight, 
+        e->screenWidth, 
+        e->screenHeight);
+    element.x = e->elementWidth;
+    element.y = e->elementHeight;
+    screen.x = e->screenWidth;
+    screen.y = e->screenHeight;
+    callback_cnt++;
+    return 0;
+}
+
+
+
 int main(int argc, char **argv) {
     log_info("JumpHare");
 
@@ -41,6 +65,8 @@ int main(int argc, char **argv) {
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
+    
+emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, 0, 1, fullscreenchange_callback);
 
     e_window_main_loop(main_loop);
 
@@ -95,6 +121,9 @@ static void main_loop(float delta_time) {
         if(time>0.25) {
             char text[64];
             sprintf(text, "%7.2f %3.0f%%\n  %i %i", cnt/time, load*100, e_window.size.x, e_window.size.y);
+            
+            sprintf(text, "%i\n%i %i\n%i %i", callback_cnt, element.x, element.y, screen.x, screen.y);
+            
             vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
                           hudcamera_right() - size.x-2,
