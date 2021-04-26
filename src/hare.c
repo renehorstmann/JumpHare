@@ -1,3 +1,4 @@
+#include "e/window.h"
 #include "r/ro_single.h"
 #include "r/ro_particle.h"
 #include "r/texture.h"
@@ -399,7 +400,16 @@ static void check_state_change(float dtime) {
 }
 
 
+static void on_pause_callback(bool resume, void *ud) {
+    log_info("hare: pause callback");
+    if(resume && L.state == HARE_GROUNDED)
+        hare_set_sleep(true);
+}
+
+
 void hare_init(float pos_x, float pos_y) {
+    e_window_register_pause_callback(on_pause_callback, NULL);
+    
     L.state = L.prev_state = HARE_FALLING;
 
     L.pos.x = pos_x;
@@ -427,6 +437,7 @@ void hare_init(float pos_x, float pos_y) {
 }
 
 void hare_kill() {
+    e_window_unregister_pause_callback(on_pause_callback);
     ro_single_kill(&L.ro);
     ro_text_kill(&L.input_text);
     memset(&L, 0, sizeof(L));
@@ -511,6 +522,7 @@ void hare_jump() {
 }
 
 void hare_set_sleep(bool instant) {
+    log_info("hare: set_sleep (instant? %i)", instant);
     L.state = HARE_SLEEPING;
     L.sleep_time = instant? 0 : -FALLING_ASLEEP_TIME;
     L.wake_up_cnt = 0;
