@@ -23,6 +23,7 @@ static ivec2 element, screen;
 static int callback_cnt = 0;
 
 EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData){ 
+    /*
     printf("%s, isFullscreen: %d, fullscreenEnabled: %d, fs element nodeName: \"%s\", fs element id: \"%s\". New size: %dx%d pixels. Screen size: %dx%d pixels.\n",
         emscripten_event_type_to_string(eventType),
         e->isFullscreen, 
@@ -33,6 +34,7 @@ EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChang
         e->elementHeight, 
         e->screenWidth, 
         e->screenHeight);
+    */
     element.x = e->elementWidth;
     element.y = e->elementHeight;
     screen.x = e->screenWidth;
