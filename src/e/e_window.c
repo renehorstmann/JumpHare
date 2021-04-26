@@ -144,7 +144,8 @@ void e_window_init(const char *name) {
         };
     
         //.canvasResizedCallback = on_canvassize_changed; 
-        int ret = emscripten_request_fullscreen_strategy(0, 1, &strategy);
+        // int ret = emscripten_request_fullscreen_strategy(0, 1, &strategy);
+        int ret = emscripten_enter_soft_fullscreen("canvas", &strategy);
         if(ret != 0) {
             log_warn("e_window_init: failed to set emscripten fullscreen: %i", ret);
         }
