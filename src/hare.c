@@ -55,7 +55,7 @@
 #define FALLING_ASLEEP_TIME 0.2
 #define WAKE_UP_TIME 0.5
 #define WAKE_UP_SPEED 75
-#define WAKE_UP_CNTS 5
+#define WAKE_UP_CNTS 3
 #define SLEEP_ZZZ_MAX 16
 
 const char *state_names[] = {
