@@ -138,14 +138,14 @@ void e_window_init(const char *name) {
 #ifdef __EMSCRIPTEN__
     {
         EmscriptenFullscreenStrategy strategy = {
-            .scaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF,
+            .scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_DEFAULT,
             .canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF,
-            .filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT
+            .filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_NEAREST
         };
     
         //.canvasResizedCallback = on_canvassize_changed; 
-        // int ret = emscripten_request_fullscreen_strategy(0, 1, &strategy);
-        int ret = emscripten_enter_soft_fullscreen("canvas", &strategy);
+         int ret = emscripten_request_fullscreen_strategy(NULL, false, &strategy);
+        //int ret = emscripten_enter_soft_fullscreen("canvas", &strategy);
         if(ret != 0) {
             log_warn("e_window_init: failed to set emscripten fullscreen: %i", ret);
         }
