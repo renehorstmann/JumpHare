@@ -36,6 +36,7 @@
 
 #define JUMP_START_TIME 0.1
 #define JUMP_FALL_TIME 0.2
+#define DOUBLE_JUMP_MAX_START_SPEED_Y 25
 #define DOUBLE_JUMP_START_TIME 0.25
 #define DOUBLE_JUMP_FREEZE_TIME 0.05
 #define AIRSTROKE_DELAY_TIME 0.1
@@ -92,7 +93,9 @@ static void check_jumping(float dtime) {
             L.set_jump_time = 1;
         }
 
-        if (L.state == HARE_FALLING && L.jump_time > DOUBLE_JUMP_START_TIME) {
+        if (L.speed.y <= DOUBLE_JUMP_MAX_START_SPEED_Y
+                && L.state == HARE_FALLING 
+                && L.jump_time > DOUBLE_JUMP_START_TIME) {
 
             L.speed.y = sca_max(L.speed.y, DOUBLE_JUMP_SPEED_Y);
 #ifndef GOD_MODE

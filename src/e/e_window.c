@@ -130,7 +130,10 @@ void e_window_init(const char *name) {
         exit(EXIT_FAILURE);
     }
     SDL_SetWindowMinimumSize(e_window.window, 480, 320);
+    
+#ifdef OPTION_GLES
     SDL_SetWindowFullscreen(e_window.window, SDL_WINDOW_FULLSCREEN);
+#endif
 
     // Not necessary, but recommended to create a gl context:
     e_window.gl_context = SDL_GL_CreateContext(e_window.window);
