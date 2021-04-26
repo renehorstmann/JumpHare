@@ -402,7 +402,7 @@ static void check_state_change(float dtime) {
 
 static void on_pause_callback(bool resume, void *ud) {
     log_info("hare: pause callback");
-    if(resume &&  L.state == HARE_GROUNDED)
+    if(!resume &&  L.state == HARE_GROUNDED)
         hare_set_sleep(false);
 }
 
