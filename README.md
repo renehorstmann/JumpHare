@@ -25,8 +25,6 @@ In active developmemt
 ![example](example.jpg)
 
 ## Todo
-- emscripten sleep mode?
-- recheck none pixel perfect camera?
 - hare state asleep
   - on game start
   - if doing nothing for 30 secs
@@ -40,7 +38,6 @@ In active developmemt
 - real level 1 (beta)
   - starshoot video animation
   - begins asleep
-- do not jump if position is far away (multitouch...)
 - collision module
   - object object
     - aabb

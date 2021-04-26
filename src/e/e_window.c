@@ -135,23 +135,6 @@ void e_window_init(const char *name) {
     SDL_SetWindowFullscreen(e_window.window, SDL_WINDOW_FULLSCREEN);
 #endif
 
-#ifdef __EMSCRIPTEN__
-    {
-        EmscriptenFullscreenStrategy strategy = {
-            .scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_ASPECT,
-            .canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF,
-            .filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_NEAREST
-        };
-    
-        //.canvasResizedCallback = on_canvassize_changed; 
-        int ret = emscripten_request_fullscreen_strategy("canvas", 1, &strategy);
-        //int ret = emscripten_enter_soft_fullscreen("canvas", &strategy);
-        if(ret != 0) {
-            log_warn("e_window_init: failed to set emscripten fullscreen: %i", ret);
-        }
-    }
-#endif
-
     // Not necessary, but recommended to create a gl context:
     e_window.gl_context = SDL_GL_CreateContext(e_window.window);
     if (!e_window.gl_context) {
