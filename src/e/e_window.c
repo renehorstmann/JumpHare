@@ -96,6 +96,12 @@ static EM_BOOL emscripten_window_resized_callback(int eventType, const void *res
     return true; 
 }
 
+static EM_BOOL fullscreenchange_callback(int eventType, const EmscriptenFullscreenChangeEvent *e, void *userData){ 
+     emscripten_window_resized_callback(0, NULL, NULL);
+     return 0;
+}
+
+
 
 
 void e_window_init(const char *name) {
@@ -153,12 +159,15 @@ void e_window_init(const char *name) {
 #endif
 
 
+
+    emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, 0, 1, fullscreenchange_callback);
+    
     EmscriptenFullscreenStrategy strategy = {0};		
     strategy.scaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF; 		
     strategy.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT; 		
     strategy.canvasResizedCallback = emscripten_window_resized_callback; 		
     strategy.canvasResizedCallbackUserData = NULL; // pointer to user data 		
-    emscripten_request_fullscreen_strategy("canvas", 0, &strategy);
+    emscripten_request_fullscreen_strategy("canvas", 1, &strategy);
     
 
     // Not necessary, but recommended to create a gl context:
