@@ -158,7 +158,7 @@ void e_window_init(const char *name) {
     strategy.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT; 		
     strategy.canvasResizedCallback = emscripten_window_resized_callback; 		
     strategy.canvasResizedCallbackUserData = NULL; // pointer to user data 		
-    emscripten_enter_soft_fullscreen("canvas", &strategy);
+    emscripten_request_fullscreen_strategy("canvas", 1, &strategy);
     
 
     // Not necessary, but recommended to create a gl context:
