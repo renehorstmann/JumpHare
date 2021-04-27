@@ -87,6 +87,16 @@ static void resume() {
 }
 
 
+static EM_BOOL emscripten_window_resized_callback(int eventType, const void *reserved, void *userData){ 		
+    double width, height; 	
+    emscripten_get_element_css_size("canvas", &width, &height); 	
+    int w = width, h = height; 	
+    // resize SDL window 	
+    SDL_SetWindowSize(e_window.window, w, h); 	
+    return true; 
+}
+
+
 
 void e_window_init(const char *name) {
 #ifdef NDEBUG
@@ -130,7 +140,7 @@ void e_window_init(const char *name) {
             SDL_WINDOWPOS_UNDEFINED,
             640, 480,
             SDL_WINDOW_OPENGL 
-            | SDL_WINDOW_RESIZABLE
+           // | SDL_WINDOW_RESIZABLE
             );
     if (!e_window.window) {
         log_error("e_window_init: SDL_CreateWindow failed: %s", SDL_GetError());
@@ -139,8 +149,17 @@ void e_window_init(const char *name) {
     SDL_SetWindowMinimumSize(e_window.window, 480, 320);
     
 #ifdef FULLSCREEN
-    SDL_SetWindowFullscreen(e_window.window, SDL_WINDOW_FULLSCREEN);
+    //SDL_SetWindowFullscreen(e_window.window, SDL_WINDOW_FULLSCREEN);
 #endif
+
+
+    EmscriptenFullscreenStrategy strategy = {0};		
+    strategy.scaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF; 		
+    strategy.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT; 		
+    strategy.canvasResizedCallback = emscripten_window_resized_callback; 		
+    strategy.canvasResizedCallbackUserData = NULL; // pointer to user data 		
+    emscripten_enter_soft_fullscreen("canvas", &strategy);
+    
 
     // Not necessary, but recommended to create a gl context:
     e_window.gl_context = SDL_GL_CreateContext(e_window.window);
