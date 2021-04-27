@@ -24,6 +24,16 @@ In active developmemt
 ## Status
 ![example](example.jpg)
 
+## How to read the code
+Have a look at [Mathc](https://github.com/renehorstmann/Mathc) for math (linear algebra) related functions (`vec_*`, `mat_*`, `sca_*`).
+Modules and classes are written in [rhc](https://github.com/renehorstmann/rhc) style.
+
+Entry point of the game is [main.c](src/main.c).
+The [level.h](include/level.b) loads all stuff, neccessary for a game level.
+The level itself is loaded as a [tilemap.h](include/tilemap.h).
+Collision is handled in [collision.h](include/collision.h) and used by the [hare.h](include/hare.h) itself.
+
+
 ## Todo
 - butterfly counter?
   - reset on death
