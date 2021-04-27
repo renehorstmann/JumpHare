@@ -96,7 +96,7 @@ static void main_loop(float delta_time) {
         cnt++;
         if(time>0.25) {
             char text[64];
-            sprintf(text, "%7.2f %3.0f%%\nB %i %i", cnt/time, load_sum/cnt*100, e_window.size.x, e_window.size.y);
+            sprintf(text, "%7.2f %3.0f%%\nC %i %i", cnt/time, load_sum/cnt*100, e_window.size.x, e_window.size.y);
             
             vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
