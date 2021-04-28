@@ -29,9 +29,9 @@ In active developmemt
 - Modules and classes are written in [rhc](https://github.com/renehorstmann/rhc) style.
 
 - Entry point of the game is [main.c](src/main.c).
-- The [level.h](include/level.h) loads all stuff, neccessary for a game level.
-- The level itself is loaded as a [tilemap.h](include/tilemap.h).
-- Collision is handled in [collision.h](include/collision.h) and used by the [hare.h](include/hare.h) itself.
+- The [level.h](include/level.h)/[level.c](src/level.c) loads all stuff, neccessary for a game level.
+- The level itself is loaded as a [tilemap.h](include/tilemap.h)/[tilemap.c](src/tilemap.c).
+- Collision is handled in [collision.h](include/collision.h)/[collision.c](src/collision.c) and used by the [hare.h](include/hare.h)/[hare.c](src/hare.c) itself.
 
 
 ## Todo
