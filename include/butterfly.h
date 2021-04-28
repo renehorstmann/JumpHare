@@ -14,4 +14,8 @@ void butterfly_render();
 
 bool butterfly_collect(vec2 position);
 
+void butterfly_save();
+
+void butterfly_load();
+
 #endif //JUMPHARE_BUTTERFLY_H

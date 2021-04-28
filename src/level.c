@@ -58,9 +58,6 @@ static void load_game() {
     dirtparticles_init();
     cameractrl_init();
     
-    vec2 butterfly_pos[512];
-    int butterflies = tilemap_get_positions(butterfly_pos, 512, BUTTERFLY_CODE, CODE_LAYER);
-    butterfly_init(butterfly_pos, butterflies);
 }
 
 static void unload_game() {
@@ -69,7 +66,6 @@ static void unload_game() {
     dirtparticles_kill();
     cameractrl_kill();
     
-    butterfly_kill();
 }
 
 static void reset() {
@@ -79,6 +75,7 @@ static void reset() {
     load_game();
     
     carrot_load();
+    butterfly_load();
 }
 
 static void check_carrot() {
@@ -126,6 +123,10 @@ void level_init(int lvl) {
     vec2 carrot_pos[3];
     assume(tilemap_get_positions(carrot_pos, 3, CARROT_CODE, CODE_LAYER) == 3, "level needs 3 carrots");
     carrot_init(carrot_pos);
+    
+    vec2 butterfly_pos[512];
+    int butterflies = tilemap_get_positions(butterfly_pos, 512, BUTTERFLY_CODE, CODE_LAYER);
+    butterfly_init(butterfly_pos, butterflies);
 
     vec2 flag_pos[64];
     int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, CODE_LAYER);
@@ -215,6 +216,7 @@ void level_kill() {
     tilemap_kill();
     goal_kill();
     carrot_kill();
+    butterfly_kill();
     flag_kill();
     for(int i=0; i<L.bubbles_size; i++) {
         speechbubble_kill(&L.bubbles[i]);

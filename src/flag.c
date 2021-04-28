@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "hare.h"
 #include "carrot.h"
+#include "butterfly.h"
 #include "button.h"
 #include "flag.h"
 
@@ -73,6 +74,7 @@ static void activate(int flag_index) {
 
     carrot_eat();
     carrot_save();
+    butterfly_save();
 }
 
 static void pointer_callback(ePointer_s pointer, void *user_data) {
