@@ -100,7 +100,7 @@ static void main_loop(float delta_time) {
             
             vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
-                          hudcamera_right() - size.x-2,
+                          -size.x/2,
                           hudcamera_top()-2);
             time -= 0.25;
             cnt = 0;

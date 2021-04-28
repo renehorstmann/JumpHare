@@ -1,4 +1,6 @@
 #include "r/ro_particle.h"
+#include "r/ro_single.h"
+#include "r/ro_text.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
@@ -6,6 +8,7 @@
 #include "mathc/utils/color.h"
 #include "rhc/error.h"
 #include "camera.h"
+#include "hudcamera.h"
 #include "hare.h"
 #include "butterfly.h"
 
@@ -16,12 +19,18 @@
 #define FLY_ACC_Y 20
 #define COLLECT_DISTANCE 16
 
+#define COLLECTED_TIME 0.2
+
 static const float RESET_TIME = 5.0 * FRAMES / CHILL_FPS;
 
 static struct {
     RoParticle ro;
+    RoSingle cnt_icon;
+    RoText cnt_text;
     float time;
     float reset_time;
+    int collected;
+    float collected_time;
 } L;
 
 static bool is_flying(int i) {
@@ -71,10 +80,21 @@ void butterfly_init(const vec2 *positions, int num) {
     }
     
     ro_particle_update(&L.ro);
+    
+    
+    L.cnt_icon = ro_single_new(hudcamera.gl, L.ro.tex);
+    L.cnt_icon.owns_tex = false;
+    L.cnt_icon.rect.color = L.ro.rects[0].color;
+    L.cnt_icon.rect.sprite.y = 1;
+    
+    L.cnt_text = ro_text_new_font55(4, hudcamera.gl);
+    ro_text_set_color(&L.cnt_text, R_COLOR_BLACK);
 }
 
 void butterfly_kill() {
     ro_particle_kill(&L.ro);
+    ro_single_kill(&L.cnt_icon);
+    ro_text_kill(&L.cnt_text);
     memset(&L, 0, sizeof(L));
 }
 
@@ -91,10 +111,28 @@ void butterfly_update(float dtime) {
         }
         ro_particle_update(&L.ro);
     }
+    
+    
+    // cnt
+    L.collected_time -= dtime;
+    L.cnt_icon.rect.sprite.x = L.collected_time>0? 2 : 0;
+    L.cnt_icon.rect.pose = u_pose_new_aa(
+            camera_right() - 16 - 4*6, 
+            camera_top(), 
+            16, 16);
+    u_pose_set_xy(&L.cnt_text.pose, 
+            camera_right() -4*6, 
+            camera_top() - (16-6)/2);
+    char buf[5];
+    assume(L.collected>=0 && L.collected <1000, "?");
+    sprintf(buf, "x%i", L.collected);
+    ro_text_set_text(&L.cnt_text, buf);
 }
 
 void butterfly_render() {
     ro_particle_render(&L.ro, L.time);
+    ro_single_render(&L.cnt_icon);
+    ro_text_render(&L.cnt_text);
 }
 
 
@@ -104,6 +142,8 @@ bool butterfly_collect(vec2 position) {
             continue;
         if(vec2_distance(position, u_pose_get_xy(L.ro.rects[i].pose)) <= COLLECT_DISTANCE) {
             fly_away(i);
+            L.collected++;
+            L.collected_time = COLLECTED_TIME;
             return true;
         }
     }
