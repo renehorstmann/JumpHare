@@ -10,7 +10,7 @@
 
 #define UPDATES_PER_SECOND 200
 
-
+// debug text
 static RoText fps_ro;
 
 static float current_time() {
@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
     tiles_init();       // loads all tile textures
     level_init(1);      // manages the gameplay (tilemap, hare, background, ...)
 
+    // debug fps + load text
     fps_ro = ro_text_new_font55(64, hudcamera.gl);
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
@@ -59,6 +60,8 @@ static void main_loop(float delta_time) {
 
     float start_time = current_time();
 
+    // e updates
+    e_input_update();
 
     // fixed update ps
     u_time += delta_time;
@@ -66,14 +69,11 @@ static void main_loop(float delta_time) {
         const float fixed_time = 1.0 / UPDATES_PER_SECOND;
         u_time -= fixed_time;
 
-        // e updates
-        e_input_update();
-
         // simulate game
         level_update(fixed_time);
     }
 
-    // camera only need to be updated before rendering
+    // camera only needs to be updated before rendering
     camera_update();
     hudcamera_update();
     
