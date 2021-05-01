@@ -5,6 +5,7 @@
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
 #include "rhc/log.h"
+#include "rhc/error.h"
 #include "camera.h"
 #include "hudcamera.h"
 #include "carrot.h"
@@ -29,11 +30,13 @@ static struct {
     RoParticle particle_ro;
     bool collected[3];
     int collected_cnt;
+    int eaten_cnt;
     float time;
     
     struct {
         bool collected[3];
         int collected_cnt;
+        int eaten_cnt;
     } save;
 } L;
 
@@ -57,21 +60,19 @@ static void emit_particles(float x, float y) {
 }
 
 static void update_cnt() {
-    if(L.collected_cnt<0) {
-        L.collected_cnt = 0;
-        log_wtf("carrot: collected_cnt < 0?");
-    } else if(L.collected_cnt>3) {
-        L.collected_cnt = 3;
-        log_wtf("carrot: collected_cnt > 3?");
-    }
+    assume(L.collected_cnt>=0 && L.eaten_cnt>=0, "wtf?");
+    assume(L.eaten_cnt + L.collected_cnt <= 3, "wtf?");
     
-    for(int i=0; i<L.collected_cnt; i++) {
+    int sum = L.eaten_cnt + L.collected_cnt;
+    
+    for(int i=0; i<sum; i++) {
          L.cnt_ro.rects[i].pose = u_pose_new_aa(
             camera_left() + 2 + i * 8,
             camera_top() - 2,
             8, 16);
+         L.cnt_ro.rects[i].sprite.x = i<L.collected_cnt? 0 : 1;
     }
-    for(int i=L.collected_cnt; i<3; i++) {
+    for(int i=sum; i<3; i++) {
         L.cnt_ro.rects[i].pose = u_pose_new_hidden();
     }
     ro_batch_update(&L.cnt_ro);
@@ -95,7 +96,7 @@ void carrot_init(const vec2 *positions_3) {
     
     // mini hud carrot
     L.cnt_ro = ro_batch_new(3, hudcamera.gl,
-                    r_texture_new_file(1, 1, "res/carrot_mini.png"));
+                    r_texture_new_file(2, 1, "res/carrot_mini.png"));
     update_cnt();
     
     
@@ -175,17 +176,20 @@ void carrot_eat() {
         return;
     }
     L.collected_cnt--;
+    L.eaten_cnt++;
     update_cnt();
 }
 
 void carrot_save() {
     memcpy(L.save.collected, L.collected, sizeof(L.collected));
     L.save.collected_cnt = L.collected_cnt;
+    L.save.eaten_cnt = L.eaten_cnt;
 }
 
 void carrot_load() {
     memcpy(L.collected, L.save.collected, sizeof(L.collected));
     L.collected_cnt = L.save.collected_cnt;
+    L.eaten_cnt = L.save.eaten_cnt;
     
     
     // particles
