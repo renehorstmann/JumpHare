@@ -10,7 +10,6 @@
 #include "camera.h"
 #include "hare.h"
 #include "carrot.h"
-#include "butterfly.h"
 #include "button.h"
 #include "flag.h"
 
@@ -35,6 +34,12 @@ static struct {
     RoParticle particle_ro;
     float time;
     vec2 active_pos;
+    
+    struct {
+        flag_activated_callback_fn cb;
+        void *ud;
+    } callbacks[FLAG_MAX_CALLBACKS];
+    int callbacks_size;
 } L;
 
 static bool flag_reached(int index) {
@@ -73,8 +78,9 @@ static void activate(int flag_index) {
     emit_particles(pos.x, pos.y);
 
     carrot_eat();
-    carrot_save();
-    butterfly_save();
+    for(int i=0; i<L.callbacks_size; i++) {
+        L.callbacks[i].cb(L.active_pos, L.callbacks[i].ud);
+    }
 }
 
 static void pointer_callback(ePointer_s pointer, void *user_data) {
@@ -158,6 +164,7 @@ void flag_kill() {
     ro_batch_kill(&L.flag_ro);
     ro_batch_kill(&L.btn_ro);
     ro_particle_kill(&L.particle_ro);
+    memset(&L, 0, sizeof(L));
 }
 
 void flag_update(float dtime) {
@@ -205,4 +212,10 @@ void flag_render() {
 
 vec2 flag_active_position() {
     return L.active_pos;
+}
+
+void flag_register_callback(flag_activated_callback_fn cb, void *ud) {
+    assume(L.callbacks_size < FLAG_MAX_CALLBACKS, "too many");
+    L.callbacks[L.callbacks_size].cb = cb;
+    L.callbacks[L.callbacks_size++].ud = ud;
 }

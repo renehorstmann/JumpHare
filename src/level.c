@@ -45,6 +45,12 @@ static struct {
     RoBatchRefract ice, mirror;
 } L;
 
+static void on_flag_activated_cb(vec2 pos, void *ud) {
+    log_info("level: flag activated");
+    carrot_save();
+    butterfly_save();
+}
+
 static void load_game() {
     vec2 start_pos;
     assume(tilemap_get_positions(&start_pos, 1, START_CODE, CODE_LAYER) == 1, "start not found");
@@ -131,6 +137,7 @@ void level_init(int lvl) {
     vec2 flag_pos[64];
     int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, CODE_LAYER);
     flag_init(flag_pos, flags);
+    flag_register_callback(on_flag_activated_cb, NULL);
     
     L.bubbles_size=0;
     vec2 bubble_pos;
