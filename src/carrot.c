@@ -67,7 +67,7 @@ static void update_cnt() {
     
     for(int i=0; i<sum; i++) {
          L.cnt_ro.rects[i].pose = u_pose_new_aa(
-            camera_left() + 2 + i * 8,
+            camera_left() + 2 + i * 9,
             camera_top() - 2,
             8, 16);
          L.cnt_ro.rects[i].sprite.x = i<L.collected_cnt? 0 : 1;
@@ -97,6 +97,8 @@ void carrot_init(const vec2 *positions_3) {
     // mini hud carrot
     L.cnt_ro = ro_batch_new(3, hudcamera.gl,
                     r_texture_new_file(2, 1, "res/carrot_mini.png"));
+    //L.collected_cnt = 1;
+    //L.eaten_cnt = 2;
     update_cnt();
     
     
