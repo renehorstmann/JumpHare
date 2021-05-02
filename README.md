@@ -74,6 +74,7 @@ In active developmemt
     - enemy collision
     - dead
   - airstroke
+  - speachbubble?
 
 
 ## Compiling for Web
