@@ -35,10 +35,6 @@ In active developmemt
 
 
 ## Todo
-- butterfly counter?
-  - reset on death
-  - lose some on death
-  - buy accesouires 
 - collision module
   - object object
     - aabb
@@ -52,8 +48,32 @@ In active developmemt
   - each level has a emojifont name
   - carrot indicator
   - button
-- non final sound effects?
-
+- music
+  - guitar
+  - wildlife sound, birds, etc.
+- sound effects
+  - butterfly collect
+  - carrot
+    - collect
+    - eat
+  - button click
+  - flag raised (+ carrot eat?)
+  - goal
+  - hare
+    - sleeping
+      - waking up 3x tick
+    - walking
+    - running
+    - grounded
+    - wall + ceill collision
+      - dirt
+      - clean
+      - oneway?
+    - jumping
+    - dbl jmp
+    - enemy collision
+    - dead
+  - airstroke
 
 
 ## Compiling for Web
