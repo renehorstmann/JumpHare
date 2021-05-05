@@ -1,0 +1,22 @@
+#include "enemies.h"
+
+
+void enemies_init() {
+    
+}
+
+void enemies_kill() {
+    
+}
+
+void enemies_update(float dtime) {
+    
+}
+
+void enemies_render() {
+    
+}
+
+void enemies_add_hedgehogs(const vec2 *positions, int n) {
+    
+}

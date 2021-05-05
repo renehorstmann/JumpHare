@@ -7,6 +7,7 @@
 #include "rhc/error.h"
 #include "background.h"
 #include "tilemap.h"
+#include "enemies.h"
 #include "hare.h"
 #include "airstroke.h"
 #include "goal.h"
@@ -33,6 +34,9 @@ const static uColor_s SPEECHBUBBLE_0_CODE = {{0, 0, 1, 4}};
 const static uColor_s SPEECHBUBBLE_1_CODE = {{0, 0, 1, 5}};
 const static uColor_s SPEECHBUBBLE_2_CODE = {{0, 0, 1, 6}};
 
+// enemies
+const static uColor_s ENEMY_HEDGHEHOG_CODE  = {{0, 0, 1, 16}};
+
 
 static struct {
     RoBatch borders_ro;
@@ -51,7 +55,16 @@ static void on_flag_activated_cb(vec2 pos, void *ud) {
     butterfly_save();
 }
 
+static void add_enemies() {
+    vec2 hedgehogs[64];
+    int hedgehogs_num = tilemap_get_positions(hedgehogs, 64, ENEMY_HEDGHEHOG_CODE, CODE_LAYER);
+    
+    enemies_add_hedgehogs(hedgehogs, hedgehogs_num);
+}
+
 static void load_game() {
+    enemies_init();
+    
     vec2 start_pos;
     assume(tilemap_get_positions(&start_pos, 1, START_CODE, CODE_LAYER) == 1, "start not found");
     
@@ -63,15 +76,14 @@ static void load_game() {
     airstroke_init();
     dirtparticles_init();
     cameractrl_init();
-    
 }
 
 static void unload_game() {
+    enemies_kill();
     hare_kill();
     airstroke_kill();
     dirtparticles_kill();
     cameractrl_kill();
-    
 }
 
 static void reset() {
@@ -250,6 +262,7 @@ void level_update(float dtime) {
         for(int i=0; i<L.bubbles_size; i++) {
             speechbubble_update(&L.bubbles[i], dtime);
         }
+        enemies_update(dtime);
         hare_update(dtime);
         airstroke_update(dtime);
         butterfly_update(dtime);
@@ -278,6 +291,7 @@ void level_render() {
     carrot_render();
     dirtparticles_render();
     airstroke_render();
+    enemies_render();
     hare_render();
     butterfly_render();
     tilemap_render_front();
