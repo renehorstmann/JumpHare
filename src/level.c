@@ -64,6 +64,7 @@ static void add_enemies() {
 
 static void load_game() {
     enemies_init();
+    add_enemies();
     
     vec2 start_pos;
     assume(tilemap_get_positions(&start_pos, 1, START_CODE, CODE_LAYER) == 1, "start not found");
