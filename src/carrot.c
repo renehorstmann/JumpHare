@@ -24,6 +24,10 @@
 static const vec3 PARTICLE_COLOR = {{1, 0.65, 0}};
 
 
+//
+// private
+//
+
 static struct {
     RoBatch carrot_ro;
     RoBatch cnt_ro;
@@ -78,6 +82,10 @@ static void update_cnt() {
     ro_batch_update(&L.cnt_ro);
 }
 
+
+//
+// public
+//
 
 void carrot_init(const vec2 *positions_3) {
     

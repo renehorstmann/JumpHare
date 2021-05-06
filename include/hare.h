@@ -13,6 +13,14 @@ enum hare_state {
     HARE_NUM_STATES
 };
 
+struct HareGlobals_s {
+    enum hare_state state;
+    vec2 pos;
+    vec2 speed;
+    bool looking_left;
+};
+extern struct HareGlobals_s hare;
+
 void hare_init(float pos_x, float pos_y);
 
 void hare_kill();
@@ -21,15 +29,6 @@ void hare_update(float dtime);
 
 void hare_render();
 
-enum hare_state hare_state();
-
-vec2 hare_position();
-
-vec2 hare_speed();
-
-vec2 hare_prev_position();
-
-bool hare_looking_left();
 
 // [-1 : 1]
 void hare_set_speed(float dx);

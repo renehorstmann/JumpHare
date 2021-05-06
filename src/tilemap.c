@@ -13,6 +13,11 @@
 
 #define MAP_LAYERS 3
 
+
+//
+// private
+//
+
 static struct {
     RoBatch ro_back[MAX_TILES];
     RoBatch ro_main[MAX_TILES];
@@ -91,6 +96,11 @@ static uColor_s pixel_color(int map_layer, int tile_layer, float x, float y) {
     return tiles_pixel(tile, pc, pr, tile_layer);
 }
 
+
+
+//
+// public
+//
 
 void tilemap_init(const char *file) {
     L.map = u_image_new_file(MAP_LAYERS, file);

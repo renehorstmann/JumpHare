@@ -20,6 +20,11 @@
 
 #define BACKGROUND_SIZE 512
 
+
+//
+// private
+//
+
 static struct {
     RoBatch background_ro;
     ePointer_s pointer[2];
@@ -160,6 +165,11 @@ static void pointer_ctrl(float dtime) {
     up_time = 0;
     last_pointer_pos = L.pointer[L.main_pointer].pos.xy;
 }
+
+
+//
+// public
+//
 
 void controller_init() {
     L.pointer[0].action = E_POINTER_UP;

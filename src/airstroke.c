@@ -12,6 +12,10 @@
 #define FRAMES 4
 #define FPS 18
 
+//
+// private
+//
+
 typedef struct {
     rRect_s *rect;
     float time;
@@ -23,6 +27,12 @@ static struct {
     RoBatch ro;
     Stroke strokes[AIRSTROKE_MAX];
 } L;
+
+
+
+//
+// public
+//
 
 void airstroke_init() {
     L.ro = ro_batch_new(AIRSTROKE_MAX, camera.gl_main, r_texture_new_file(1, 1, "res/airstroke.png"));

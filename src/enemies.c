@@ -11,6 +11,11 @@
 
 #define MAX_ENEMIE_TYPES 32
 
+
+//
+// private
+//
+
 struct Type;
 
 typedef void (*update_fn)(struct Type *self, float dtime);
@@ -31,6 +36,11 @@ static void add_type(Type add) {
     assume(L.types_num < MAX_ENEMIE_TYPES, "wtf?");
     L.types[L.types_num++] = add;
 }
+
+
+//
+// public
+//
 
 
 void enemies_init() {
@@ -56,6 +66,11 @@ void enemies_render() {
     }
 }
 
+
+
+//
+// private
+//
 
 
 static void hedgehog_collision_cb(vec2 delta, enum collision_state state, void *ud) {
@@ -85,7 +100,7 @@ static void hedgehog_update(Type *self, float dtime) {
     for(int i=0; i<self->ro.num; i++) {
         vec2 pos = u_pose_get_xy(self->ro.rects[i].pose);
         float distance = vec2_distance(
-                hare_position(), 
+                hare.pos, 
                 pos);
         if(distance < 45) {
             int roll_frame = 0;
@@ -117,6 +132,11 @@ static void hedgehog_update(Type *self, float dtime) {
     
     ro_batch_update(&self->ro);
 }
+
+
+//
+// public
+//
 
 void enemies_add_hedgehogs(const vec2 *positions, int n) {
     if(n<=0)

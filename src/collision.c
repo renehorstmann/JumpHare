@@ -12,6 +12,11 @@
 #define SLOPE_CHECK_DISTANCE 2.0
 #define MAX_SLOPE_RATIO 4.5
 
+
+//
+// private
+//
+
 static bool scan_left(Collision_s self, float x, float y) {
     uColor_s id;
     float pos = tilemap_wall_left(x + SCAN_SIZE, y, &id);
@@ -111,6 +116,10 @@ static void scan_bottom_grounded(Collision_s self, float x_a, float x_b, float y
     self.cb(delta, state, self.cb_user_data);
 }
 
+
+//
+// public
+//
 
 void collision_tilemap_grounded(Collision_s self, vec2 center, vec2 radius, vec2 speed) {
     if (center.y < tilemap_border_bottom()) {

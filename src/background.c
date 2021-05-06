@@ -10,10 +10,20 @@
 
 #define PIXEL_SIZE 2.0
 
+
+//
+// private 
+//
+
 static struct {
     RoBatch ro[CAMERA_BACKGROUNDS];
 } L;
 
+
+
+//
+// public
+//
 
 void background_init(float level_width, float level_height, 
         bool repeat_h, bool repeat_v, 

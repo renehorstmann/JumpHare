@@ -12,11 +12,21 @@
 #define SIZE 2.0
 #define PARTICLE_ALPHA 1.0
 
+
+//
+// private
+//
+
 static struct {
     RoParticle ro;
     float time;
     int next;
 } L;
+
+
+//
+// public
+//
 
 void dirtparticles_init() {
     L.ro = ro_particle_new(MAX_PARTCLES, camera.gl_main, r_texture_new_white_pixel());

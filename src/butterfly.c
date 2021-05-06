@@ -24,6 +24,11 @@
 
 static const float RESET_TIME = 5.0 * FRAMES / CHILL_FPS;
 
+
+//
+// private
+//
+
 static struct {
     RoParticle ro;
     RoSingle cnt_icon;
@@ -80,6 +85,11 @@ static void fly_away(int i) {
     init_fly(i);
     ro_particle_update_sub(&L.ro, i, 1);
 }
+
+
+//
+// public
+//
 
 void butterfly_init(const vec2 *positions, int num) {
     assume(num>0, "atleast one butterfly in a level?");

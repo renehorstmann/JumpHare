@@ -7,6 +7,10 @@
 
 struct CameraControlGlobals_s cameractrl;
 
+//
+// private
+//
+
 static struct {
     vec2 pos;
 } L;
@@ -36,8 +40,12 @@ static void apply_pos(float dtime) {
 }
 
 
+//
+// public
+//
+
 void cameractrl_init() {
-    cameractrl.pos = hare_position();
+    cameractrl.pos = hare.pos;
     cameractrl.max_diff = vec2_set(20);
     cameractrl.diff_offset = (vec2) {{-10, 0}};
 }
@@ -48,7 +56,7 @@ void cameractrl_kill() {
 
 void cameractrl_update(float dtime) {
 //	vec2_println(cameractrl.pos);
-    vec2 h = hare_position();
+    vec2 h = hare.pos;
     vec2 delta = vec2_sub_vec(h, cameractrl.pos);
 
     float max_right = cameractrl.diff_offset.x + cameractrl.max_diff.x;

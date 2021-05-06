@@ -28,6 +28,10 @@
 #define PARTICLE_ALPHA 2.0
 
 
+//
+// private
+//
+
 static struct {
     RoBatch flag_ro;
     RoBatch btn_ro;
@@ -116,6 +120,11 @@ static void check_key_click() {
     }
 }
 
+
+//
+// public
+//
+
 void flag_init(const vec2 *positions, int num) {
     assume(num>=1, "a level needs at least one flag");
     e_input_register_pointer_event(pointer_callback, NULL);
@@ -180,7 +189,7 @@ void flag_update(float dtime) {
     ro_batch_update(&L.flag_ro);
     
     
-    vec2 hare_pos = hare_position();
+    vec2 hare_pos = hare.pos;
     for(int i=0; i<L.flag_ro.num; i++) {
         if(flag_reached(i) || carrot_collected() == 0) {
             L.btn_ro.rects[i].color.a = 0;

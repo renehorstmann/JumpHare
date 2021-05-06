@@ -11,6 +11,11 @@
 
 struct CameraGlobals_s camera;
 
+
+//
+// private
+//
+
 static struct {
     float real_pixel_per_pixel;
     float left, right, bottom, top;
@@ -30,6 +35,11 @@ static void camera_matrices_update(struct CameraMatrices_s *self) {
     self->vp = mat4_mul_mat(camera.matrices_p, self->v_inv);
     self->v_p_inv = mat4_mul_mat(self->v, camera.matrices_p_inv);
 }
+
+
+//
+// public
+//
 
 void camera_init() {
     assert(CAMERA_SIZE % 2 == 0 && "CAMERA_SIZE must be even");

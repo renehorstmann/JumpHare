@@ -38,6 +38,11 @@ const static uColor_s SPEECHBUBBLE_2_CODE = {{0, 0, 1, 6}};
 const static uColor_s ENEMY_HEDGHEHOG_CODE  = {{0, 0, 1, 16}};
 
 
+
+//
+// private
+//
+
 static struct {
     RoBatch borders_ro;
     int current_lvl;
@@ -98,7 +103,7 @@ static void reset() {
 }
 
 static void check_carrot() {
-    carrot_collect(hare_position());
+    carrot_collect(hare.pos);
     
     vec2 strokes[AIRSTROKE_MAX];
     int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
@@ -108,7 +113,7 @@ static void check_carrot() {
 }
 
 static void check_butterfly() {
-    butterfly_collect(hare_position());
+    butterfly_collect(hare.pos);
     
     vec2 strokes[AIRSTROKE_MAX];
     int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
@@ -120,6 +125,12 @@ static void check_butterfly() {
 static void dead_callback(void *ud) {
     reset();
 }
+
+
+
+//
+// public
+//
 
 void level_init(int lvl) {
     log_info("level: init lvl %i", lvl);

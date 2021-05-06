@@ -25,6 +25,10 @@
 #define PARTICLE_ALPHA 2.0
 
 
+//
+// private
+//
+
 static struct {
     RoSingle goal_ro;
     RoParticle particle_ro;
@@ -67,6 +71,11 @@ static void activate() {
     emit_particles(pos.x, pos.y);
 }
 
+
+//
+// public
+//
+
 void goal_init(vec2 position) {
     
     L.goal_ro = ro_single_new(camera.gl_main,
@@ -108,13 +117,12 @@ void goal_update(float dtime) {
     if(goal_reached())
         return;
     
-    if(hare_state() != HARE_GROUNDED)
+    if(hare.state != HARE_GROUNDED)
         return;
-
-    vec2 hare_pos = hare_position();    
+    
     vec2 center = u_pose_get_xy(L.goal_ro.rect.pose);
     center.y -= GOAL_OFFSET_Y;
-    if(vec2_distance(hare_pos, center) <= MAX_DIST) {
+    if(vec2_distance(hare.pos, center) <= MAX_DIST) {
         activate();
     }
 }

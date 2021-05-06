@@ -15,6 +15,11 @@
 #define START_SIZE 2048
 #define END_SIZE 512
 
+
+//
+// private
+//
+
 static struct {
     RoSingle strike_ro, blend_ro;
     float time;
@@ -22,6 +27,12 @@ static struct {
     void *callback_user_data;
     bool callback_called;
 } L;
+
+
+
+//
+// public
+//
 
 
 void dead_init(DeadFinishedFn callback, void *callback_user_data) {

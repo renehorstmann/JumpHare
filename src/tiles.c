@@ -4,6 +4,11 @@
 
 struct TilesGlobals_s tiles;
 
+
+//
+// public
+//
+
 void tiles_init() {
     int tile_id = 1;
     tiles.size = 0;

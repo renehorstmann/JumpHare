@@ -9,11 +9,20 @@
 
 struct HudCameraGlobals_s hudcamera;
 
+
+//
+// private
+//
+
 static struct {
     float real_pixel_per_pixel;
     float left, right, bottom, top;
 } L;
 
+
+//
+// public
+//
 
 void hudcamera_init() {
     assert(HUDCAMERA_SIZE % 2 == 0 && "HUDCAMERA_SIZE must be even");

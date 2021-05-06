@@ -14,6 +14,11 @@
 #define COLUMNS 6
 #define ROWS 6
 
+
+//
+// private
+//
+
 static bool emojifont_sprite_cb(vec2 *sprite, char c) {
 
     bool nl = false;
@@ -57,6 +62,14 @@ static bool emojifont_sprite_cb(vec2 *sprite, char c) {
     return nl;
 }
 
+
+
+//
+// public
+//
+
+
+// public ?
 void emojifont_init(RoText *self, int max, const float *vp) {
     *self = ro_text_new(max, emojifont_sprite_cb, vp, r_texture_new_file(COLUMNS, ROWS, "res/emojifont.png"));
     self->size = (vec2) {16, 16};
@@ -121,9 +134,8 @@ void speechbubble_kill(SpeechBubble *self) {
 void speechbubble_update(SpeechBubble *self, float dtime) {
     if(sca_isnan(self->position.x))
         return;
-        
-    vec2 hare_pos = hare_position();
-    float dist = vec2_distance(hare_pos, self->position);
+    
+    float dist = vec2_distance(hare.pos, self->position);
     
     float alpha;
     if(dist < MIN_DIST) {
