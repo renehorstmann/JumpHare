@@ -75,7 +75,7 @@ void enemies_render() {
 
 static void hedgehog_collision_cb(vec2 delta, enum collision_state state, void *ud) {
     rRect_s *rect = ud;
-    bool left = u_pose_get_w(rect->uv) > 0;
+    bool left = u_pose_aa_get_w(rect->uv) > 0;
     vec2 pos = u_pose_get_xy(rect->pose);
     
     if(state != COLLISION_BOTTOM) {
@@ -114,7 +114,7 @@ static void hedgehog_update(Type *self, float dtime) {
         } else {
             self->ro.rects[i].sprite = (vec2) {{frame, 0}};
             
-            bool left = u_pose_get_w(self->ro.rects[i].uv) > 0;
+            bool left = u_pose_aa_get_w(self->ro.rects[i].uv) > 0;
             
             float speed_x = left? -10 : 10;
             pos.x += speed_x * dtime;

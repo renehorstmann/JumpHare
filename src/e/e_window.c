@@ -17,6 +17,12 @@ void e_window_handle_window_event(const SDL_Event *event);
 
 struct eWindowGlobals_s e_window;
 
+
+
+//
+// private 
+//
+
 typedef struct {
     e_window_pause_callback_fn cb;
     void *ud;    
@@ -79,6 +85,11 @@ static void resume() {
     L.pause = false;
 }
 
+
+
+//
+// public
+//
 
 void e_window_init(const char *name) {
 #ifdef NDEBUG
