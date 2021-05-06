@@ -42,6 +42,9 @@ int main(int argc, char **argv) {
     for(int i=0; i<fps_ro.ro.num; i++)
         fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
+#ifdef OPTION_GLES
+    e_window_set_screen_mode(E_WINDOW_MODE_FULLSCREEN);
+#endif
     
     e_window_main_loop(main_loop);
 
