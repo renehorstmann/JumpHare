@@ -35,6 +35,13 @@ In active developmemt
 
 
 ## Todo
+- game'script module
+  - hare_set_speed(input.speed_x);
+  - hare_jump(input.action);
+  - carrot_collect(hare.pos);
+  - butrerfly_collect(hare.pos)
+  - for stroke : airstrokes -> collect
+  - ...
 - collision module
   - object object
     - aabb
