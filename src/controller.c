@@ -5,7 +5,6 @@
 #include "mathc/float.h"
 #include "mathc/bool.h"
 #include "mathc/sca/int.h"
-#include "hare.h"
 #include "camera.h"
 #include "hudcamera.h"
 #include "controller.h"
@@ -20,6 +19,8 @@
 
 #define BACKGROUND_SIZE 512
 
+
+struct ControllerGlobals_s controller;
 
 //
 // private
@@ -63,26 +64,24 @@ static void pointer_event(ePointer_s pointer, void *ud) {
 }
 
 static void key_ctrl() {
-    static bool jumped = false;
-    static bool set_0 = true;
-
+    static bool action = false;
+    
     if (e_input.keys.right && !e_input.keys.left) {
-        hare_set_speed(1);
-        set_0 = false;
+        controller.speed_x = 1;
     } else if (e_input.keys.left && !e_input.keys.right) {
-        hare_set_speed(-1);
-        set_0 = false;
-    } else if (!set_0) {
-        hare_set_speed(0);
-        set_0 = true;
-    }
+        controller.speed_x = -1;
+    } 
 
-    if (e_input.keys.space && !jumped) {
-        jumped = true;
-        hare_jump();
+    // only once
+    if (e_input.keys.space && action) {
+        action = true;
+        controller.action = true;
     }
-    if (!e_input.keys.space)
-        jumped = false;
+    
+    if (!e_input.keys.space) {
+        action = false;
+    }
+        
 }
 
 static void pointer_ctrl(float dtime) {
@@ -90,6 +89,7 @@ static void pointer_ctrl(float dtime) {
     static float multi_time = -1;
     static float single_time = 0;
     static vec2 last_pointer_pos;
+    static float speed = 0;
 
     // single time
     if (L.pointer_down == 0) {
@@ -107,8 +107,8 @@ static void pointer_ctrl(float dtime) {
     // stopping?
     if (L.pointer_down == 0) {
         up_time += dtime;
-        if (up_time >= UP_TIME) {
-            hare_set_speed(0);
+        if (up_time < UP_TIME) {
+            controller.speed_x = speed;
         }
         return;
     }
@@ -120,14 +120,14 @@ static void pointer_ctrl(float dtime) {
         if(vec2_distance(L.pointer[L.main_pointer].pos.xy,
                 last_pointer_pos) 
                 <= MAX_JUMP_TAP_DISTANCE) {
-            hare_jump();
+            controller.action = true;
         }
     }
 
     // multi tap to jump
     if (multi_time < 0 && L.pointer_down == 2) {
         multi_time = 0;
-        hare_jump();
+        controller.action = true;
     }
 
     if (multi_time >= 0) {
@@ -149,17 +149,18 @@ static void pointer_ctrl(float dtime) {
         pos.x -= center;
     }
 
-    float speed = pos.x / DISTANCE;
+    
+    speed = pos.x / DISTANCE;
     speed = sca_clamp(speed, -1, 1);
 
-    if(sca_abs(speed) < MIN_SPEED_X)
+    if(sca_abs(speed) < MIN_SPEED_X) {
         speed = 0;
-
+    }
     if (single_time < MULTI_TIME && multi_time >= 0) {
         speed = 0;
     }
 
-    hare_set_speed(speed);
+    controller.speed_x = speed;
 
     // reset up_time, cause we are moving
     up_time = 0;
@@ -187,9 +188,15 @@ void controller_kill() {
 }
 
 void controller_update(float dtime) {
-    pointer_ctrl(dtime);
+    controller.speed_x = 0;
+    controller.action = false;
+    
     key_ctrl();
+    pointer_ctrl(dtime);
+    
 
+
+    // ro
     mat4 pose = u_pose_new(0, 0, BACKGROUND_SIZE, BACKGROUND_SIZE);
     if (hudcamera_is_portrait_mode()) {
         u_pose_set_y(&pose, camera_bottom() - BACKGROUND_SIZE/2);

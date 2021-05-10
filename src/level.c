@@ -19,6 +19,7 @@
 #include "dead.h"
 #include "controller.h"
 #include "cameractrl.h"
+#include "scripts.h"
 #include "camera.h"
 #include "level.h"
 
@@ -102,26 +103,6 @@ static void reset() {
     butterfly_load();
 }
 
-static void check_carrot() {
-    carrot_collect(hare.pos);
-    
-    vec2 strokes[AIRSTROKE_MAX];
-    int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
-    for(int i=0; i<strokes_num; i++) {
-        carrot_collect(strokes[i]);
-    }
-}
-
-static void check_butterfly() {
-    butterfly_collect(hare.pos);
-    
-    vec2 strokes[AIRSTROKE_MAX];
-    int strokes_num = airstroke_positions(strokes, AIRSTROKE_MAX);
-    for(int i=0; i<strokes_num; i++) {
-        butterfly_collect(strokes[i]);
-    }
-}
-
 static void dead_callback(void *ud) {
     reset();
 }
@@ -178,11 +159,14 @@ void level_init(int lvl) {
     dead_init(dead_callback, NULL);
     controller_init();
     
+    scripts_init();
 
     load_game();
     
+    // level 1?
     hare_set_sleep(true);
 
+    // ro
     L.borders_ro = ro_batch_new(4, camera.gl_main, r_texture_new_white_pixel());
 
     // black borders
@@ -254,6 +238,8 @@ void level_kill() {
     }
     dead_kill();
     controller_kill();
+    scripts_kill();
+    
     unload_game();
 
     ro_batch_kill(&L.borders_ro);
@@ -267,12 +253,16 @@ void level_update(float dtime) {
     goal_update(dtime);
     dead_update(dtime);
     if (!dead_is_dead()) {
+        
+        // module linkage
+        scripts_update(dtime);
+        
         background_update(dtime);
         tilemap_update(dtime);
         carrot_update(dtime);
         flag_update(dtime);
         for(int i=0; i<L.bubbles_size; i++) {
-            speechbubble_update(&L.bubbles[i], dtime);
+            speechbubble_update(&L.bubbles[i], dtime, hare.pos);
         }
         enemies_update(dtime);
         hare_update(dtime);
@@ -280,9 +270,6 @@ void level_update(float dtime) {
         butterfly_update(dtime);
         dirtparticles_update(dtime);
         controller_update(dtime);
-
-        check_carrot();
-        check_butterfly();
     }
     cameractrl_update(dtime);
 }

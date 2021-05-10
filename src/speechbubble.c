@@ -3,13 +3,12 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "camera.h"
-#include "hare.h"
 #include "speechbubble.h"
 
 
 #define OFFSET_Y 64
-#define MAX_DIST 45.0
-#define MIN_DIST 15.0
+#define MAX_DIST 60.0
+#define MIN_DIST 25.0
 
 #define COLUMNS 6
 #define ROWS 6
@@ -131,11 +130,11 @@ void speechbubble_kill(SpeechBubble *self) {
     ro_batch_kill(&self->bubble);
 }
 
-void speechbubble_update(SpeechBubble *self, float dtime) {
+void speechbubble_update(SpeechBubble *self, float dtime, vec2 blend_pos) {
     if(sca_isnan(self->position.x))
         return;
     
-    float dist = vec2_distance(hare.pos, self->position);
+    float dist = vec2_distance(blend_pos, self->position);
     
     float alpha;
     if(dist < MIN_DIST) {

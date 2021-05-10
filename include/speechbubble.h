@@ -13,7 +13,7 @@ void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext)
 
 void speechbubble_kill(SpeechBubble *self);
 
-void speechbubble_update(SpeechBubble *self, float dtime);
+void speechbubble_update(SpeechBubble *self, float dtime, vec2 blend_pos);
 
 void speechbubble_render(SpeechBubble *self);
 
