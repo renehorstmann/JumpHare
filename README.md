@@ -35,6 +35,12 @@ In active developmemt
 
 
 ## Todo
+- anon struct style
+  - s.in.dst
+  - s.out.pos
+  - s.L.cnt
+  - also for some
+    - ro.L.vao, .tex, ...
 - game'script module
   - hare_set_speed(input.speed_x);
   - hare_jump(input.action);
