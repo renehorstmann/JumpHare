@@ -73,7 +73,7 @@ static void key_ctrl() {
     } 
 
     // only once
-    if (e_input.keys.space && action) {
+    if (e_input.keys.space && !action) {
         action = true;
         controller.action = true;
     }

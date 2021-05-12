@@ -20,6 +20,7 @@ static float current_time() {
 static void main_loop(float delta_time);
 
 int main(int argc, char **argv) {
+    rhc_log_set_min_level(RHC_LOG_INFO);
     log_info("JumpHare");
 
     // init e (environment)
