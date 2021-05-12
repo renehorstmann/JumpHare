@@ -13,6 +13,7 @@ void airstroke_update(float dtime);
 
 void airstroke_render();
 
+// used by hare
 void airstroke_add(float x, float y);
 
 int airstroke_positions(vec2 *out_positions, int max_positions);

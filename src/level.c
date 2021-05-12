@@ -274,7 +274,7 @@ void level_update(float dtime) {
     }
     cameractrl_update(dtime);
 
-#define NUM_PARTICLES 1024
+#define NUM_PARTICLES 128
 #define PARTICLE_SIZE 2.0
 #define PARTICLE_SPEED 100.0
 #define PARTICLE_TIME 1.5

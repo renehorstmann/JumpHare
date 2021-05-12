@@ -8,7 +8,7 @@
 #include "pixelparticles.h"
 
 
-#define MAX_PARTCLES 512*512
+#define MAX_PARTCLES 512*64
 
 #define DIRT_LIFETIME 1.0
 #define DIRT_SIZE 2.0
