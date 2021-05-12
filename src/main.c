@@ -1,6 +1,7 @@
 #include "e/e.h"
 #include "r/r.h"
 #include "u/u.h"
+#include "mathc/mathc.h"
 #include "rhc/rhc.h"
 
 #include "camera.h"
@@ -104,8 +105,8 @@ static void main_loop(float delta_time) {
             
             vec2 size = ro_text_set_text(&fps_ro, text);
             u_pose_set_xy(&fps_ro.pose,
-                          -size.x/2,
-                          hudcamera_top()-2);
+                          sca_floor(-size.x/2),
+                          sca_floor(hudcamera_top()-2));
             time -= 0.25;
             cnt = 0;
             load_sum = 0;

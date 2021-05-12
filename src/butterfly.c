@@ -152,12 +152,12 @@ void butterfly_update(float dtime) {
     L.collected_time -= dtime;
     L.cnt_icon.rect.sprite.x = L.collected_time>0? 2 : 0;
     L.cnt_icon.rect.pose = u_pose_new_aa(
-            camera_right() - 16 - 4*6, 
-            camera_top(), 
+            sca_floor(camera_right() - 16 - 4*6), 
+            sca_floor(camera_top()), 
             16, 16);
     u_pose_set_xy(&L.cnt_text.pose, 
-            camera_right() -4*6, 
-            camera_top() - (16-6)/2);
+            sca_floor(camera_right() -4*6), 
+            sca_floor(camera_top() - (16-6)/2));
     char buf[5];
     assume(L.collected>=0 && L.collected <1000, "?");
     sprintf(buf, "x%i", L.collected);
