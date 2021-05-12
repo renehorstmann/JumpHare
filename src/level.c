@@ -15,7 +15,7 @@
 #include "flag.h"
 #include "speechbubble.h"
 #include "butterfly.h"
-#include "dirtparticles.h"
+#include "pixelparticles.h"
 #include "dead.h"
 #include "controller.h"
 #include "cameractrl.h"
@@ -81,7 +81,7 @@ static void load_game() {
     
     hare_init(start_pos.x, start_pos.y);
     airstroke_init();
-    dirtparticles_init();
+    pixelparticles_init();
     cameractrl_init();
 }
 
@@ -89,7 +89,7 @@ static void unload_game() {
     enemies_kill();
     hare_kill();
     airstroke_kill();
-    dirtparticles_kill();
+    pixelparticles_kill();
     cameractrl_kill();
 }
 
@@ -268,7 +268,7 @@ void level_update(float dtime) {
         hare_update(dtime);
         airstroke_update(dtime);
         butterfly_update(dtime);
-        dirtparticles_update(dtime);
+        pixelparticles_update(dtime);
         controller_update(dtime);
     }
     cameractrl_update(dtime);
@@ -288,7 +288,7 @@ void level_render() {
         speechbubble_render(&L.bubbles[i]);
     }
     carrot_render();
-    dirtparticles_render();
+    pixelparticles_render();
     airstroke_render();
     enemies_render();
     hare_render();

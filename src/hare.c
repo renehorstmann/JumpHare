@@ -9,7 +9,7 @@
 #include "camera.h"
 #include "tilemap.h"
 #include "airstroke.h"
-#include "dirtparticles.h"
+#include "pixelparticles.h"
 #include "dead.h"
 #include "tiles.h"
 #include "collision.h"
@@ -385,7 +385,7 @@ static void emit_dirt(float dtime) {
     vec2 particle_pos = hare.pos;
     particle_pos.y -= 7;
     vec2 particle_dir = {{-hare.speed.x / 10, 12}};
-    dirtparticles_add(particle_pos, particle_dir, col, add);
+    pixelparticles_add_dirt(particle_pos, particle_dir, col, add);
 }
 
 
