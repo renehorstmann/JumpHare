@@ -4,6 +4,7 @@
 #include "u/pose.h"
 #include "u/image.h"
 #include "mathc/float.h"
+#include "mathc/utils/random.h"
 #include "rhc/error.h"
 #include "background.h"
 #include "tilemap.h"
@@ -272,6 +273,39 @@ void level_update(float dtime) {
         controller_update(dtime);
     }
     cameractrl_update(dtime);
+
+#define NUM_PARTICLES 1024
+#define PARTICLE_SIZE 2.0
+#define PARTICLE_SPEED 100.0
+#define PARTICLE_TIME 1.5
+#define PARTICLE_ALPHA 2.0
+
+    float x = hare.pos.x;
+    float y = hare.pos.y;
+
+    rParticleRect_s rects[NUM_PARTICLES];
+    for(int i=0; i<NUM_PARTICLES; i++) {
+        rects[i] = r_particlerect_new();
+        rects[i].pose = u_pose_new(x, y, PARTICLE_SIZE, PARTICLE_SIZE);
+        float angle = sca_random_range(
+                sca_radians(90-20),
+                sca_radians(90+20));
+        float speed = sca_random_range(0.1*PARTICLE_SPEED, PARTICLE_SPEED);
+        rects[i].speed.x = sca_cos(angle) * speed;
+        rects[i].speed.y = sca_sin(angle) * speed;
+        rects[i].acc.y = - speed * 0.33;
+
+        if(rand()%2==0) {
+            rects[i].color.rgb = vec3_set(sca_random_noise(0.9, 0.1));
+        } else {
+            rects[i].color.rgb = vec3_set(sca_random_noise(0.1, 0.1));
+        }
+        rects[i].color.a = PARTICLE_ALPHA;
+        rects[i].color_speed.a = (float)-PARTICLE_ALPHA/PARTICLE_TIME;
+        rects[i].start_time = pixelparticles.time;
+    }
+
+    pixelparticles_add(rects, NUM_PARTICLES);
 }
 
 void level_render() {

@@ -1,11 +1,11 @@
 #include "r/ro_batch.h"
-#include "r/ro_particle.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
 #include "rhc/log.h"
 #include "rhc/error.h"
+#include "pixelparticles.h"
 #include "camera.h"
 #include "hudcamera.h"
 #include "carrot.h"
@@ -31,12 +31,11 @@ static const vec3 PARTICLE_COLOR = {{1, 0.65, 0}};
 static struct {
     RoBatch carrot_ro;
     RoBatch cnt_ro;
-    RoParticle particle_ro;
     bool collected[3];
     int collected_cnt;
     int eaten_cnt;
     float time;
-    
+
     struct {
         bool collected[3];
         int collected_cnt;
@@ -46,21 +45,23 @@ static struct {
 
 
 static void emit_particles(float x, float y) {
-    for(int i=0; i<L.particle_ro.num; i++) {
-        rParticleRect_s *r = &L.particle_ro.rects[i];
-        r->pose = u_pose_new(x, y, PARTICLE_SIZE, PARTICLE_SIZE);
+    rParticleRect_s rects[NUM_PARTICLES];
+    for(int i=0; i<NUM_PARTICLES; i++) {
+        rects[i] = r_particlerect_new();
+        rects[i].pose = u_pose_new(x, y, PARTICLE_SIZE, PARTICLE_SIZE);
         float angle = sca_random_range(0, 2*M_PI);
         float speed = sca_random_range(0.1*PARTICLE_SPEED, PARTICLE_SPEED);
-        r->speed.x = sca_cos(angle) * speed;
-        r->speed.y = sca_sin(angle) * speed;
-        r->acc.xy = vec2_scale(r->speed.xy, -0.5/PARTICLE_TIME);
-        r->color.rgb = vec3_random_noise_vec(
+        rects[i].speed.x = sca_cos(angle) * speed;
+        rects[i].speed.y = sca_sin(angle) * speed;
+        rects[i].acc.xy = vec2_scale(rects[i].speed.xy, -0.5 / PARTICLE_TIME);
+        rects[i].color.rgb = vec3_random_noise_vec(
                 PARTICLE_COLOR,
                 (vec3) {{0.2, 0.2, 0.2}});
-        r->color.a = PARTICLE_ALPHA;
-        r->start_time = L.time;
+        rects[i].color.a = PARTICLE_ALPHA;
+        rects[i].color_speed.a = (float) -PARTICLE_ALPHA / PARTICLE_TIME;
+        rects[i].start_time = pixelparticles.time;
     }
-    ro_particle_update(&L.particle_ro);
+    pixelparticles_add(rects, NUM_PARTICLES);
 }
 
 static void update_cnt() {
@@ -108,19 +109,7 @@ void carrot_init(const vec2 *positions_3) {
     //L.collected_cnt = 1;
     //L.eaten_cnt = 2;
     update_cnt();
-    
-    
-    // particles
-    L.particle_ro = ro_particle_new(NUM_PARTICLES, camera.gl_main, r_texture_new_white_pixel());
 
-    for(int i=0; i<L.particle_ro.num; i++) {
-        L.particle_ro.rects[i].pose = u_pose_new_hidden();
-        L.particle_ro.rects[i].color = vec4_set(0);
-        L.particle_ro.rects[i].color_speed.a = 
-                (float)-PARTICLE_ALPHA/PARTICLE_TIME;
-    }
-
-    ro_particle_update(&L.particle_ro);
 }
 
 void carrot_kill() {
@@ -150,7 +139,6 @@ void carrot_update(float dtime) {
 }
 
 void carrot_render() {
-    ro_particle_render(&L.particle_ro, L.time);
     ro_batch_render(&L.carrot_ro);
 }
 
@@ -200,13 +188,6 @@ void carrot_load() {
     memcpy(L.collected, L.save.collected, sizeof(L.collected));
     L.collected_cnt = L.save.collected_cnt;
     L.eaten_cnt = L.save.eaten_cnt;
-    
-    
-    // particles
-    for(int i=0; i<L.particle_ro.num; i++) {
-        L.particle_ro.rects[i].pose = u_pose_new_hidden();
-    }
-    ro_particle_update(&L.particle_ro);
     
     // in game carrots
     for(int i=0; i<3; i++) {
