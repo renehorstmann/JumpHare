@@ -113,7 +113,7 @@ void butterfly_init(const vec2 *positions, int num) {
     ro_particle_update(&L.ro);
     
     
-    L.cnt_icon = ro_single_new(hudcamera.gl, L.ro.tex);
+    L.cnt_icon = ro_single_new(hudcamera.gl, L.ro.L.tex);
     L.cnt_icon.owns_tex = false;
     L.cnt_icon.rect.color.rgb = vec3_set(0.75);
     L.cnt_icon.rect.sprite.y = 1;

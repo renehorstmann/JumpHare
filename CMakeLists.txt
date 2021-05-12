@@ -12,6 +12,7 @@ project(jumphare C)
 # NDEBUG                is used at some points, too
 # MATHC_NO_PRINT_COLOR  disable colored mathc prints
 # NUKLEAR_SCALE=3.0     for small hd screens (smartphones)
+# RHC_LOG_DO_NOT_PRINT_TIME_FILE disable time and file in logs
 
 set(CMAKE_C_STANDARD 11)
 
@@ -44,8 +45,9 @@ elseif (GLES_LIB)
     add_definitions(-DOPTION_GLES)
     # -not used- add_definitions(-DOPTION_GYRO)
     add_definitions(-DOPTION_SDL)
-    add_definitions(-DNUKLEAR_SCALE=3.0)
     add_definitions(-DMATHC_NO_PRINT_COLOR)
+    add_definitions(-DNUKLEAR_SCALE=3.0)
+    add_definitions(-DRHC_LOG_DO_NOT_PRINT_TIME_FILE)
     target_link_libraries(jumphare ${GLES_LIB})
 else ()
     message(FATAL_ERROR "Neither GL nor GLESv3 found, exiting CMake")
