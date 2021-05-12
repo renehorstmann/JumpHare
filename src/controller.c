@@ -67,15 +67,15 @@ static void key_ctrl() {
     static bool action = false;
     
     if (e_input.keys.right && !e_input.keys.left) {
-        controller.speed_x = 1;
+        controller.out.speed_x = 1;
     } else if (e_input.keys.left && !e_input.keys.right) {
-        controller.speed_x = -1;
+        controller.out.speed_x = -1;
     } 
 
     // only once
     if (e_input.keys.space && !action) {
         action = true;
-        controller.action = true;
+        controller.out.action = true;
     }
     
     if (!e_input.keys.space) {
@@ -108,7 +108,7 @@ static void pointer_ctrl(float dtime) {
     if (L.pointer_down == 0) {
         up_time += dtime;
         if (up_time < UP_TIME) {
-            controller.speed_x = speed;
+            controller.out.speed_x = speed;
         }
         return;
     }
@@ -120,14 +120,14 @@ static void pointer_ctrl(float dtime) {
         if(vec2_distance(L.pointer[L.main_pointer].pos.xy,
                 last_pointer_pos) 
                 <= MAX_JUMP_TAP_DISTANCE) {
-            controller.action = true;
+            controller.out.action = true;
         }
     }
 
     // multi tap to jump
     if (multi_time < 0 && L.pointer_down == 2) {
         multi_time = 0;
-        controller.action = true;
+        controller.out.action = true;
     }
 
     if (multi_time >= 0) {
@@ -160,7 +160,7 @@ static void pointer_ctrl(float dtime) {
         speed = 0;
     }
 
-    controller.speed_x = speed;
+    controller.out.speed_x = speed;
 
     // reset up_time, cause we are moving
     up_time = 0;
@@ -188,8 +188,8 @@ void controller_kill() {
 }
 
 void controller_update(float dtime) {
-    controller.speed_x = 0;
-    controller.action = false;
+    controller.out.speed_x = 0;
+    controller.out.action = false;
     
     key_ctrl();
     pointer_ctrl(dtime);

@@ -4,8 +4,10 @@
 #include <stdbool.h>
 
 struct ControllerGlobals_s {
-    float speed_x;
-    bool action;
+    struct {
+        float speed_x;
+        bool action;
+    } out;
 };
 extern struct ControllerGlobals_s controller;
 

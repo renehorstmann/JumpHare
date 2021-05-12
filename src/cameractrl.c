@@ -56,8 +56,7 @@ void cameractrl_kill() {
 
 void cameractrl_update(float dtime) {
 //	vec2_println(cameractrl.pos);
-    vec2 h = hare.pos;
-    vec2 delta = vec2_sub_vec(h, cameractrl.pos);
+    vec2 delta = vec2_sub_vec(cameractrl.in.dst, cameractrl.pos);
 
     float max_right = cameractrl.diff_offset.x + cameractrl.max_diff.x;
     float max_left = cameractrl.diff_offset.x - cameractrl.max_diff.x;
