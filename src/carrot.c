@@ -30,7 +30,6 @@ static const vec3 PARTICLE_COLOR = {{1, 0.65, 0}};
 
 static struct {
     RoBatch carrot_ro;
-    RoBatch cnt_ro;
     bool collected[3];
     int collected_cnt;
     int eaten_cnt;
@@ -64,24 +63,6 @@ static void emit_particles(float x, float y) {
     pixelparticles_add(rects, NUM_PARTICLES);
 }
 
-static void update_cnt() {
-    assume(L.collected_cnt>=0 && L.eaten_cnt>=0, "wtf?");
-    assume(L.eaten_cnt + L.collected_cnt <= 3, "wtf?");
-    
-    int sum = L.eaten_cnt + L.collected_cnt;
-    
-    for(int i=0; i<sum; i++) {
-         L.cnt_ro.rects[i].pose = u_pose_new_aa(
-            sca_floor(camera_left() + 2 + i * 9),
-            sca_floor(camera_top() - 2),
-            8, 16);
-         L.cnt_ro.rects[i].sprite.x = i<L.collected_cnt? 0 : 1;
-    }
-    for(int i=sum; i<3; i++) {
-        L.cnt_ro.rects[i].pose = u_pose_new_hidden();
-    }
-    ro_batch_update(&L.cnt_ro);
-}
 
 
 //
@@ -101,14 +82,6 @@ void carrot_init(const vec2 *positions_3) {
                 16, 32);
     }
     ro_batch_update(&L.carrot_ro);
-
-    
-    // mini hud carrot
-    L.cnt_ro = ro_batch_new(3, hudcamera.gl,
-                    r_texture_new_file(2, 1, "res/carrot_mini.png"));
-    //L.collected_cnt = 1;
-    //L.eaten_cnt = 2;
-    update_cnt();
 
 }
 
@@ -135,16 +108,12 @@ void carrot_update(float dtime) {
     }
     
     ro_batch_update(&L.carrot_ro);
-    update_cnt();
 }
 
 void carrot_render() {
     ro_batch_render(&L.carrot_ro);
 }
 
-void carrot_render_hud() {
-    ro_batch_render(&L.cnt_ro);
-}
 
 bool carrot_collect(vec2 position) {
     for(int i=0; i<3; i++) {
@@ -156,7 +125,6 @@ bool carrot_collect(vec2 position) {
             vec2 cxy = u_pose_get_xy(L.carrot_ro.rects[i].pose);
             emit_particles(cxy.x, cxy.y);
             L.collected_cnt++;
-            update_cnt();
             return true;
         }
     }
@@ -167,15 +135,17 @@ int carrot_collected() {
     return L.collected_cnt;
 }
 
+int carrot_eaten() {
+    return L.eaten_cnt;
+}
+
 
 void carrot_eat() {
-    if(L.collected_cnt <= 0) {
+    if(L.collected_cnt <= 0 || L.eaten_cnt >= L.collected_cnt) {
         log_error("carrot: failed to eat, collected_cnt <= 0");
         return;
     }
-    L.collected_cnt--;
     L.eaten_cnt++;
-    update_cnt();
 }
 
 void carrot_save() {
@@ -198,8 +168,5 @@ void carrot_load() {
         }
     }
     ro_batch_update(&L.carrot_ro);
-    
-    // hud carrots
-    update_cnt();
 }
 

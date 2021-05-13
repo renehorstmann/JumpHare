@@ -18,6 +18,7 @@
 #include "butterfly.h"
 #include "pixelparticles.h"
 #include "dead.h"
+#include "hud.h"
 #include "controller.h"
 #include "cameractrl.h"
 #include "scripts.h"
@@ -159,7 +160,7 @@ void level_init(int lvl) {
 
     dead_init(dead_callback, NULL);
     controller_init();
-    
+    hud_init();
     scripts_init();
 
     load_game();
@@ -239,6 +240,7 @@ void level_kill() {
     }
     dead_kill();
     controller_kill();
+    hud_kill();
     scripts_kill();
     
     unload_game();
@@ -253,6 +255,7 @@ void level_kill() {
 void level_update(float dtime) {  
     goal_update(dtime);
     dead_update(dtime);
+    hud_update(dtime);
     if (!dead_is_dead()) {
         
         // module linkage
@@ -295,11 +298,10 @@ void level_render() {
     hare_render();
     butterfly_render();
     tilemap_render_front();
+    hud_render();
     dead_render();
 
     ro_batch_render(&L.borders_ro);
-
-    carrot_render_hud();
 
     controller_render();
     

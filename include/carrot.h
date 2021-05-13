@@ -12,11 +12,12 @@ void carrot_update(float dtime);
 
 void carrot_render();
 
-void carrot_render_hud();
-
 bool carrot_collect(vec2 position);
 
+// eaten + available
 int carrot_collected();
+
+int carrot_eaten();
 
 void carrot_eat();
 
