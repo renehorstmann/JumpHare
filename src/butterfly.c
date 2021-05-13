@@ -1,6 +1,4 @@
 #include "r/ro_particle.h"
-#include "r/ro_single.h"
-#include "r/ro_text.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
@@ -20,8 +18,6 @@
 #define FLY_ACC_Y 20
 #define COLLECT_DISTANCE 16
 
-#define COLLECTED_TIME 0.2
-
 static const float RESET_TIME = 5.0 * FRAMES / CHILL_FPS;
 
 
@@ -31,12 +27,11 @@ static const float RESET_TIME = 5.0 * FRAMES / CHILL_FPS;
 
 static struct {
     RoParticle ro;
-    RoSingle cnt_icon;
-    RoText cnt_text;
     float time;
     float reset_time;
     int collected;
     float collected_time;
+    vec3 last_color;
     
     struct {
         bool *collected;
@@ -112,23 +107,14 @@ void butterfly_init(const vec2 *positions, int num) {
     
     ro_particle_update(&L.ro);
     
-    
-    L.cnt_icon = ro_single_new(hudcamera.gl, L.ro.L.tex);
-    L.cnt_icon.owns_tex = false;
-    L.cnt_icon.rect.color.rgb = vec3_set(0.75);
-    L.cnt_icon.rect.sprite.y = 1;
-    
-    L.cnt_text = ro_text_new_font55(4, hudcamera.gl);
-    ro_text_set_color(&L.cnt_text, R_COLOR_BLACK);
-    
+    L.last_color = vec3_set(0.75);
+   
     L.save.collected = rhc_malloc_raising(num * sizeof(bool));
     memset(L.save.collected, 0, num * sizeof(bool));
 }
 
 void butterfly_kill() {
     ro_particle_kill(&L.ro);
-    ro_single_kill(&L.cnt_icon);
-    ro_text_kill(&L.cnt_text);
     rhc_free(L.save.collected);
     memset(&L, 0, sizeof(L));
 }
@@ -148,28 +134,20 @@ void butterfly_update(float dtime) {
     }
     
     
-    // cnt
-    L.collected_time -= dtime;
-    L.cnt_icon.rect.sprite.x = L.collected_time>0? 2 : 0;
-    L.cnt_icon.rect.pose = u_pose_new_aa(
-            sca_floor(camera_right() - 16 - 4*6), 
-            sca_floor(camera_top()), 
-            16, 16);
-    u_pose_set_xy(&L.cnt_text.pose, 
-            sca_floor(camera_right() -4*6), 
-            sca_floor(camera_top() - (16-6)/2));
-    char buf[5];
-    assume(L.collected>=0 && L.collected <1000, "?");
-    sprintf(buf, "x%i", L.collected);
-    ro_text_set_text(&L.cnt_text, buf);
+   
 }
 
 void butterfly_render() {
     ro_particle_render(&L.ro, L.time);
-    ro_single_render(&L.cnt_icon);
-    ro_text_render(&L.cnt_text);
 }
 
+int butterfly_collected() {
+    return L.collected;
+}
+
+vec3 butterfly_last_color() {
+    return L.last_color;
+}
 
 bool butterfly_collect(vec2 position) {
     for(int i=0; i<L.ro.num; i++) {
@@ -178,8 +156,7 @@ bool butterfly_collect(vec2 position) {
         if(vec2_distance(position, u_pose_get_xy(L.ro.rects[i].pose)) <= COLLECT_DISTANCE) {
             fly_away(i);
             L.collected++;
-            L.collected_time = COLLECTED_TIME;
-            L.cnt_icon.rect.color = L.ro.rects[i].color;
+            L.last_color = L.ro.rects[i].color.rgb;
             return true;
         }
     }
@@ -206,6 +183,6 @@ void butterfly_load() {
     L.time = 0;
     L.reset_time = 0;
     ro_particle_update(&L.ro);
-    L.cnt_icon.rect.color.rgb = vec3_set(0.75);
+    L.last_color = vec3_set(0.75);
 }
 

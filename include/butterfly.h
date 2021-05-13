@@ -12,6 +12,10 @@ void butterfly_update(float dtime);
 
 void butterfly_render();
 
+int butterfly_collected();
+
+vec3 butterfly_last_color();
+
 bool butterfly_collect(vec2 position);
 
 void butterfly_save();
