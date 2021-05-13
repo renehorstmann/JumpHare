@@ -7,7 +7,6 @@
 #include "rhc/error.h"
 #include "pixelparticles.h"
 #include "camera.h"
-#include "hudcamera.h"
 #include "carrot.h"
 
 #define FPS 3.0
