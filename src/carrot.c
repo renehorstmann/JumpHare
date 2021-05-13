@@ -72,8 +72,8 @@ static void update_cnt() {
     
     for(int i=0; i<sum; i++) {
          L.cnt_ro.rects[i].pose = u_pose_new_aa(
-            camera_left() + 2 + i * 9,
-            camera_top() - 2,
+            sca_floor(camera_left() + 2 + i * 9),
+            sca_floor(camera_top() - 2),
             8, 16);
          L.cnt_ro.rects[i].sprite.x = i<L.collected_cnt? 0 : 1;
     }

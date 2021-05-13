@@ -42,6 +42,9 @@ In active developmemt
   - also for some
     - ro.L.vao, .tex, ...
   - const for read only?
+- hud module
+  - carrot cnt
+  - butterfly cnt
 - game'script module
   - hare_set_speed(input.speed_x);
   - hare_jump(input.action);
