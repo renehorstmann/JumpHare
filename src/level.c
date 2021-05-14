@@ -294,7 +294,7 @@ void level_render() {
     carrot_render();
     pixelparticles_render();
     airstroke_render();
-    enemies_render();
+    //enemies_render();
     hare_render();
     butterfly_render();
     tilemap_render_front();
