@@ -5,62 +5,62 @@
 #include <math.h>
 
 /** dst = pow(x, y) */
-static char csca_pow(char x, char y) {
+static signed char csca_pow(signed char x, signed char y) {
     return pow(x, y);
 }
 
 /** dst = exp(x) */
-static char csca_exp(char x) {
+static signed char csca_exp(signed char x) {
     return exp(x);
 }
 
 /** dst = log(x) */
-static char csca_log(char x) {
+static signed char csca_log(signed char x) {
     return log(x);
 }
 
 /** dst = exp2(x) */
-static char csca_exp2(char x) {
+static signed char csca_exp2(signed char x) {
     return exp2(x);
 }
 
 /** dst = log2(x) */
-static char csca_log2(char x) {
+static signed char csca_log2(signed char x) {
     return log2(x);
 }
 
 /** dst = sqrt(x) */
-static char csca_sqrt(char x) {
+static signed char csca_sqrt(signed char x) {
     return sqrt(x);
 }
 
 /** dst = abs(x) */
-static char csca_abs(char x) {
+static signed char csca_abs(signed char x) {
     return abs(x);
 }
 
 /** dst = a < b ? a : b */
-static char csca_min(char a, char b) {
+static signed char csca_min(signed char a, signed char b) {
     return a < b ? a : b;
 }
 
 /** dst = a > b ? a : b */
-static char csca_max(char a, char b) {
+static signed char csca_max(signed char a, signed char b) {
     return a > b ? a : b;
 }
 
 /** dst = x < min ? min : (x > max ? max : x) */
-static char csca_clamp(char x, char min, char max) {
+static signed char csca_clamp(signed char x, signed char min, signed char max) {
     return x < min ? min : (x > max ? max : x);
 }
 
 /** dst = a * (1-t) + b * t */
-static char csca_mix(char a, char b, float t) {
+static signed char csca_mix(signed char a, signed char b, float t) {
     return a * (1.0-t) + b * t;
 }
 
 /** dst = x < edge ? 0 : 1 */
-static char csca_step(char x, char edge) {
+static signed char csca_step(signed char x, signed char edge) {
     return x < edge ? 0: 1;
 }
 
