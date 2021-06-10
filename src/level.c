@@ -269,13 +269,12 @@ void level_update(float dtime) {
             speechbubble_update(&L.bubbles[i], dtime, hare.pos);
         }
         enemies_update(dtime);
-        hare_update(dtime);
+        
         airstroke_update(dtime);
         butterfly_update(dtime);
         pixelparticles_update(dtime);
-        controller_update(dtime);
+        
     }
-    cameractrl_update(dtime);
 }
 
 void level_render() {

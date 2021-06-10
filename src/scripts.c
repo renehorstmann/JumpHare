@@ -1,6 +1,7 @@
 #include "mathc/float.h"
 #include "controller.h"
 #include "hare.h"
+#include "dead.h"
 #include "airstroke.h"
 #include "butterfly.h"
 #include "carrot.h"
@@ -23,15 +24,25 @@ void scripts_kill() {
 
 void scripts_update(float dtime) {
 
+    bool dead = dead_is_dead();
+    
+    if(!dead)
+        controller_update(dtime);
     
     // hare
-    hare_set_speed(controller.out.speed_x);
-    if(controller.out.action) {
-        hare_jump();
-    }
-
+    hare.in.speed = controller.out.speed_x;
+    hare.in.jump = controller.out.action;
+    if(!dead)
+        hare_update(dtime);
+    
+    // cameractrl
     cameractrl.in.dst = hare.pos;
+    cameractrl_update(dtime);
 
+    // airstroke
+    if(hare.out.jump_action) {
+        airstroke_add(hare.pos.x, hare.pos.y);
+    }
     vec2 as_pos[AIRSTROKE_MAX];
     int as_num = airstroke_positions(as_pos, AIRSTROKE_MAX);
     
@@ -53,4 +64,9 @@ void scripts_update(float dtime) {
            goal_activate();
     }
     
+    
+    // dead
+    if(hare.state == HARE_DEAD) {
+        dead_set_dead(hare.pos.x, hare.pos.y);
+    }
 }

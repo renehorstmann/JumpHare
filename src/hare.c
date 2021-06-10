@@ -8,9 +8,7 @@
 #include "mathc/utils/random.h"
 #include "camera.h"
 #include "tilemap.h"
-#include "airstroke.h"
 #include "pixelparticles.h"
-#include "dead.h"
 #include "tiles.h"
 #include "collision.h"
 #include "hare.h"
@@ -70,8 +68,10 @@ const char *state_names[] = {
     "HARE_FALLING",
     "HARE_JUMPING",
     "HARE_DOUBLE_JUMP",
-    "HARE_NUM_STATES"
+    "HARE_SLEEPING",
+    "HARE_DEAD"
 };
+_Static_assert(sizeof(state_names)/sizeof(*state_names)==HARE_NUM_STATES, "");
 
 
 
@@ -243,7 +243,7 @@ static void collision_callback(vec2 delta, enum collision_state state, void *ud)
     } else if (state == COLLISION_KILL) {
 #ifndef GOD_MODE
         log_info("hare: dead by tilemap");
-        dead_set_dead(hare.pos.x, hare.pos.y);
+        hare.state = HARE_DEAD;
 #endif
         return;
     }
@@ -283,7 +283,7 @@ static void check_collision() {
             collision_tilemap_falling(coll, center, radius, speed);
             break;
         default:
-            assert(0 && "invalid hare state");
+            log_wtf("invalid hare state");
     }
 }
 
@@ -390,6 +390,7 @@ static void emit_dirt(float dtime) {
 
 
 static void check_state_change(float dtime) {
+    assume(hare.state>=0 && hare.state<HARE_NUM_STATES, "invalid state");
     if(hare.state != L.prev.state) {
         log_trace("hare: state changed from %s to %s", state_names[L.prev.state], state_names[hare.state]);
     }
@@ -399,7 +400,7 @@ static void check_state_change(float dtime) {
     if (L.add_airstroke_time > 0) {
         L.add_airstroke_time -= dtime;
         if (L.add_airstroke_time <= 0) {
-            airstroke_add(hare.pos.x, hare.pos.y);
+            hare.out.jump_action = true;
         }
     }
 }
@@ -417,7 +418,7 @@ static void on_pause_callback(bool resume, void *ud) {
 //
 
 void hare_init(float pos_x, float pos_y) {
-    e_window_register_pause_callback(on_pause_callback, NULL);
+     e_window_register_pause_callback(on_pause_callback, NULL);
     
     hare.state = HARE_FALLING;
 
@@ -457,6 +458,20 @@ void hare_update(float dtime) {
     
     L.sleep_ro_time += dtime;
     
+    L.set_speed_x = sca_clamp(hare.in.speed, -1, 1) * MAX_SPEED_X;
+    if(hare.in.speed != 0) {
+        L.last_input_time = 0;
+    }
+    
+    if(hare.in.jump) {
+        L.set_jump_time = SET_JUMP_TIME;
+        L.last_input_time = 0;
+    }
+    
+    hare.in.speed = 0;
+    hare.in.jump = false;
+    hare.out.jump_action = false;
+    
     check_fall_asleep(dtime);
     
     if (hare.state == HARE_SLEEPING) {
@@ -473,14 +488,15 @@ void hare_update(float dtime) {
     }
     
     check_collision();
-
+    
     u_pose_set_xy(&L.ro.rect.pose, hare.pos.x, hare.pos.y);
+    
     animate(dtime);
-
+    
     emit_dirt(dtime);
-
+    
     check_state_change(dtime);
-
+    
     // debug
     char text[64];
     sprintf(text, "%i %+08.3f %+05.3f\n  %+08.3f %+08.3f",
@@ -497,18 +513,6 @@ void hare_render() {
     //ro_text_render(&L.input_text);
 }
 
-
-// [-1 : 1]
-void hare_set_speed(float dx) {
-    L.set_speed_x = sca_clamp(dx, -1, 1) * MAX_SPEED_X;
-    if(dx != 0)
-        L.last_input_time = 0;
-}
-
-void hare_jump() {
-    L.set_jump_time = SET_JUMP_TIME;
-    L.last_input_time = 0;
-}
 
 void hare_set_sleep(bool instant) {
     log_info("hare: set_sleep (instant? %i)", instant);

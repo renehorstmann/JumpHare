@@ -42,8 +42,6 @@ In active developmemt
     - hare
   - enemies
     - hare
-  - hare
-    - dead
 - collision module
   - object object
     - aabb

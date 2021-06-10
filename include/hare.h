@@ -10,6 +10,7 @@ enum hare_state {
     HARE_JUMPING,
     HARE_DOUBLE_JUMP,
     HARE_SLEEPING,
+    HARE_DEAD,
     HARE_NUM_STATES
 };
 
@@ -18,6 +19,15 @@ struct HareGlobals_s {
     vec2 pos;
     vec2 speed;
     bool looking_left;
+    
+    struct {
+        float speed;  // [-1 : 1]
+        bool jump;
+    } in;
+    
+    struct {
+        bool jump_action;
+    } out;
 };
 extern struct HareGlobals_s hare;
 
@@ -28,12 +38,6 @@ void hare_kill();
 void hare_update(float dtime);
 
 void hare_render();
-
-
-// [-1 : 1]
-void hare_set_speed(float dx);
-
-void hare_jump();
 
 void hare_set_sleep(bool instant);
 

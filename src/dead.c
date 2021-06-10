@@ -94,6 +94,8 @@ void dead_render() {
 }
 
 void dead_set_dead(float x, float y) {
+    if(dead_is_dead())
+        return;
     log_info("dead: dead");
     L.time = 0;
     L.callback_called = false;
