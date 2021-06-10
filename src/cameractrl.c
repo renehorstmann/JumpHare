@@ -1,6 +1,5 @@
 #include "mathc/float.h"
 #include "camera.h"
-#include "hare.h"
 #include "tilemap.h"
 #include "cameractrl.h"
 
@@ -45,7 +44,6 @@ static void apply_pos(float dtime) {
 //
 
 void cameractrl_init() {
-    cameractrl.pos = hare.pos;
     cameractrl.max_diff = vec2_set(20);
     cameractrl.diff_offset = (vec2) {{-10, 0}};
 }

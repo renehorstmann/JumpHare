@@ -35,6 +35,15 @@ In active developmemt
 
 
 ## Todo
+- decouple
+  - flag
+    - e input
+    - carrot
+    - hare
+  - enemies
+    - hare
+  - hare
+    - dead
 - collision module
   - object object
     - aabb

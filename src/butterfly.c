@@ -7,7 +7,6 @@
 #include "rhc/error.h"
 #include "rhc/allocator.h"
 #include "camera.h"
-#include "hare.h"
 #include "butterfly.h"
 
 #define CHILL_FPS 6.0

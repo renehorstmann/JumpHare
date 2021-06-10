@@ -14,4 +14,8 @@ void goal_render();
 
 bool goal_reached();
 
+vec2 goal_position();
+
+void goal_activate();
+
 #endif //JUMPHARE_GOAL_H

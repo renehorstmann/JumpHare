@@ -1,12 +1,16 @@
+#include "mathc/float.h"
 #include "controller.h"
 #include "hare.h"
 #include "airstroke.h"
 #include "butterfly.h"
 #include "carrot.h"
 #include "flag.h"
+#include "goal.h"
 #include "cameractrl.h"
 
 #include "scripts.h"
+
+#define GOAL_MAX_DIST 15.0
 
 
 void scripts_init() {
@@ -41,6 +45,12 @@ void scripts_update(float dtime) {
     carrot_collect(hare.pos);
     for(int i=0; i<as_num; i++) {
         carrot_collect(as_pos[i]);
+    }
+    
+    // goal
+    if(hare.state == HARE_GROUNDED 
+       && vec2_distance(hare.pos, goal_position()) <= GOAL_MAX_DIST) {
+           goal_activate();
     }
     
 }

@@ -1,4 +1,3 @@
-#include "e/input.h"
 #include "r/ro_single.h"
 #include "r/texture.h"
 #include "u/pose.h"
@@ -8,15 +7,12 @@
 #include "rhc/log.h"
 #include "pixelparticles.h"
 #include "camera.h"
-#include "hare.h"
 #include "goal.h"
 
 #define GOAL_OFFSET_Y 8.0
 
 #define FPS 4.0
 #define FRAMES 4
-
-#define MAX_DIST 15.0
 
 #define NUM_PARTICLES 128
 #define PARTICLE_SIZE 2.0
@@ -60,15 +56,7 @@ static void emit_particles(float x, float y) {
 }
 
 static void activate() {
-    log_info("goal: activated");
-    L.goal_ro.rect.sprite.y = 0;
-
-    vec2 pos = u_pose_get_xy(L.goal_ro.rect.pose);
-
-    pos.y -= GOAL_OFFSET_Y;
-
-    pos.y += 8 + GOAL_OFFSET_Y;
-    emit_particles(pos.x, pos.y);
+    
 }
 
 
@@ -99,21 +87,7 @@ void goal_update(float dtime) {
 
     float animate_time = sca_mod(L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
-    L.goal_ro.rect.sprite.x = frame;
-    
-    
-    // check reached
-    if(goal_reached())
-        return;
-    
-    if(hare.state != HARE_GROUNDED)
-        return;
-    
-    vec2 center = u_pose_get_xy(L.goal_ro.rect.pose);
-    center.y -= GOAL_OFFSET_Y;
-    if(vec2_distance(hare.pos, center) <= MAX_DIST) {
-        activate();
-    }
+    L.goal_ro.rect.sprite.x = frame;    
 }
 
 void goal_render() {
@@ -122,4 +96,24 @@ void goal_render() {
 
 bool goal_reached() {
     return L.goal_ro.rect.sprite.y < 0.5;
+}
+
+vec2 goal_position() {
+    vec2 center = u_pose_get_xy(L.goal_ro.rect.pose);
+    center.y -= GOAL_OFFSET_Y;
+    return center;
+}
+
+void goal_activate() {
+    if(goal_reached())
+        return;
+    log_info("goal_activate");
+    L.goal_ro.rect.sprite.y = 0;
+
+    vec2 pos = u_pose_get_xy(L.goal_ro.rect.pose);
+
+    pos.y -= GOAL_OFFSET_Y;
+
+    pos.y += 8 + GOAL_OFFSET_Y;
+    emit_particles(pos.x, pos.y);
 }
