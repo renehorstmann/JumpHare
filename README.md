@@ -35,6 +35,12 @@ In active developmemt
 
 
 ## Todo
+- get rid of global state?
+  - some
+  - no more global or local structs
+  - public data in a public struct
+  - private data in opaque struct
+  - mix opaque?
 - decouple
   - flag
     - e input
