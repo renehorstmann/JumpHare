@@ -40,9 +40,11 @@ In active developmemt
     - rhc (error + log)
   - classes that are not trivially copyable -> pimpl
     - e stuff?
+    - most modules, hare, ...
+      They need so much types of some headers?
   - classes that are trivially copyable -> inner struct L
     - r(o) stuff
-    - modules
+    - small modules, camera, ...
   - some
   - no more global or local structs
   - public data in a public struct
