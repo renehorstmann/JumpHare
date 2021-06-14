@@ -36,6 +36,13 @@ In active developmemt
 
 ## Todo
 - get rid of global state?
+  - some few modules may use globals
+    - rhc (error + log)
+  - classes that are not trivially copyable -> pimpl
+    - e stuff?
+  - classes that are trivially copyable -> inner struct L
+    - r(o) stuff
+    - modules
   - some
   - no more global or local structs
   - public data in a public struct
