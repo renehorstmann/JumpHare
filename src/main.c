@@ -11,8 +11,15 @@
 
 #define UPDATES_PER_SECOND 200
 
-// debug text
-static RoText fps_ro;
+static struct {
+    eWindow *window;
+    eInput *input;
+    eGui *gui;
+    rRender *render;
+
+    // debug text
+    RoText fps_ro;
+} L;
 
 static float current_time() {
     return SDL_GetTicks() / 1000.0f;
@@ -25,32 +32,35 @@ int main(int argc, char **argv) {
     log_info("JumpHare");
 
     // init e (environment)
-    e_window_init("JumpHare");
-    e_input_init();
-    e_gui_init();       // nuklear debug windows
+    L.window = e_window_new("JumpHare");
+    L.input = e_input_new(L.window);
+    L.gui = e_gui_new(L.window);       // nuklear debug windows
 
     // init r (render)
-    r_render_init(e_window.window);
+    L.render = r_render_new(e_window_get_sdl_window(L.window));
 
 
     // init systems
     camera_init();      // camera for the level
     hudcamera_init();  // camera for hud elements
     tiles_init();       // loads all tile textures
-    level_init(1);      // manages the gameplay (tilemap, hare, background, ...)
+    level_init(1, L.window, L.input, L.render);      // manages the gameplay (tilemap, hare, background, ...)
 
     // debug fps + load text
-    fps_ro = ro_text_new_font55(64, hudcamera.gl);
-    for(int i=0; i<fps_ro.ro.num; i++)
-        fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
+    L.fps_ro = ro_text_new_font55(64);
+    for (int i = 0; i < L.fps_ro.ro.num; i++)
+        L.fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
 #ifdef OPTION_GLES
     e_window_set_screen_mode(E_WINDOW_MODE_FULLSCREEN);
 #endif
-    
-    e_window_main_loop(main_loop);
 
-    e_gui_kill();
+    e_window_main_loop(L.window, main_loop);
+
+    r_render_kill(&L.render);
+    e_gui_kill(&L.gui);
+    e_input_kill(&L.input);
+    e_window_kill(&L.window);
 
     return 0;
 }
@@ -60,13 +70,13 @@ static void main_loop(float delta_time) {
     static float u_time = 0;
 
     //delta_time /= 5;
-
-    r_render_begin_frame(e_window.size.x, e_window.size.y);
+    ivec2 window_size = e_window_get_size(L.window);
+    r_render_begin_frame(L.render, window_size.x, window_size.y);
 
     float start_time = current_time();
 
     // e updates
-    e_input_update();
+    e_input_update(L.input);
 
     // fixed update ps
     u_time += delta_time;
@@ -79,13 +89,13 @@ static void main_loop(float delta_time) {
     }
 
     // camera only needs to be updated before rendering
-    camera_update();
-    hudcamera_update();
-    
+    camera_update(window_size.x, window_size.y);
+    hudcamera_update(window_size.x, window_size.y);
+
     // render
     level_render();
-    
-    
+
+
     // fps + load
     {
         static float time = 0;
@@ -99,29 +109,29 @@ static void main_loop(float delta_time) {
 
         time += delta_time;
         cnt++;
-        if(time>0.25) {
+        if (time > 0.25) {
             char text[64];
-            sprintf(text, "%7.2f %3.0f%%", cnt/time, load_sum/cnt*100);
-            
-            vec2 size = ro_text_set_text(&fps_ro, text);
-            u_pose_set_xy(&fps_ro.pose,
-                          sca_floor(-size.x/2),
-                          sca_floor(hudcamera_top()-2));
+            sprintf(text, "%7.2f %3.0f%%", cnt / time, load_sum / cnt * 100);
+
+            vec2 size = ro_text_set_text(&L.fps_ro, text);
+            u_pose_set_xy(&L.fps_ro.pose,
+                          sca_floor(-size.x / 2),
+                          sca_floor(hudcamera_top() - 2));
             time -= 0.25;
             cnt = 0;
             load_sum = 0;
         }
-        ro_text_render(&fps_ro);
+        ro_text_render(&L.fps_ro, hudcamera.gl);
     }
-    
+
     // nuklear debug windows
-    e_gui_render();
+    e_gui_render(L.gui);
 
     // blit current frame to texture
-    r_render_blit_framebuffer(e_window.size.x, e_window.size.y);
+    r_render_blit_framebuffer(L.render, window_size.x, window_size.y);
 
     // swap buffers
-    r_render_end_frame();
+    r_render_end_frame(L.render);
 }
 
 

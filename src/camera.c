@@ -45,8 +45,8 @@ void camera_init() {
     assert(CAMERA_SIZE % 2 == 0 && "CAMERA_SIZE must be even");
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
-        camera.gl_background[i] = &camera.matrices_background[i].vp.m00;
-    camera.gl_main = &camera.matrices_main.vp.m00;
+        camera.gl_background[i] = &camera.matrices_background[i].vp;
+    camera.gl_main = &camera.matrices_main.vp;
     
     camera.gl_scale = &L.real_pixel_per_pixel;
     camera.gl_view_aabb = &L.view_aabb.v0;
@@ -57,13 +57,9 @@ void camera_init() {
     
     camera.matrices_p = mat4_eye();
     camera.matrices_p_inv = mat4_eye();
-
-    camera_update();
 }
 
-void camera_update() {
-    int wnd_width = e_window.size.x;
-    int wnd_height = e_window.size.y;
+void camera_update(int wnd_width, int wnd_height) {
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     

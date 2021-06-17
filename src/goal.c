@@ -66,7 +66,7 @@ static void activate() {
 
 void goal_init(vec2 position) {
     
-    L.goal_ro = ro_single_new(camera.gl_main,
+    L.goal_ro = ro_single_new(
                     r_texture_new_file(4, 2, "res/goal_flag.png"));
     L.goal_ro.rect.pose = u_pose_new(
             position.x,
@@ -91,7 +91,7 @@ void goal_update(float dtime) {
 }
 
 void goal_render() {
-    ro_single_render(&L.goal_ro);
+    ro_single_render(&L.goal_ro, camera.gl_main);
 }
 
 bool goal_reached() {

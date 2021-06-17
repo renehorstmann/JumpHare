@@ -33,6 +33,7 @@
 //
 
 static struct {
+    eInput *input;
     RoBatch flag_ro;
     RoBatch btn_ro;
     float time;
@@ -107,12 +108,14 @@ static void check_key_click() {
     for(int i=0; i<L.btn_ro.num; i++) {
         if(L.btn_ro.rects[i].color.a<0.99)
             continue;
-        if(e_input.keys.enter) {
+
+        eInputKeys keys = e_input_get_keys(L.input);
+        if(keys.enter) {
             button_set_pressed(&L.btn_ro.rects[i], true);
             key_was_pressed = true;
         }
         
-        if(key_was_pressed && !e_input.keys.enter) {
+        if(key_was_pressed && !keys.enter) {
             key_was_pressed = false;
             if(button_is_pressed(&L.btn_ro.rects[i])) {
                 activate(i);
@@ -126,13 +129,15 @@ static void check_key_click() {
 // public
 //
 
-void flag_init(const vec2 *positions, int num) {
+void flag_init(const vec2 *positions, int num, eInput *input) {
     assume(num>=1, "a level needs at least one flag");
-    e_input_register_pointer_event(pointer_callback, NULL);
+    L.input = input;
+
+    e_input_register_pointer_event(input, pointer_callback, NULL);
 
     L.active_pos = (vec2) {{NAN, NAN}};
 
-    L.flag_ro = ro_batch_new(num, camera.gl_main,
+    L.flag_ro = ro_batch_new(num,
                     r_texture_new_file(4, 2, "res/flag.png"));
     for(int i=0; i<num; i++) {
         L.flag_ro.rects[i].pose = u_pose_new(
@@ -145,7 +150,7 @@ void flag_init(const vec2 *positions, int num) {
     ro_batch_update(&L.flag_ro);
     
     
-    L.btn_ro = ro_batch_new(num, camera.gl_main,
+    L.btn_ro = ro_batch_new(num,
                     r_texture_new_file(2, 1, "res/carrot_btn.png"));
     for(int i=0; i<num; i++) {
         
@@ -159,7 +164,7 @@ void flag_init(const vec2 *positions, int num) {
 }
 
 void flag_kill() {
-    e_input_unregister_pointer_event(
+    e_input_unregister_pointer_event(L.input,
             pointer_callback);
     ro_batch_kill(&L.flag_ro);
     ro_batch_kill(&L.btn_ro);
@@ -204,8 +209,8 @@ void flag_update(float dtime) {
 }
 
 void flag_render() {
-    ro_batch_render(&L.flag_ro);
-    ro_batch_render(&L.btn_ro);
+    ro_batch_render(&L.flag_ro, camera.gl_main);
+    ro_batch_render(&L.btn_ro, camera.gl_main);
 }
 
 vec2 flag_active_position() {

@@ -125,13 +125,13 @@ void tilemap_init(const char *file) {
     for (int i = 0; i < tiles.size; i++) {
         L.ro_back_active[i] = tile_back_nums[i] > 0;
         if(L.ro_back_active[i]) {
-            L.ro_back[i] = ro_batch_new(tile_back_nums[i], camera.gl_main, tiles.textures[i]);
+            L.ro_back[i] = ro_batch_new(tile_back_nums[i], tiles.textures[i]);
             L.ro_back[i].owns_tex = false;
         }
         
         L.ro_main_active[i] = tile_main_nums[i] > 0;
         if(L.ro_main_active[i]) {
-            L.ro_main[i] = ro_batch_new(tile_main_nums[i], camera.gl_main, tiles.textures[i]);
+            L.ro_main[i] = ro_batch_new(tile_main_nums[i], tiles.textures[i]);
             L.ro_main[i].owns_tex = false;
         }
     }
@@ -194,11 +194,11 @@ void tilemap_update(float dtime) {
 void tilemap_render_back() {
     for (int i = 0; i < tiles.size; i++) {
         if(L.ro_back_active[i])
-            ro_batch_render(&L.ro_back[i]);
+            ro_batch_render(&L.ro_back[i], camera.gl_main);
     }
     for (int i = 0; i < tiles.size; i++) {
         if(L.ro_main_active[i])
-            ro_batch_render(&L.ro_main[i]);
+            ro_batch_render(&L.ro_main[i], camera.gl_main);
     }
 }
 

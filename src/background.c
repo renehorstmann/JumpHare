@@ -26,12 +26,13 @@ static struct {
 //
 
 void background_init(float level_width, float level_height, 
-        bool repeat_h, bool repeat_v, 
+        bool repeat_h, bool repeat_v,
+        rRender *render,
         const char *file) {
     uImage img = u_image_new_file(CAMERA_BACKGROUNDS, file);
 
     // top left pixel will be clear color
-    r_render.clear_color.rgb = vec3_cast_from_uchar_1(u_image_pixel(img, 0, 0, 0)->v);
+    r_render_clear_color(render)->rgb = vec3_cast_from_uchar_1(u_image_pixel(img, 0, 0, 0)->v);
 
     float rows = img.rows * PIXEL_SIZE;
     float cols = img.cols * PIXEL_SIZE;
@@ -41,7 +42,7 @@ void background_init(float level_width, float level_height,
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
         rTexture tex = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, i));
-        L.ro[i] = ro_batch_new(size_h*size_v, camera.gl_background[i], tex);
+        L.ro[i] = ro_batch_new(size_h*size_v, tex);
 
         for (int v = 0; v < size_v; v++) {
             for(int h = 0; h < size_h; h++) {
@@ -72,6 +73,6 @@ void background_update(float dtime) {
 
 void background_render() {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
-        ro_batch_render(&L.ro[i]);
+        ro_batch_render(&L.ro[i], camera.gl_background[i]);
 }
 

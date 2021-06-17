@@ -27,6 +27,7 @@ struct ControllerGlobals_s controller;
 //
 
 static struct {
+    eInput *input;
     RoBatch background_ro;
     ePointer_s pointer[2];
     bvec2 pointer_down_map;
@@ -65,20 +66,21 @@ static void pointer_event(ePointer_s pointer, void *ud) {
 
 static void key_ctrl() {
     static bool action = false;
-    
-    if (e_input.keys.right && !e_input.keys.left) {
+
+    eInputKeys keys = e_input_get_keys(L.input);
+    if (keys.right && !keys.left) {
         controller.out.speed_x = 1;
-    } else if (e_input.keys.left && !e_input.keys.right) {
+    } else if (keys.left && !keys.right) {
         controller.out.speed_x = -1;
     } 
 
     // only once
-    if (e_input.keys.space && !action) {
+    if (keys.space && !action) {
         action = true;
         controller.out.action = true;
     }
     
-    if (!e_input.keys.space) {
+    if (!keys.space) {
         action = false;
     }
         
@@ -172,17 +174,18 @@ static void pointer_ctrl(float dtime) {
 // public
 //
 
-void controller_init() {
+void controller_init(eInput *input) {
+    L.input = input;
     L.pointer[0].action = E_POINTER_UP;
     L.pointer[1].action = E_POINTER_UP;
-    e_input_register_pointer_event(pointer_event, NULL);
+    e_input_register_pointer_event(input, pointer_event, NULL);
 
-    L.background_ro = ro_batch_new(2, hudcamera.gl, r_texture_new_file(1, 1, "res/hud_background.png"));
+    L.background_ro = ro_batch_new(2, r_texture_new_file(1, 1, "res/hud_background.png"));
     //L.background_ro.rect.color.a = 0.0;
 }
 
 void controller_kill() {
-    e_input_unregister_pointer_event(pointer_event);
+    e_input_unregister_pointer_event(L.input, pointer_event);
     ro_batch_kill(&L.background_ro);
     memset(&L, 0, sizeof(L));
 }
@@ -214,5 +217,5 @@ void controller_update(float dtime) {
 }
 
 void controller_render() {
-    ro_batch_render(&L.background_ro);
+    ro_batch_render(&L.background_ro, hudcamera.gl);
 }

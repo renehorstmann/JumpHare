@@ -31,7 +31,7 @@ static struct {
 //
 
 void pixelparticles_init() {
-    L.ro = ro_particle_new(MAX_PARTCLES, camera.gl_main, r_texture_new_white_pixel());
+    L.ro = ro_particle_new(MAX_PARTCLES, r_texture_new_white_pixel());
 
     for (int i = 0; i < L.ro.num; i++) {
         L.ro.rects[i].pose = u_pose_new_hidden();
@@ -50,7 +50,7 @@ void pixelparticles_update(float dtime) {
 }
 
 void pixelparticles_render() {
-    ro_particle_render(&L.ro, pixelparticles.time);
+    ro_particle_render(&L.ro, pixelparticles.time, camera.gl_main);
 }
 
 void pixelparticles_add(const rParticleRect_s *particles, int n) {

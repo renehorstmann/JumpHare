@@ -28,8 +28,8 @@ struct CameraGlobals_s {
     struct CameraMatrices_s matrices_background[CAMERA_BACKGROUNDS];
     struct CameraMatrices_s matrices_main;
     
-    const float *gl_background[CAMERA_BACKGROUNDS];
-    const float *gl_main;
+    const mat4 *gl_background[CAMERA_BACKGROUNDS];
+    const mat4 *gl_main;
     
     const float *gl_scale;
     // in texture space (origin is top left) [0:1]
@@ -41,7 +41,7 @@ extern struct CameraGlobals_s camera;
 
 void camera_init();
 
-void camera_update();
+void camera_update(int wnd_width, int wnd_height);
 
 float camera_real_pixel_per_pixel();
 

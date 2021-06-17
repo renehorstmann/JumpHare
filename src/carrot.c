@@ -71,7 +71,7 @@ static void emit_particles(float x, float y) {
 void carrot_init(const vec2 *positions_3) {
     
     // in game carrots
-    L.carrot_ro = ro_batch_new(3, camera.gl_main,
+    L.carrot_ro = ro_batch_new(3,
                     r_texture_new_file(4, 1, "res/carrot.png"));
             
     for(int i=0; i<3; i++) {
@@ -110,7 +110,7 @@ void carrot_update(float dtime) {
 }
 
 void carrot_render() {
-    ro_batch_render(&L.carrot_ro);
+    ro_batch_render(&L.carrot_ro, camera.gl_main);
 }
 
 

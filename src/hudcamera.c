@@ -26,16 +26,12 @@ static struct {
 
 void hudcamera_init() {
     assert(HUDCAMERA_SIZE % 2 == 0 && "HUDCAMERA_SIZE must be even");
-    hudcamera.gl = &hudcamera.matrices.p.m00;
+    hudcamera.gl = &hudcamera.matrices.p;
     hudcamera.matrices.p = mat4_eye();
     hudcamera.matrices.p_inv = mat4_eye();
-
-    hudcamera_update();
 }
 
-void hudcamera_update() {
-    int wnd_width = e_window.size.x;
-    int wnd_height = e_window.size.y;
+void hudcamera_update(int wnd_width, int wnd_height) {
 
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;

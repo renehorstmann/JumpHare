@@ -64,22 +64,22 @@ struct HareGlobals_s hare;
 //
 
 const char *state_names[] = {
-    "HARE_GROUNDED",
-    "HARE_FALLING",
-    "HARE_JUMPING",
-    "HARE_DOUBLE_JUMP",
-    "HARE_SLEEPING",
-    "HARE_DEAD"
+        "HARE_GROUNDED",
+        "HARE_FALLING",
+        "HARE_JUMPING",
+        "HARE_DOUBLE_JUMP",
+        "HARE_SLEEPING",
+        "HARE_DEAD"
 };
-_Static_assert(sizeof(state_names)/sizeof(*state_names)==HARE_NUM_STATES, "");
-
+_Static_assert(sizeof(state_names) / sizeof(*state_names) == HARE_NUM_STATES, "");
 
 
 static struct {
+    eWindow *window;
     RoSingle ro;
     RoParticle sleep_zzz_ro;
     RoText input_text;
-    
+
     struct HareGlobals_s prev;
 
     float last_input_time;
@@ -97,7 +97,7 @@ static struct {
     int emit_dirt_next_add;
 
     float add_airstroke_time;
-    
+
     float sleep_time;
     float sleep_ro_time;
     int sleep_zzz_id;
@@ -108,55 +108,55 @@ static struct {
 
 static void emit_zzz(bool exclamation) {
     rParticleRect_s *r = &L.sleep_zzz_ro.rects[L.sleep_zzz_id];
-    
+
     r->pose = u_pose_new(
-            hare.pos.x + sca_random_noise(0, 5), 
-            hare.pos.y + sca_random_range(0, 10), 
+            hare.pos.x + sca_random_noise(0, 5),
+            hare.pos.y + sca_random_range(0, 10),
             16, 16);
-    
+
     r->color.rgb = vec3_random_range(0.9, 1.0);
-    
-    r->color.a = exclamation? 3:1;
-    r->sprite.y = exclamation? 1:0;
-    
+
+    r->color.a = exclamation ? 3 : 1;
+    r->sprite.y = exclamation ? 1 : 0;
+
     r->speed.x = sca_random_noise(0, 20);
     r->speed.y = 30;
     r->acc.x = r->speed.x * -0.25;
     r->acc.y = -0.25;
-    r->color_speed.a = exclamation? -1.5 : -0.5;
+    r->color_speed.a = exclamation ? -1.5 : -0.5;
     r->start_time = L.sleep_ro_time;
-    
+
     ro_particle_update_sub(&L.sleep_zzz_ro, L.sleep_zzz_id, 1);
-    L.sleep_zzz_id = (L.sleep_zzz_id+1) % L.sleep_zzz_ro.num;
+    L.sleep_zzz_id = (L.sleep_zzz_id + 1) % L.sleep_zzz_ro.num;
 }
 
 
 static void check_fall_asleep(float dtime) {
-    if(hare.state != HARE_GROUNDED)
+    if (hare.state != HARE_GROUNDED)
         return;
-        
+
     L.last_input_time += dtime;
-    if(L.last_input_time > NO_INPUT_SLEEP_TIME) {
+    if (L.last_input_time > NO_INPUT_SLEEP_TIME) {
         hare_set_sleep(false);
     }
 }
 
 static void check_wake_up(float dtime) {
-    if(L.sleep_time != 0)
+    if (L.sleep_time != 0)
         return;
-    if(
+    if (
             (
-                L.wake_up_cnt%2==0 
-                && L.set_speed_x > WAKE_UP_SPEED
-            )||( 
-                L.wake_up_cnt%2==1 
-                && L.set_speed_x < -WAKE_UP_SPEED
+                    L.wake_up_cnt % 2 == 0
+                    && L.set_speed_x > WAKE_UP_SPEED
+            ) || (
+                    L.wake_up_cnt % 2 == 1
+                    && L.set_speed_x < -WAKE_UP_SPEED
             )) {
         L.wake_up_cnt++;
         emit_zzz(true);
         L.sleep_zzz_next = 1.5;
     }
-    if(L.wake_up_cnt >= WAKE_UP_CNTS) {
+    if (L.wake_up_cnt >= WAKE_UP_CNTS) {
         L.sleep_time = WAKE_UP_TIME;
     }
 }
@@ -170,8 +170,8 @@ static void check_jumping(float dtime) {
         }
 
         if (hare.speed.y <= DOUBLE_JUMP_MAX_START_SPEED_Y
-                && hare.state == HARE_FALLING 
-                && L.jump_time > DOUBLE_JUMP_START_TIME) {
+            && hare.state == HARE_FALLING
+            && L.jump_time > DOUBLE_JUMP_START_TIME) {
 
             hare.speed.y = sca_max(hare.speed.y, DOUBLE_JUMP_SPEED_Y);
 #ifndef GOD_MODE
@@ -202,21 +202,21 @@ static void apply_speed(float dtime) {
 
     float set_speed_x = hare.state == HARE_DOUBLE_JUMP ?
                         L.set_speed_x * DOUBLE_JUMP_SPEED_X_FACTOR
-                                                    : L.set_speed_x;
+                                                       : L.set_speed_x;
     // x
     if (sca_sign(set_speed_x) * sca_sign(hare.speed.x) == -1) {
         hare.speed.x = 0;
     }
-    
+
     float diff = set_speed_x - hare.speed.x;
     if (diff > 0) {
         hare.speed.x = sca_min(hare.speed.x
-                            + (hare.speed.x < 0 ? DEACC : ACC)
-                              * dtime, set_speed_x);
+                               + (hare.speed.x < 0 ? DEACC : ACC)
+                                 * dtime, set_speed_x);
     } else if (diff < 0) {
         hare.speed.x = sca_max(hare.speed.x
-                            - (hare.speed.x > 0 ? DEACC : ACC)
-                              * dtime, set_speed_x);
+                               - (hare.speed.x > 0 ? DEACC : ACC)
+                                 * dtime, set_speed_x);
     }
 
     float actual_speed = sca_abs(hare.speed.x) < MIN_SPEED_X ? 0 : hare.speed.x;
@@ -293,13 +293,13 @@ static void animate(float dtime) {
         hare.looking_left = true;
     if (hare.speed.x > MIN_SPEED_X)
         hare.looking_left = false;
-        
+
     if (!hare.looking_left)
         L.ro.rect.uv = u_pose_new(0, 0, 1, 1);
     else
         L.ro.rect.uv = u_pose_new(0, 0, -1, 1);
-        
-    
+
+
     if (hare.state == HARE_GROUNDED) {
         float fps = ANIMATION_GROUNDED_FPS;
         int frames = ANIMATION_FRAMES;
@@ -308,37 +308,37 @@ static void animate(float dtime) {
         int v = sca_abs(hare.speed.x) < MIN_SPEED_X ? 0 : 1;
         if (sca_abs(hare.speed.x) >= RUN_SPEED_X)
             v++;
-            
+
         L.ro.rect.sprite = (vec2) {{u, v}};
 
     } else if (hare.state == HARE_SLEEPING) {
         int u = 2;
-        
-        if(L.sleep_time == 0) {
+
+        if (L.sleep_time == 0) {
             // sleeping
             L.sleep_zzz_next -= dtime;
-            if(L.sleep_zzz_next < 0) {
+            if (L.sleep_zzz_next < 0) {
                 emit_zzz(false);
                 L.sleep_zzz_next = sca_random_noise(1, 0.25);
             }
-            
-        } else if(L.sleep_time < 0) {
+
+        } else if (L.sleep_time < 0) {
             // fall asleep
             L.sleep_time = sca_min(0, L.sleep_time + dtime);
-            u = L.sleep_time < -FALLING_ASLEEP_TIME/2? 0 : 1;
-        } else if(L.sleep_time > 0) {
+            u = L.sleep_time < -FALLING_ASLEEP_TIME / 2 ? 0 : 1;
+        } else if (L.sleep_time > 0) {
             // wake up
             L.sleep_time = sca_max(0, L.sleep_time - dtime);
-            
+
             u += 6 - L.sleep_time / WAKE_UP_TIME * 5;
-            
-            if(L.sleep_time == 0) {
+
+            if (L.sleep_time == 0) {
                 // awake
                 hare.state = HARE_GROUNDED;
                 L.set_jump_time = 1; // not jump accidently at wake up
             }
         }
-        
+
         int v = 5;
         L.ro.rect.sprite = (vec2) {{u, v}};
     } else {
@@ -348,9 +348,9 @@ static void animate(float dtime) {
         if (hare.speed.y < 0) {
             u = 7;
         }
-        
-        int v = hare.state == HARE_DOUBLE_JUMP? 4 : 3;
-        
+
+        int v = hare.state == HARE_DOUBLE_JUMP ? 4 : 3;
+
         L.ro.rect.sprite = (vec2) {{u, v}};
     }
 }
@@ -390,8 +390,8 @@ static void emit_dirt(float dtime) {
 
 
 static void check_state_change(float dtime) {
-    assume(hare.state>=0 && hare.state<HARE_NUM_STATES, "invalid state");
-    if(hare.state != L.prev.state) {
+    assume(hare.state >= 0 && hare.state < HARE_NUM_STATES, "invalid state");
+    if (hare.state != L.prev.state) {
         log_trace("hare: state changed from %s to %s", state_names[L.prev.state], state_names[hare.state]);
     }
     if (hare.state == HARE_DOUBLE_JUMP && L.prev.state != HARE_DOUBLE_JUMP) {
@@ -408,7 +408,7 @@ static void check_state_change(float dtime) {
 
 static void on_pause_callback(bool resume, void *ud) {
     log_info("hare: pause callback");
-    if(!resume &&  hare.state == HARE_GROUNDED)
+    if (!resume && hare.state == HARE_GROUNDED)
         hare_set_sleep(false);
 }
 
@@ -417,37 +417,37 @@ static void on_pause_callback(bool resume, void *ud) {
 // public
 //
 
-void hare_init(float pos_x, float pos_y) {
-     e_window_register_pause_callback(on_pause_callback, NULL);
-    
+void hare_init(float pos_x, float pos_y, eWindow *window) {
+    L.window = window;
+    e_window_register_pause_callback(window, on_pause_callback, NULL);
+
     hare.state = HARE_FALLING;
 
     hare.pos.x = pos_x;
     hare.pos.y = pos_y;
-    
+
     L.last_input_time = 0;
 
     L.emit_dirt_add = sca_random_noise(6, 2);
 
-    L.ro = ro_single_new(camera.gl_main, r_texture_new_file(8, 6, "res/hare.png"));
-    
+    L.ro = ro_single_new(r_texture_new_file(8, 6, "res/hare.png"));
+
     u_pose_set_size(&L.ro.rect.pose, 32, 32);
-    
-    L.sleep_zzz_ro = ro_particle_new(SLEEP_ZZZ_MAX, camera.gl_main, r_texture_new_file(1, 2, "res/sleep_zzz.png"));
-    
-    for(int i=0; i<L.sleep_zzz_ro.num; i++) {
+
+    L.sleep_zzz_ro = ro_particle_new(SLEEP_ZZZ_MAX, r_texture_new_file(1, 2, "res/sleep_zzz.png"));
+
+    for (int i = 0; i < L.sleep_zzz_ro.num; i++) {
         L.sleep_zzz_ro.rects[i].pose = u_pose_new_hidden();
     }
     ro_particle_update(&L.sleep_zzz_ro);
 
-    
 
-    L.input_text = ro_text_new_font55(64, hudcamera.gl);
+    L.input_text = ro_text_new_font55(64);
     ro_text_set_color(&L.input_text, R_COLOR_BLACK);
 }
 
 void hare_kill() {
-    e_window_unregister_pause_callback(on_pause_callback);
+    e_window_unregister_pause_callback(L.window, on_pause_callback);
     ro_single_kill(&L.ro);
     ro_text_kill(&L.input_text);
     memset(&L, 0, sizeof(L));
@@ -455,25 +455,25 @@ void hare_kill() {
 
 void hare_update(float dtime) {
     L.prev = hare;
-    
+
     L.sleep_ro_time += dtime;
-    
+
     L.set_speed_x = sca_clamp(hare.in.speed, -1, 1) * MAX_SPEED_X;
-    if(hare.in.speed != 0) {
+    if (hare.in.speed != 0) {
         L.last_input_time = 0;
     }
-    
-    if(hare.in.jump) {
+
+    if (hare.in.jump) {
         L.set_jump_time = SET_JUMP_TIME;
         L.last_input_time = 0;
     }
-    
+
     hare.in.speed = 0;
     hare.in.jump = false;
     hare.out.jump_action = false;
-    
+
     check_fall_asleep(dtime);
-    
+
     if (hare.state == HARE_SLEEPING) {
         check_wake_up(dtime);
     } else {
@@ -484,19 +484,19 @@ void hare_update(float dtime) {
             apply_speed(dtime / 4);
         } else {
             apply_speed(dtime);
-        } 
+        }
     }
-    
+
     check_collision();
-    
+
     u_pose_set_xy(&L.ro.rect.pose, hare.pos.x, hare.pos.y);
-    
+
     animate(dtime);
-    
+
     emit_dirt(dtime);
-    
+
     check_state_change(dtime);
-    
+
     // debug
     char text[64];
     sprintf(text, "%i %+08.3f %+05.3f\n  %+08.3f %+08.3f",
@@ -508,21 +508,21 @@ void hare_update(float dtime) {
 }
 
 void hare_render() {
-    ro_single_render(&L.ro);
-    ro_particle_render(&L.sleep_zzz_ro, L.sleep_ro_time);
-    //ro_text_render(&L.input_text);
+    ro_single_render(&L.ro, camera.gl_main);
+    ro_particle_render(&L.sleep_zzz_ro, L.sleep_ro_time, camera.gl_main);
+    //ro_text_render(&L.input_text, hudcamera.gl);
 }
 
 
 void hare_set_sleep(bool instant) {
     log_info("hare: set_sleep (instant? %i)", instant);
     hare.state = HARE_SLEEPING;
-    L.sleep_time = instant? 0 : -FALLING_ASLEEP_TIME;
+    L.sleep_time = instant ? 0 : -FALLING_ASLEEP_TIME;
     L.wake_up_cnt = 0;
     L.sleep_ro_time = 0;
     L.sleep_zzz_next = 0.75;
-        
-    for(int i=0; i<L.sleep_zzz_ro.num; i++) {
+
+    for (int i = 0; i < L.sleep_zzz_ro.num; i++) {
         L.sleep_zzz_ro.rects[i].pose = u_pose_new_hidden();
     }
     ro_particle_update(&L.sleep_zzz_ro);

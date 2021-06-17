@@ -2,6 +2,7 @@
 #include "r/ro_single.h"
 #include "r/ro_batch.h"
 #include "r/ro_text.h"
+#include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "rhc/error.h"
@@ -80,15 +81,15 @@ static void update_butterfly(float dtime) {
 //
 
 void hud_init() {
-    L.carrots = ro_batch_new(3, hudcamera.gl,
+    L.carrots = ro_batch_new(3,
                     r_texture_new_file(2, 1, "res/carrot_mini.png"));
                     
     
-    L.butterfly_icon = ro_single_new(hudcamera.gl, r_texture_new_file(12, 2, "res/butterfly.png"));
+    L.butterfly_icon = ro_single_new(r_texture_new_file(12, 2, "res/butterfly.png"));
     
     L.butterfly_icon.rect.sprite.y = 1;
     
-    L.butterfly_cnt = ro_text_new_font55(4, hudcamera.gl);
+    L.butterfly_cnt = ro_text_new_font55(4);
     ro_text_set_color(&L.butterfly_cnt, R_COLOR_BLACK);
     
 }
@@ -106,7 +107,7 @@ void hud_update(float dtime) {
 }
 
 void hud_render() {
-    ro_batch_render(&L.carrots);
-    ro_single_render(&L.butterfly_icon);
-    ro_text_render(&L.butterfly_cnt);
+    ro_batch_render(&L.carrots, hudcamera.gl);
+    ro_single_render(&L.butterfly_icon, hudcamera.gl);
+    ro_text_render(&L.butterfly_cnt, hudcamera.gl);
 }

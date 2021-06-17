@@ -86,7 +86,7 @@ static void fly_away(int i) {
 
 void butterfly_init(const vec2 *positions, int num) {
     assume(num>0, "atleast one butterfly in a level?");
-    L.ro = ro_particle_new(num, camera.gl_main,
+    L.ro = ro_particle_new(num,
             r_texture_new_file(12, 2, "res/butterfly.png"));
             
     for(int i=0; i<num; i++) {
@@ -136,7 +136,7 @@ void butterfly_update(float dtime) {
 }
 
 void butterfly_render() {
-    ro_particle_render(&L.ro, L.time);
+    ro_particle_render(&L.ro, L.time, camera.gl_main);
 }
 
 int butterfly_collected() {

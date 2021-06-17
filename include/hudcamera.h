@@ -19,14 +19,14 @@ struct HudCameraMatrices_s {
 
 struct HudCameraGlobals_s {
     struct HudCameraMatrices_s matrices;
-    const float *gl;
+    const mat4 *gl;
 };
 extern struct HudCameraGlobals_s hudcamera;
 
 
 void hudcamera_init();
 
-void hudcamera_update();
+void hudcamera_update(int wnd_width, int wnd_height);
 
 float hudcamera_real_pixel_per_pixel();
 

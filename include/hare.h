@@ -2,6 +2,7 @@
 #define JUMPHARE_HARE_H
 
 #include <stdbool.h>
+#include "e/window.h"
 #include "mathc/types/float.h"
 
 enum hare_state {
@@ -31,7 +32,7 @@ struct HareGlobals_s {
 };
 extern struct HareGlobals_s hare;
 
-void hare_init(float pos_x, float pos_y);
+void hare_init(float pos_x, float pos_y, eWindow *window);
 
 void hare_kill();
 

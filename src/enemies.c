@@ -1,4 +1,5 @@
 #include "r/ro_batch.h"
+#include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "rhc/error.h"
@@ -62,7 +63,7 @@ void enemies_update(float dtime) {
 
 void enemies_render() {
     for(int i=0; i<L.types_num; i++) {
-        ro_batch_render(&L.types[i].ro);
+        ro_batch_render(&L.types[i].ro, camera.gl_main);
     }
 }
 
@@ -144,7 +145,7 @@ void enemies_add_hedgehogs(const vec2 *positions, int n) {
     assume(positions, "wtf?");
     log_info("enemies_add_hedgehogs: %i", n);
     Type t = {0};
-    t.ro = ro_batch_new(n, camera.gl_main,
+    t.ro = ro_batch_new(n,
             r_texture_new_file(4, 2, "res/enemies/hedgehog.png"));
     t.update = hedgehog_update;
     

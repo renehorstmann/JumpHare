@@ -1,4 +1,5 @@
 #include <string.h>
+#include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
@@ -69,8 +70,8 @@ static bool emojifont_sprite_cb(vec2 *sprite, char c) {
 
 
 // public ?
-void emojifont_init(RoText *self, int max, const float *vp) {
-    *self = ro_text_new(max, emojifont_sprite_cb, vp, r_texture_new_file(COLUMNS, ROWS, "res/emojifont.png"));
+void emojifont_init(RoText *self, int max) {
+    *self = ro_text_new(max, emojifont_sprite_cb, r_texture_new_file(COLUMNS, ROWS, "res/emojifont.png"));
     self->size = (vec2) {16, 16};
     self->offset = (vec2) {18, 18};
 }
@@ -81,7 +82,7 @@ void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext)
     self->position = position;
     
     int len = strlen(emojitext);
-    emojifont_init(&self->text, len, camera.gl_main);
+    emojifont_init(&self->text, len);
     vec2 size = ro_text_set_text(&self->text, emojitext);
     
     float text_x = position.x - size.x/2;
@@ -94,7 +95,7 @@ void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext)
     float bubbly_x = text_x-18/2;
     float bubble_y = text_y+18/2;
     
-    self->bubble = ro_batch_new(rows*cols, camera.gl_main, r_texture_new_file(1, 1, "res/speechbubble.png"));
+    self->bubble = ro_batch_new(rows*cols, r_texture_new_file(1, 1, "res/speechbubble.png"));
     
     for(int r=0; r<rows; r++) {
         for(int c=0; c<cols;c++) {
@@ -157,6 +158,6 @@ void speechbubble_update(SpeechBubble *self, float dtime, vec2 blend_pos) {
 }
 
 void speechbubble_render(SpeechBubble *self) {
-    ro_batch_render(&self->bubble);
-    ro_text_render(&self->text);
+    ro_batch_render(&self->bubble, camera.gl_main);
+    ro_text_render(&self->text, camera.gl_main);
 }

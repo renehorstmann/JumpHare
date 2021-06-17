@@ -47,6 +47,7 @@ const static uColor_s ENEMY_HEDGHEHOG_CODE  = {{0, 0, 1, 16}};
 //
 
 static struct {
+    eWindow *window;
     RoBatch borders_ro;
     int current_lvl;
     SpeechBubble bubbles[3];
@@ -81,7 +82,7 @@ static void load_game() {
     if(!sca_isnan(flag_pos.x))
         start_pos = flag_pos;
     
-    hare_init(start_pos.x, start_pos.y);
+    hare_init(start_pos.x, start_pos.y, L.window);
     airstroke_init();
     pixelparticles_init();
     cameractrl_init();
@@ -115,7 +116,8 @@ static void dead_callback(void *ud) {
 // public
 //
 
-void level_init(int lvl) {
+void level_init(int lvl, eWindow *window, eInput *input, rRender *render) {
+    L.window = window;
     log_info("level: init lvl %i", lvl);
     assume(lvl == 1, "...");
 
@@ -124,6 +126,7 @@ void level_init(int lvl) {
     tilemap_init("res/levels/level_01.png");
     background_init(tilemap_width(), tilemap_height(),
             true, false,
+            render,
             "res/backgrounds/greenhills.png"
             //true, true,
             //"res/backgrounds/blueblocks.png"
@@ -143,7 +146,7 @@ void level_init(int lvl) {
 
     vec2 flag_pos[64];
     int flags = tilemap_get_positions(flag_pos, 64, FLAG_CODE, CODE_LAYER);
-    flag_init(flag_pos, flags);
+    flag_init(flag_pos, flags, input);
     flag_register_callback(on_flag_activated_cb, NULL);
     
     L.bubbles_size=0;
@@ -159,7 +162,7 @@ void level_init(int lvl) {
     }
 
     dead_init(dead_callback, NULL);
-    controller_init();
+    controller_init(input);
     hud_init();
     scripts_init();
 
@@ -169,7 +172,7 @@ void level_init(int lvl) {
     hare_set_sleep(true);
 
     // ro
-    L.borders_ro = ro_batch_new(4, camera.gl_main, r_texture_new_white_pixel());
+    L.borders_ro = ro_batch_new(4, r_texture_new_white_pixel());
 
     // black borders
     for (int i = 0; i < 4; i++) {
@@ -205,7 +208,7 @@ void level_init(int lvl) {
     tex_main = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 0));
     tex_refract = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 1));
     u_image_kill(&img);
-    L.ice = ro_batchrefract_new(1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
+    L.ice = ro_batchrefract_new(1, camera.gl_scale, tex_main, tex_refract);
     L.ice.view_aabb = camera.gl_view_aabb;
     for(int i=0; i<L.ice.num; i++) {
         L.ice.rects[i].pose = u_pose_new(260+16*i, 100, 32, 64);
@@ -219,7 +222,7 @@ void level_init(int lvl) {
     tex_main = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 0));
     tex_refract = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 1));
     u_image_kill(&img);
-    L.mirror = ro_batchrefract_new(1, camera.gl_main, camera.gl_scale, tex_main, tex_refract);
+    L.mirror = ro_batchrefract_new(1, camera.gl_scale, tex_main, tex_refract);
     L.mirror.view_aabb = camera.gl_view_aabb;
     for(int i=0; i<L.mirror.num; i++) {
         L.mirror.rects[i].pose = u_pose_new(120+32*i, 100, 32, 64);
@@ -284,8 +287,8 @@ void level_render() {
     tilemap_render_back();
 
     // test
-    //ro_batchrefract_render(&L.ice);
-    //ro_batchrefract_render(&L.mirror);
+    //ro_batchrefract_render(&L.ice, camera.gl_main);
+    //ro_batchrefract_render(&L.mirror, camera.gl_main);
 
     for(int i=0; i<L.bubbles_size; i++) {
         speechbubble_render(&L.bubbles[i]);
@@ -300,7 +303,7 @@ void level_render() {
     hud_render();
     dead_render();
 
-    ro_batch_render(&L.borders_ro);
+    ro_batch_render(&L.borders_ro, camera.gl_main);
 
     controller_render();
     

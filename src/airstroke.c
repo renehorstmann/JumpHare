@@ -35,7 +35,7 @@ static struct {
 //
 
 void airstroke_init() {
-    L.ro = ro_batch_new(AIRSTROKE_MAX, camera.gl_main, r_texture_new_file(1, 1, "res/airstroke.png"));
+    L.ro = ro_batch_new(AIRSTROKE_MAX, r_texture_new_file(1, 1, "res/airstroke.png"));
 
     for (int i = 0; i < AIRSTROKE_MAX; i++) {
         L.ro.rects[i].pose = u_pose_new_hidden();
@@ -94,7 +94,7 @@ void airstroke_update(float dtime) {
 }
 
 void airstroke_render() {
-    ro_batch_render(&L.ro);
+    ro_batch_render(&L.ro, camera.gl_main);
 }
 
 void airstroke_add(float x, float y) {

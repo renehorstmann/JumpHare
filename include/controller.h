@@ -2,6 +2,7 @@
 #define JUMPHARE_CONTROLLER_H
 
 #include <stdbool.h>
+#include "e/input.h"
 
 struct ControllerGlobals_s {
     struct {
@@ -11,7 +12,7 @@ struct ControllerGlobals_s {
 };
 extern struct ControllerGlobals_s controller;
 
-void controller_init();
+void controller_init(eInput *input);
 
 void controller_kill();
 
