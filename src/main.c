@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
         L.fps_ro.ro.rects[i].color = (vec4) {{0, 0, 0, 1}};
 
 #ifdef OPTION_GLES
-    e_window_set_screen_mode(E_WINDOW_MODE_FULLSCREEN);
+    e_window_set_screen_mode(L.window, E_WINDOW_MODE_FULLSCREEN);
 #endif
 
     e_window_main_loop(L.window, main_loop);
