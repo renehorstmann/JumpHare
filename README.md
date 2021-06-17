@@ -35,6 +35,7 @@ In active developmemt
 
 
 ## Todo
+-> use the big some update...
 - get rid of global state?
   - some few modules may use globals
     - rhc (error + log)
