@@ -4,7 +4,6 @@ Based on [some](https://github.com/renehorstmann/some) framework.
 
 
 
-
 ## Art
 Pixelart was made with my [Pixelc](https://github.com/renehorstmann/pixelc) App.
 
