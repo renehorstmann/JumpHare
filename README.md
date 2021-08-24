@@ -114,16 +114,16 @@ emcc -I../include/ -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_TTF=2 -s FULL_ES3=
 
 May / will not work on Apple, because of their poor WebGL2 support.
 
-## Compiling on Windows
+## Without Cmake
 
-Compiling with Mingw (msys2). Currently not working with cmake, but with the following gcc call.
+Instead of cmake, the following call to gcc should work, too.
 
 ```sh
 mkdir build && cd build
 
 cp -r ../res .
 
-gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/ $(sdl2-config --cflags --libs) -lSDL2_image -lglew32 -lopengl32 -lglu32 -DOPTION_GLEW -DOPTION_SDL -o JumpHare
+gcc ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -I../include/ $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf -lglew32 -lopengl32 -lglu32 -DOPTION_GLEW -DOPTION_SDL -o jumphare
 ```
 
 ## Author
