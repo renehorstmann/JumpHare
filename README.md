@@ -38,6 +38,11 @@ In active developmemt
 
 ## Todo
 -> use the big some update...
+- pixelart:
+  - left right space enter keys
+  - pointing hand
+- keys and hand on startup, until awake
+- enter and hand on first Button, if available
 - get rid of global state?
   - some few modules may use globals
     - rhc (error + log)
