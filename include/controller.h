@@ -3,21 +3,38 @@
 
 #include <stdbool.h>
 #include "e/input.h"
+#include "r/ro_types.h"
+#include "mathc/types/bool.h"
+#include "camera.h"
+#include "hudcamera.h"
 
-struct ControllerGlobals_s {
+
+typedef struct {
+    eInput *input_ref;
+    const Camera_s *camera_ref;
+    const HudCamera_s *hudcam_ref;
+    
     struct {
         float speed_x;
         bool action;
     } out;
-};
-extern struct ControllerGlobals_s controller;
+    
+    struct {
+        RoBatch background_ro;
+        ePointer_s pointer[2];
+        bvec2 pointer_down_map;
+        int pointer_down;
+        int main_pointer;
+    } L;
+} Controller;
 
-void controller_init(eInput *input);
 
-void controller_kill();
+Controller *controller_new(eInput *input, const Camera_s *camera, const HudCamera_s *hudcam);
 
-void controller_update(float dtime);
+void controller_kill(Controller **self_ptr);
 
-void controller_render();
+void controller_update(Controller *self, float dtime);
+
+void controller_render(Controller *self, const mat4 *hudcam_mat);
 
 #endif //JUMPHARE_CONTROLLER_H

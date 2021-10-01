@@ -21,52 +21,45 @@ struct CameraMatrices_s {
     mat4 v_p_inv;   // v @ p_inv
 };
 
-struct CameraGlobals_s {
+typedef struct {
     mat4 matrices_p;
     mat4 matrices_p_inv;
 
     struct CameraMatrices_s matrices_background[CAMERA_BACKGROUNDS];
     struct CameraMatrices_s matrices_main;
     
-    const mat4 *gl_background[CAMERA_BACKGROUNDS];
-    const mat4 *gl_main;
     
-    const float *gl_scale;
-    // in texture space (origin is top left) [0:1]
-    // as center_x, _y, radius_x, _y
-    const float *gl_view_aabb;
-};
-extern struct CameraGlobals_s camera;
+    struct {
+        float real_pixel_per_pixel;
+        float left, right, bottom, top;
+        
+        vec2 offset;
+        
+        // in texture space (origin is top left) [0:1]
+        // as center_x, _y, radius_x, _y
+        vec4 view_aabb;
+    } RO; // read only
+
+} Camera_s;
 
 
-void camera_init();
+Camera_s *camera_new();
 
-void camera_update(int wnd_width, int wnd_height);
+void camera_update(Camera_s *self, int wnd_width, int wnd_height);
 
-float camera_real_pixel_per_pixel();
 
-float camera_left();
-
-float camera_right();
-
-float camera_bottom();
-
-float camera_top();
-
-vec2 camera_center_offset();
-
-static float camera_width() {
-    return -camera_left() + camera_right();
+static float camera_width(const Camera_s *self) {
+    return -self->RO.left + self->RO.right;
 }
 
-static float camera_height() {
-    return -camera_bottom() + camera_top();
+static float camera_height(const Camera_s *self) {
+    return -self->RO.bottom + self->RO.top;
 }
 
-void camera_set_pos(float x, float y);
+void camera_set_pos(Camera_s *self, float x, float y);
 
-void camera_set_size(float size);
+void camera_set_size(Camera_s *self, float size);
 
-void camera_set_angle(float alpha);
+void camera_set_angle(Camera_s *self, float alpha);
 
 #endif //JUMPHARE_CAMERA_H

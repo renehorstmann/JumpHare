@@ -1,28 +1,43 @@
 #ifndef JUMPHARE_CARROT_H
 #define JUMPHARE_CARROT_H
 
-#include <stdbool.h>
-#include "mathc/types/float.h"
+#include "r/ro_types.h"
 
-void carrot_init(const vec2 *positions_3);
 
-void carrot_kill();
+typedef struct {
+    struct {
+        int collected;  // eaten + available
+        int eaten;
+    } RO; // read only
+    
+    struct {
+        RoBatch carrot_ro;
+        bool collected[3];
+        
+        float time;
 
-void carrot_update(float dtime);
+        struct {
+            bool collected[3];
+            int collected_cnt;
+            int eaten_cnt;
+        } save;
+    } L;
+} Carrot;
 
-void carrot_render();
+Carrot *carrot_new(const vec2 *positions_3);
 
-bool carrot_collect(vec2 position);
+void carrot_kill(Carrot **self_ptr);
 
-// eaten + available
-int carrot_collected();
+void carrot_update(Carrot *self, float dtime);
 
-int carrot_eaten();
+void carrot_render(Carrot *self, const mat4 *cam_mat);
 
-void carrot_eat();
+bool carrot_collect(Carrot *self, vec2 position);
 
-void carrot_save();
+void carrot_eat(Carrot *self);
 
-void carrot_load();
+void carrot_save(Carrot *self);
+
+void carrot_load(Carrot *self);
 
 #endif //JUMPHARE_CARROT_H

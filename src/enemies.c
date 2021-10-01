@@ -10,32 +10,16 @@
 #include "enemies.h"
 
 
-#define MAX_ENEMIE_TYPES 32
-
-
 //
 // private
 //
 
-struct Type;
-
-typedef void (*update_fn)(struct Type *self, float dtime);
-
-typedef struct Type {
-    RoBatch ro;
-    update_fn update;
-    float time;
-} Type;
-
-static struct {
-    Type types[MAX_ENEMIE_TYPES];
-    int types_num;
-} L;
+typedef struct Enemies_Type Type;
 
 
-static void add_type(Type add) {
-    assume(L.types_num < MAX_ENEMIE_TYPES, "wtf?");
-    L.types[L.types_num++] = add;
+static void add_type(Enemies *self, Type add) {
+    assume(self->L.types_num < ENEMIES_MAX_TYPES, "wtf?");
+    self->L.types[self->L.types_num++] = add;
 }
 
 
@@ -44,26 +28,32 @@ static void add_type(Type add) {
 //
 
 
-void enemies_init() {
-    L.types_num = 0; // to be safe...
+Enemies *enemies_new(const Collision *collision) {
+    Enemies *self = rhc_calloc(sizeof *self);
+    self->collision_ref = collision;
+    return self;
 }
 
-void enemies_kill() {
-    for(int i=0; i<L.types_num; i++) {
-        ro_batch_kill(&L.types[i].ro);
+void enemies_kill(Enemies **self_ptr) {
+    Enemies *self = *self_ptr;
+    if(!self)
+        return;
+    for(int i=0; i<self->L.types_num; i++) {
+        ro_batch_kill(&self->L.types[i].ro);
     }
-    memset(&L, 0, sizeof(L));
+    rhc_free(self);
+    *self_ptr = NULL;
 }
 
-void enemies_update(float dtime) {
-    for(int i=0; i<L.types_num; i++) {
-        L.types[i].update(&L.types[i], dtime);
+void enemies_update(Enemies *self, float dtime) {
+    for(int i=0; i<self->L.types_num; i++) {
+        self->L.types[i].update(&self->L.types[i], dtime);
     }
 }
 
-void enemies_render() {
-    for(int i=0; i<L.types_num; i++) {
-        ro_batch_render(&L.types[i].ro, camera.gl_main);
+void enemies_render(Enemies *self, const mat4 *cam_mat) {
+    for(int i=0; i<self->L.types_num; i++) {
+        ro_batch_render(&self->L.types[i].ro, cam_mat);
     }
 }
 
@@ -122,12 +112,12 @@ static void hedgehog_update(Type *self, float dtime) {
             
             u_pose_set_xy(&self->ro.rects[i].pose, pos.x, pos.y);
             
-            Collision_s coll = {hedgehog_collision_cb, &self->ro.rects[i]};
+            CollisionCallback_s coll = {hedgehog_collision_cb, &self->ro.rects[i]};
             vec2 center = {{pos.x, pos.y-6}};
             vec2 radius = {{8, 8}};
             vec2 speed = {.x = speed_x};
             
-            collision_tilemap_grounded(coll, center, radius, speed);
+            collision_tilemap_grounded(self->enemies_ref->collision_ref, coll, center, radius, speed);
         }
     }
     
@@ -139,12 +129,13 @@ static void hedgehog_update(Type *self, float dtime) {
 // public
 //
 
-void enemies_add_hedgehogs(const vec2 *positions, int n) {
+void enemies_add_hedgehogs(Enemies *self, const vec2 *positions, int n) {
     if(n<=0)
         return;
     assume(positions, "wtf?");
     log_info("enemies_add_hedgehogs: %i", n);
     Type t = {0};
+    t.enemies_ref = self;
     t.ro = ro_batch_new(n,
             r_texture_new_file(4, 2, "res/enemies/hedgehog.png"));
     t.update = hedgehog_update;
@@ -156,5 +147,5 @@ void enemies_add_hedgehogs(const vec2 *positions, int n) {
                 32, 32);
     }
     
-    add_type(t);
+    add_type(self, t);
 }

@@ -17,37 +17,29 @@ struct HudCameraMatrices_s {
     mat4 p_inv;
 };
 
-struct HudCameraGlobals_s {
+typedef struct {
     struct HudCameraMatrices_s matrices;
-    const mat4 *gl;
-};
-extern struct HudCameraGlobals_s hudcamera;
+    struct {
+        float real_pixel_per_pixel;
+        float left, right, bottom, top;
+    } RO;   // read only
+} HudCamera_s;
+
+HudCamera_s *hudcamera_new();
+
+void hudcamera_update(HudCamera_s *self, int wnd_width, int wnd_height);
 
 
-void hudcamera_init();
-
-void hudcamera_update(int wnd_width, int wnd_height);
-
-float hudcamera_real_pixel_per_pixel();
-
-float hudcamera_left();
-
-float hudcamera_right();
-
-float hudcamera_bottom();
-
-float hudcamera_top();
-
-static float hudcamera_width() {
-    return -hudcamera_left() + hudcamera_right();
+static float hudcamera_width(const HudCamera_s *self) {
+    return -self->RO.left + self->RO.right;
 }
 
-static float hudcamera_height() {
-    return -hudcamera_bottom() + hudcamera_top();
+static float hudcamera_height(const HudCamera_s *self) {
+    return -self->RO.bottom + self->RO.top;
 }
 
-static bool hudcamera_is_portrait_mode() {
-    return hudcamera_height() > hudcamera_width();
+static bool hudcamera_is_portrait_mode(const HudCamera_s *self) {
+    return hudcamera_height(self) > hudcamera_width(self);
 }
 
 

@@ -16,6 +16,12 @@ static struct {
     eInput *input;
     eGui *gui;
     rRender *render;
+    
+    Camera_s *camera;
+    HudCamera_s *hudcam;
+    
+    Tiles *tiles;
+    Level *level;
 
     // debug text
     RoText fps_ro;
@@ -41,10 +47,10 @@ int main(int argc, char **argv) {
 
 
     // init systems
-    camera_init();      // camera for the level
-    hudcamera_init();  // camera for hud elements
-    tiles_init();       // loads all tile textures
-    level_init(1, L.window, L.input, L.render);      // manages the gameplay (tilemap, hare, background, ...)
+    L.camera = camera_new();      // camera for the level
+    L.hudcam = hudcamera_new();  // camera for hud elements
+    L.tiles = tiles_new();       // loads all tile textures
+    L.level = level_new(1, L.camera, L.hudcam, L.tiles, L.window, L.input, L.render);      // manages the gameplay (tilemap, hare, background, ...)
 
     // debug fps + load text
     L.fps_ro = ro_text_new_font55(64);
@@ -85,15 +91,17 @@ static void main_loop(float delta_time) {
         u_time -= fixed_time;
 
         // simulate game
-        level_update(fixed_time);
+        level_update(L.level, fixed_time);
     }
 
     // camera only needs to be updated before rendering
-    camera_update(window_size.x, window_size.y);
-    hudcamera_update(window_size.x, window_size.y);
+    camera_update(L.camera, window_size.x, window_size.y);
+    hudcamera_update(L.hudcam, window_size.x, window_size.y);
+    
+    const mat4 *hudcam_mat = &L.hudcam->matrices.p;
 
     // render
-    level_render();
+    level_render(L.level, L.camera, hudcam_mat);
 
 
     // fps + load
@@ -116,12 +124,12 @@ static void main_loop(float delta_time) {
             vec2 size = ro_text_set_text(&L.fps_ro, text);
             u_pose_set_xy(&L.fps_ro.pose,
                           sca_floor(-size.x / 2),
-                          sca_floor(hudcamera_top() - 2));
+                          sca_floor(L.hudcam->RO.top - 2));
             time -= 0.25;
             cnt = 0;
             load_sum = 0;
         }
-        ro_text_render(&L.fps_ro, hudcamera.gl);
+        ro_text_render(&L.fps_ro, hudcam_mat);
     }
 
     // nuklear debug windows

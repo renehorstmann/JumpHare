@@ -25,11 +25,6 @@
 // private
 //
 
-static struct {
-    RoSingle goal_ro;
-    float time;
-} L;
-
 static void emit_particles(float x, float y) {
     rParticleRect_s rects[NUM_PARTICLES];
     for(int i=0; i<NUM_PARTICLES; i++) {
@@ -64,53 +59,61 @@ static void activate() {
 // public
 //
 
-void goal_init(vec2 position) {
+Goal *goal_new(vec2 position) {
+    Goal *self = rhc_calloc(sizeof *self);
     
-    L.goal_ro = ro_single_new(
+    self->L.goal_ro = ro_single_new(
                     r_texture_new_file(4, 2, "res/goal_flag.png"));
-    L.goal_ro.rect.pose = u_pose_new(
+    self->L.goal_ro.rect.pose = u_pose_new(
             position.x,
             position.y+GOAL_OFFSET_Y,
             32, 48);
 
-    L.goal_ro.rect.sprite.y = 1;
+    self->L.goal_ro.rect.sprite.y = 1;
     
+    return self;
 }
 
-void goal_kill() {
-    ro_single_kill(&L.goal_ro);
+void goal_kill(Goal **self_ptr) {
+    Goal *self = *self_ptr;
+    if(!self)
+        return;
+    ro_single_kill(&self->L.goal_ro);
+    
+    rhc_free(self);
+    *self_ptr = NULL;
 }
 
-void goal_update(float dtime) {
-    L.time += dtime;
+void goal_update(Goal *self, float dtime) {
+    self->L.time += dtime;
 
 
-    float animate_time = sca_mod(L.time, FRAMES / FPS);
+    float animate_time = sca_mod(self->L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
-    L.goal_ro.rect.sprite.x = frame;    
+    self->L.goal_ro.rect.sprite.x = frame;    
 }
 
-void goal_render() {
-    ro_single_render(&L.goal_ro, camera.gl_main);
+void goal_render(Goal *self, const mat4 *cam_mat) {
+    ro_single_render(&self->L.goal_ro, cam_mat);
 }
 
-bool goal_reached() {
-    return L.goal_ro.rect.sprite.y < 0.5;
+bool goal_reached(const Goal *self) {
+    return self->L.goal_ro.rect.sprite.y < 0.5;
 }
 
-vec2 goal_position() {
-    vec2 center = u_pose_get_xy(L.goal_ro.rect.pose);
+vec2 goal_position(const Goal *self) {
+    vec2 center = u_pose_get_xy(self->L.goal_ro.rect.pose);
     center.y -= GOAL_OFFSET_Y;
     return center;
 }
 
-void goal_activate() {
-    if(goal_reached())
+void goal_activate(Goal *self) {
+    if(goal_reached(self))
         return;
     log_info("goal_activate");
-    L.goal_ro.rect.sprite.y = 0;
+    self->L.goal_ro.rect.sprite.y = 0;
 
-    vec2 pos = u_pose_get_xy(L.goal_ro.rect.pose);
+    vec2 pos = u_pose_get_xy(self->L.goal_ro.rect.pose);
 
     pos.y -= GOAL_OFFSET_Y;
 

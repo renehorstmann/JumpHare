@@ -2,20 +2,27 @@
 #define JUMPHARE_GOAL_H
 
 #include <stdbool.h>
-#include "mathc/types/float.h"
+#include "r/ro_types.h"
 
-void goal_init(vec2 position);
+typedef struct {
+    struct {
+        RoSingle goal_ro;
+        float time;
+    } L;
+} Goal;
 
-void goal_kill();
+Goal *goal_new(vec2 position);
 
-void goal_update(float dtime);
+void goal_kill(Goal **self_ptr);
 
-void goal_render();
+void goal_update(Goal *self, float dtime);
 
-bool goal_reached();
+void goal_render(Goal *self, const mat4 *cam_mat);
 
-vec2 goal_position();
+bool goal_reached(const Goal *self);
 
-void goal_activate();
+vec2 goal_position(const Goal *self);
+
+void goal_activate(Goal *self);
 
 #endif //JUMPHARE_GOAL_H

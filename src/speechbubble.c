@@ -70,19 +70,23 @@ static bool emojifont_sprite_cb(vec2 *sprite, char c) {
 
 
 // public ?
-void emojifont_init(RoText *self, int max) {
-    *self = ro_text_new(max, emojifont_sprite_cb, r_texture_new_file(COLUMNS, ROWS, "res/emojifont.png"));
-    self->size = (vec2) {16, 16};
-    self->offset = (vec2) {18, 18};
+static RoText emojifont_new(int max) {
+    RoText self = ro_text_new(max, emojifont_sprite_cb, r_texture_new_file(COLUMNS, ROWS, "res/emojifont.png"));
+    self.size = (vec2) {16, 16};
+    self.offset = (vec2) {18, 18};
+    return self;
 }
 
 
 
-void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext) {
+SpeechBubble speechbubble_new(vec2 position, const char *emojitext) {
+    SpeechBubble bubble = {0};
+    SpeechBubble *self = &bubble;
+    
     self->position = position;
     
     int len = strlen(emojitext);
-    emojifont_init(&self->text, len);
+    self->text = emojifont_new(len);
     vec2 size = ro_text_set_text(&self->text, emojitext);
     
     float text_x = position.x - size.x/2;
@@ -124,6 +128,8 @@ void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext)
     }
     
     ro_batch_update(&self->bubble);
+    
+    return bubble;
 }
 
 void speechbubble_kill(SpeechBubble *self) {
@@ -157,7 +163,7 @@ void speechbubble_update(SpeechBubble *self, float dtime, vec2 blend_pos) {
     ro_batch_update(&self->bubble);
 }
 
-void speechbubble_render(SpeechBubble *self) {
-    ro_batch_render(&self->bubble, camera.gl_main);
-    ro_text_render(&self->text, camera.gl_main);
+void speechbubble_render(SpeechBubble *self, const mat4 *cam_mat) {
+    ro_batch_render(&self->bubble, cam_mat);
+    ro_text_render(&self->text, cam_mat);
 }

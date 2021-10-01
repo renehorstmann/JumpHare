@@ -9,12 +9,12 @@ typedef struct {
     vec2 position;    // reset to NAN, to ignore alpha blend (or just dont call update)
 } SpeechBubble;
 
-void speechbubble_init(SpeechBubble *self, vec2 position, const char *emojitext);
+SpeechBubble speechbubble_new(vec2 position, const char *emojitext);
 
 void speechbubble_kill(SpeechBubble *self);
 
 void speechbubble_update(SpeechBubble *self, float dtime, vec2 blend_pos);
 
-void speechbubble_render(SpeechBubble *self);
+void speechbubble_render(SpeechBubble *self, const mat4 *cam_mat);
 
 #endif //JUMPHARE_SPEECHBUBBLE_H

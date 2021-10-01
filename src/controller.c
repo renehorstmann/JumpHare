@@ -20,64 +20,55 @@
 #define BACKGROUND_SIZE 512
 
 
-struct ControllerGlobals_s controller;
-
 //
 // private
 //
 
-static struct {
-    eInput *input;
-    RoBatch background_ro;
-    ePointer_s pointer[2];
-    bvec2 pointer_down_map;
-    int pointer_down;
-    int main_pointer;
-} L;
-
-static bool in_control_area(vec2 pos) {
-    return pos.x < camera_left() + LANDSCAPE_INGAME_AREA 
-            || pos.x > camera_right() - LANDSCAPE_INGAME_AREA
-            || pos.y > camera_top() || pos.y < camera_bottom();
+static bool in_control_area(const Camera_s *camera, vec2 pos) {
+    return pos.x < camera->RO.left + LANDSCAPE_INGAME_AREA 
+            || pos.x > camera->RO.right - LANDSCAPE_INGAME_AREA
+            || pos.y > camera->RO.top || pos.y < camera->RO.bottom;
 }
 
 static void pointer_event(ePointer_s pointer, void *ud) {
     if (pointer.id < 0 || pointer.id > 1)
         return;
+        
+    Controller *self = ud;
 
-    pointer.pos = mat4_mul_vec(hudcamera.matrices.p_inv, pointer.pos);
+    pointer.pos = mat4_mul_vec(self->hudcam_ref->matrices.p_inv, pointer.pos);
 
-    if(in_control_area(pointer.pos.xy)) {
+    if(in_control_area(self->camera_ref, pointer.pos.xy)) {
         if(pointer.action == E_POINTER_DOWN) {
-            L.pointer_down_map.v[pointer.id] = true;
+            self->L.pointer_down_map.v[pointer.id] = true;
         }
     } 
     if(pointer.action == E_POINTER_UP) {
-        L.pointer_down_map.v[pointer.id] = false;
+        self->L.pointer_down_map.v[pointer.id] = false;
     }
     
-    L.pointer_down = bvec2_sum(L.pointer_down_map);
-    if(L.pointer_down == 1) {
-        L.main_pointer = L.pointer_down_map.v0 == 0? 1 : 0;
+    self->L.pointer_down = bvec2_sum(self->L.pointer_down_map);
+    if(self->L.pointer_down == 1) {
+        self->L.main_pointer = self->L.pointer_down_map.v0 == 0? 1 : 0;
     }
 
-    L.pointer[pointer.id] = pointer;
+    self->L.pointer[pointer.id] = pointer;
 }
 
-static void key_ctrl() {
+static void key_ctrl(Controller *self) {
     static bool action = false;
 
-    eInputKeys keys = e_input_get_keys(L.input);
+    eInputKeys keys = e_input_get_keys(self->input_ref);
     if (keys.right && !keys.left) {
-        controller.out.speed_x = 1;
+        self->out.speed_x = 1;
     } else if (keys.left && !keys.right) {
-        controller.out.speed_x = -1;
+        self->out.speed_x = -1;
     } 
 
     // only once
     if (keys.space && !action) {
         action = true;
-        controller.out.action = true;
+        self->out.action = true;
     }
     
     if (!keys.space) {
@@ -86,7 +77,7 @@ static void key_ctrl() {
         
 }
 
-static void pointer_ctrl(float dtime) {
+static void pointer_ctrl(Controller *self, float dtime) {
     static float up_time = FLT_MAX;
     static float multi_time = -1;
     static float single_time = 0;
@@ -94,23 +85,23 @@ static void pointer_ctrl(float dtime) {
     static float speed = 0;
 
     // single time
-    if (L.pointer_down == 0) {
+    if (self->L.pointer_down == 0) {
         single_time = 0;
     }
-    if (L.pointer_down == 1) {
+    if (self->L.pointer_down == 1) {
         single_time += dtime;
     }
 
     // stop multi time
-    if (L.pointer_down != 2) {
+    if (self->L.pointer_down != 2) {
         multi_time = -1;
     }
 
     // stopping?
-    if (L.pointer_down == 0) {
+    if (self->L.pointer_down == 0) {
         up_time += dtime;
         if (up_time < UP_TIME) {
-            controller.out.speed_x = speed;
+            self->out.speed_x = speed;
         }
         return;
     }
@@ -119,33 +110,33 @@ static void pointer_ctrl(float dtime) {
     if (up_time > 0 && up_time <= JUMP_TIME) {
         
         // check distance
-        if(vec2_distance(L.pointer[L.main_pointer].pos.xy,
+        if(vec2_distance(self->L.pointer[self->L.main_pointer].pos.xy,
                 last_pointer_pos) 
                 <= MAX_JUMP_TAP_DISTANCE) {
-            controller.out.action = true;
+            self->out.action = true;
         }
     }
 
     // multi tap to jump
-    if (multi_time < 0 && L.pointer_down == 2) {
+    if (multi_time < 0 && self->L.pointer_down == 2) {
         multi_time = 0;
-        controller.out.action = true;
+        self->out.action = true;
     }
 
     if (multi_time >= 0) {
         multi_time += dtime;
     }
 
-    vec2 pos = L.pointer[L.main_pointer].pos.xy;
+    vec2 pos = self->L.pointer[self->L.main_pointer].pos.xy;
 
-    if(!hudcamera_is_portrait_mode()) {
+    if(!hudcamera_is_portrait_mode(self->hudcam_ref)) {
         float center;
         if(pos.x > 0) {
-            center = sca_mix(camera_right(), hudcamera_right(), 0.33);
-            center = sca_min(center, hudcamera_right()-DISTANCE*1.5);
+            center = sca_mix(self->camera_ref->RO.right, self->hudcam_ref->RO.right, 0.33);
+            center = sca_min(center, self->hudcam_ref->RO.right-DISTANCE*1.5);
         } else {
-            center = sca_mix(camera_left(), hudcamera_left(), 0.33);
-            center = sca_max(center, hudcamera_left()+DISTANCE*1.5);
+            center = sca_mix(self->camera_ref->RO.left, self->hudcam_ref->RO.left, 0.33);
+            center = sca_max(center, self->hudcam_ref->RO.left+DISTANCE*1.5);
         }
         
         pos.x -= center;
@@ -162,60 +153,73 @@ static void pointer_ctrl(float dtime) {
         speed = 0;
     }
 
-    controller.out.speed_x = speed;
+    self->out.speed_x = speed;
 
     // reset up_time, cause we are moving
     up_time = 0;
-    last_pointer_pos = L.pointer[L.main_pointer].pos.xy;
+    last_pointer_pos = self->L.pointer[self->L.main_pointer].pos.xy;
 }
 
 
-//
+//j
 // public
 //
 
-void controller_init(eInput *input) {
-    L.input = input;
-    L.pointer[0].action = E_POINTER_UP;
-    L.pointer[1].action = E_POINTER_UP;
-    e_input_register_pointer_event(input, pointer_event, NULL);
-
-    L.background_ro = ro_batch_new(2, r_texture_new_file(1, 1, "res/hud_background.png"));
-    //L.background_ro.rect.color.a = 0.0;
-}
-
-void controller_kill() {
-    e_input_unregister_pointer_event(L.input, pointer_event);
-    ro_batch_kill(&L.background_ro);
-    memset(&L, 0, sizeof(L));
-}
-
-void controller_update(float dtime) {
-    controller.out.speed_x = 0;
-    controller.out.action = false;
+Controller *controller_new(eInput *input, const Camera_s *camera, const HudCamera_s *hudcam) {
+    Controller *self = rhc_calloc(sizeof *self);
     
-    key_ctrl();
-    pointer_ctrl(dtime);
+    self->input_ref = input;
+    self->camera_ref = camera;
+    self->hudcam_ref = hudcam;
+    
+    self->L.pointer[0].action = E_POINTER_UP;
+    self->L.pointer[1].action = E_POINTER_UP;
+    e_input_register_pointer_event(input, pointer_event, self);
+
+    self->L.background_ro = ro_batch_new(2, r_texture_new_file(1, 1, "res/hud_background.png"));
+    //self->L.background_ro.rect.color.a = 0.0;
+    
+    return self;
+}
+
+void controller_kill(Controller **self_ptr) {
+    Controller *self = *self_ptr;
+    if(!self)
+        return;
+        
+    e_input_unregister_pointer_event(self->input_ref, pointer_event);
+    ro_batch_kill(&self->L.background_ro);
+    
+    rhc_free(self);
+    *self_ptr = NULL;
+}
+
+void controller_update(Controller *self, float dtime) {
+    self->out.speed_x = 0;
+    self->out.action = false;
+    
+    key_ctrl(self);
+    pointer_ctrl(self, dtime);
     
 
 
     // ro
     mat4 pose = u_pose_new(0, 0, BACKGROUND_SIZE, BACKGROUND_SIZE);
-    if (hudcamera_is_portrait_mode()) {
-        u_pose_set_y(&pose, camera_bottom() - BACKGROUND_SIZE/2);
-        L.background_ro.rects[0].pose = pose;
+    if (hudcamera_is_portrait_mode(self->hudcam_ref)) {
+        u_pose_set_y(&pose, self->camera_ref->RO.bottom - BACKGROUND_SIZE/2);
+        self->L.background_ro.rects[0].pose = pose;
         
-        L.background_ro.rects[1].pose = u_pose_new_hidden();
+        self->L.background_ro.rects[1].pose = u_pose_new_hidden();
     } else {
-        u_pose_set_x(&pose, camera_left() - BACKGROUND_SIZE/2);
-        L.background_ro.rects[0].pose = pose;
-        u_pose_set_x(&pose, camera_right() + BACKGROUND_SIZE/2);
-        L.background_ro.rects[1].pose = pose;
+        u_pose_set_x(&pose, self->camera_ref->RO.left - BACKGROUND_SIZE/2);
+        self->L.background_ro.rects[0].pose = pose;
+        u_pose_set_x(&pose, self->camera_ref->RO.right + BACKGROUND_SIZE/2);
+        self->L.background_ro.rects[1].pose = pose;
     }
     
-    ro_batch_update(&L.background_ro);
+    ro_batch_update(&self->L.background_ro);
 }
 
-void controller_render() {
-    ro_batch_render(&L.background_ro, hudcamera.gl);
+void controller_render(Controller *self, const mat4 *hudcam_mat) {
+    ro_batch_render(&self->L.background_ro, hudcam_mat);
 }

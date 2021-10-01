@@ -27,21 +27,6 @@ static const vec3 PARTICLE_COLOR = {{1, 0.65, 0}};
 // private
 //
 
-static struct {
-    RoBatch carrot_ro;
-    bool collected[3];
-    int collected_cnt;
-    int eaten_cnt;
-    float time;
-
-    struct {
-        bool collected[3];
-        int collected_cnt;
-        int eaten_cnt;
-    } save;
-} L;
-
-
 static void emit_particles(float x, float y) {
     rParticleRect_s rects[NUM_PARTICLES];
     for(int i=0; i<NUM_PARTICLES; i++) {
@@ -68,104 +53,103 @@ static void emit_particles(float x, float y) {
 // public
 //
 
-void carrot_init(const vec2 *positions_3) {
+Carrot *carrot_new(const vec2 *positions_3) {
+    Carrot *self = rhc_calloc(sizeof *self);
     
     // in game carrots
-    L.carrot_ro = ro_batch_new(3,
+    self->L.carrot_ro = ro_batch_new(3,
                     r_texture_new_file(4, 1, "res/carrot.png"));
             
     for(int i=0; i<3; i++) {
-        L.carrot_ro.rects[i].pose = u_pose_new(
+        self->L.carrot_ro.rects[i].pose = u_pose_new(
                 positions_3[i].x,
                 positions_3[i].y,
                 16, 32);
     }
-    ro_batch_update(&L.carrot_ro);
+    ro_batch_update(&self->L.carrot_ro);
 
+    return self;
 }
 
-void carrot_kill() {
-    ro_batch_kill(&L.carrot_ro);
-    memset(&L, 0, sizeof(L));
+void carrot_kill(Carrot **self_ptr) {
+    Carrot *self = *self_ptr;
+    if(!self)
+        return;
+    ro_batch_kill(&self->L.carrot_ro);
+    
+    rhc_free(self);
+    *self_ptr = NULL;
 }
 
-void carrot_update(float dtime) {
-    L.time += dtime;
-    float animate_time = sca_mod(L.time, FRAMES / FPS);
+void carrot_update(Carrot *self, float dtime) {
+    self->L.time += dtime;
+    float animate_time = sca_mod(self->L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
     for(int i=0; i<3; i++)
-        L.carrot_ro.rects[i].sprite.x = frame;
+        self->L.carrot_ro.rects[i].sprite.x = frame;
 
     for(int i=0; i<3; i++) {
-        if(!L.collected[i])
+        if(!self->L.collected[i])
             continue;
         
-        float h = u_pose_get_h(L.carrot_ro.rects[i].pose);
+        float h = u_pose_get_h(self->L.carrot_ro.rects[i].pose);
         h = sca_max(0, h - COLLECT_SHRINK_SPEED * dtime);
         
-        u_pose_set_size(&L.carrot_ro.rects[i].pose, h/2, h);
+        u_pose_set_size(&self->L.carrot_ro.rects[i].pose, h/2, h);
     }
     
-    ro_batch_update(&L.carrot_ro);
+    ro_batch_update(&self->L.carrot_ro);
 }
 
-void carrot_render() {
-    ro_batch_render(&L.carrot_ro, camera.gl_main);
+void carrot_render(Carrot *self, const mat4 *cam_mat) {
+    ro_batch_render(&self->L.carrot_ro, cam_mat);
 }
 
 
-bool carrot_collect(vec2 position) {
+bool carrot_collect(Carrot *self, vec2 position) {
     for(int i=0; i<3; i++) {
-        if(L.collected[i])
+        if(self->L.collected[i])
             continue;
-        if(u_pose_aa_contains(L.carrot_ro.rects[i].pose, position)) {
+        if(u_pose_aa_contains(self->L.carrot_ro.rects[i].pose, position)) {
             log_info("carrot: collected %i", i);
-            L.collected[i] = true;
-            vec2 cxy = u_pose_get_xy(L.carrot_ro.rects[i].pose);
+            self->L.collected[i] = true;
+            vec2 cxy = u_pose_get_xy(self->L.carrot_ro.rects[i].pose);
             emit_particles(cxy.x, cxy.y);
-            L.collected_cnt++;
+            self->RO.collected++;
             return true;
         }
     }
     return false;
 }
 
-int carrot_collected() {
-    return L.collected_cnt;
-}
 
-int carrot_eaten() {
-    return L.eaten_cnt;
-}
-
-
-void carrot_eat() {
-    if(L.collected_cnt <= 0 || L.eaten_cnt >= L.collected_cnt) {
-        log_error("carrot: failed to eat, collected_cnt <= 0");
+void carrot_eat(Carrot *self) {
+    if(self->RO.collected <= 0 || self->RO.eaten >= self->RO.collected) {
+        log_error("carrot: failed to eat, collected <= 0");
         return;
     }
-    L.eaten_cnt++;
+    self->RO.eaten++;
 }
 
-void carrot_save() {
-    memcpy(L.save.collected, L.collected, sizeof(L.collected));
-    L.save.collected_cnt = L.collected_cnt;
-    L.save.eaten_cnt = L.eaten_cnt;
+void carrot_save(Carrot *self) {
+    memcpy(self->L.save.collected, self->L.collected, sizeof(self->L.collected));
+    self->L.save.collected_cnt = self->RO.collected;
+    self->L.save.eaten_cnt = self->RO.eaten;
 }
 
-void carrot_load() {
-    memcpy(L.collected, L.save.collected, sizeof(L.collected));
-    L.collected_cnt = L.save.collected_cnt;
-    L.eaten_cnt = L.save.eaten_cnt;
+void carrot_load(Carrot *self) {
+    memcpy(self->L.collected, self->L.save.collected, sizeof(self->L.collected));
+    self->RO.collected = self->L.save.collected_cnt;
+    self->RO.eaten = self->L.save.eaten_cnt;
     
     // in game carrots
     for(int i=0; i<3; i++) {
-        if(L.collected[i]) {
-            u_pose_set_size(&L.carrot_ro.rects[i].pose, 0, 0);
+        if(self->L.collected[i]) {
+            u_pose_set_size(&self->L.carrot_ro.rects[i].pose, 0, 0);
         } else {
-            u_pose_set_size_angle(&L.carrot_ro.rects[i].pose, 16, 32, 0);
+            u_pose_set_size_angle(&self->L.carrot_ro.rects[i].pose, 16, 32, 0);
         }
     }
-    ro_batch_update(&L.carrot_ro);
+    ro_batch_update(&self->L.carrot_ro);
 }
 

@@ -2,7 +2,12 @@
 #define JUMPHARE_COLLISION_H
 
 #include <stdbool.h>
-#include "mathc/types/float.h"
+#include "tilemap.h"
+
+
+typedef struct {
+    const Tilemap *tilemap_ref;
+} Collision;
 
 enum collision_state {
   COLLISION_BOTTOM,
@@ -19,12 +24,16 @@ typedef void (*collision_tilemap_cb_fn)(vec2 delta, enum collision_state state, 
 typedef struct {
     collision_tilemap_cb_fn cb;
     void *cb_user_data;
-} Collision_s;
+} CollisionCallback_s;
 
 
-void collision_tilemap_grounded(Collision_s self, vec2 center, vec2 radius, vec2 speed);
+Collision *collision_new(const Tilemap *tilemap);
 
-void collision_tilemap_falling(Collision_s self, vec2 center, vec2 radius, vec2 speed);
+void collision_kill(Collision **self_ptr);
+
+void collision_tilemap_grounded(const Collision *self, CollisionCallback_s callback, vec2 center, vec2 radius, vec2 speed);
+
+void collision_tilemap_falling(const Collision *self, CollisionCallback_s callback, vec2 center, vec2 radius, vec2 speed);
 
 
 #endif //JUMPHARE_COLLISION_H
