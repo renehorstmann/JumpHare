@@ -1,6 +1,6 @@
 #include "u/pose.h"
 #include "e/window.h"
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
 #include "mathc/utils/camera.h"

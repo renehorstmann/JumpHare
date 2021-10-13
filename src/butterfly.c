@@ -5,7 +5,7 @@
 #include "mathc/utils/random.h"
 #include "mathc/utils/color.h"
 #include "rhc/error.h"
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "camera.h"
 #include "butterfly.h"
 
@@ -74,7 +74,7 @@ static void fly_away(Butterfly *self, int i) {
 Butterfly *butterfly_new(const vec2 *positions, int num) {
     assume(num>0, "atleast one butterfly in a level?");
     
-    Butterfly *self = rhc_calloc_raising(sizeof *self);
+    Butterfly *self = rhc_calloc(sizeof *self);
     
     self->L.ro = ro_particle_new(num,
             r_texture_new_file(12, 2, "res/butterfly.png"));
@@ -97,7 +97,7 @@ Butterfly *butterfly_new(const vec2 *positions, int num) {
     
     self->RO.last_color = vec3_set(0.75);
    
-    self->L.save.collected = rhc_calloc_raising(num * sizeof(bool));
+    self->L.save.collected = rhc_calloc(num * sizeof(bool));
     
     return self;
 }

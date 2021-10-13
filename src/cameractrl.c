@@ -1,4 +1,4 @@
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "mathc/float.h"
 #include "camera.h"
 #include "tilemap.h"

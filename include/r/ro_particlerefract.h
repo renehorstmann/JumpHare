@@ -22,7 +22,7 @@
 ////    defaults to fullscreen (0.5, 0.5, 0.5, 0.5)
 //
 
-#include "rhc/allocator.h"
+#include "rhc/alloc.h"
 #include "ro_types.h"
 
 
@@ -38,17 +38,17 @@ static RoParticleRefract ro_particlerefract_new(int num,
                                                 rTexture tex_refraction_sink) {
     return ro_particlerefract_new_a(num, scale_ptr,
                                     tex_main_sink, tex_refraction_sink,
-                                    allocator_new_default());
+                                    rhc_allocator_new());
 }
 
 
 void ro_particlerefract_kill(RoParticleRefract *self);
 
 // updates a subset of the particles into the gpu
-void ro_particlerefract_update_sub(RoParticleRefract *self, int offset, int size);
+void ro_particlerefract_update_sub(const RoParticleRefract *self, int offset, int size);
 
 // renders a subset of the particles
-void ro_particlerefract_render_sub(RoParticleRefract *self, float time, int num, const mat4 *camera_mat);
+void ro_particlerefract_render_sub(const RoParticleRefract *self, float time, int num, const mat4 *camera_mat);
 
 // resets the texture, if .owns_tex_main is true, it will delete the old texture
 void ro_particlerefract_set_texture_main(RoParticleRefract *self, rTexture tex_main_sink);
@@ -57,11 +57,11 @@ void ro_particlerefract_set_texture_main(RoParticleRefract *self, rTexture tex_m
 void ro_particlerefract_set_texture_refraction(RoParticleRefract *self, rTexture tex_refraction_sink);
 
 
-static void ro_particlerefract_update(RoParticleRefract *self) {
+static void ro_particlerefract_update(const RoParticleRefract *self) {
     ro_particlerefract_update_sub(self, 0, self->num);
 }
 
-static void ro_particlerefract_render(RoParticleRefract *self, float time, const mat4 *camera_mat) {
+static void ro_particlerefract_render(const RoParticleRefract *self, float time, const mat4 *camera_mat) {
     ro_particlerefract_render_sub(self, time, self->num, camera_mat);
 }
 
