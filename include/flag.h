@@ -40,7 +40,7 @@ void flag_kill(Flag **self_ptr);
 
 void flag_update(Flag *self, const Hare *hare, float dtime);
 
-void flag_render(Flag *self, const mat4 *cam_mat);
+void flag_render(const Flag *self, const mat4 *cam_mat);
 
 // returns NAN, NAN if no flag is actice
 vec2 flag_active_position(const Flag *self);

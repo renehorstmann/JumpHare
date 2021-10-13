@@ -35,6 +35,6 @@ void controller_kill(Controller **self_ptr);
 
 void controller_update(Controller *self, float dtime);
 
-void controller_render(Controller *self, const mat4 *hudcam_mat);
+void controller_render(const Controller *self, const mat4 *hudcam_mat);
 
 #endif //JUMPHARE_CONTROLLER_H

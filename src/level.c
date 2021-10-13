@@ -6,23 +6,7 @@
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
 #include "rhc/error.h"
-#include "background.h"
-#include "tilemap.h"
-#include "enemies.h"
-#include "hare.h"
-#include "airstroke.h"
-#include "goal.h"
-#include "carrot.h"
-#include "flag.h"
-#include "speechbubble.h"
-#include "butterfly.h"
-#include "pixelparticles.h"
-#include "dead.h"
-#include "hud.h"
-#include "controller.h"
-#include "cameractrl.h"
 #include "scripts.h"
-#include "camera.h"
 #include "level.h"
 
 #define CODE_LAYER 2
@@ -260,7 +244,7 @@ void level_update(Level *self, float dtime) {
     }
 }
 
-void level_render(Level *self, const Camera_s *cam, const mat4 *hudcam_mat) {
+void level_render(const Level *self, const Camera_s *cam, const mat4 *hudcam_mat) {
     const mat4 *cam_main_mat = &cam->matrices_main.vp;
     
     background_render(self->background, cam);

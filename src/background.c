@@ -5,7 +5,6 @@
 #include "u/pose.h"
 #include "u/image.h"
 #include "mathc/float.h"
-#include "camera.h"
 #include "background.h"
 
 #define PIXEL_SIZE 2.0
@@ -71,7 +70,7 @@ void background_update(Background *self, float dtime) {
 
 }
 
-void background_render(Background *self, const Camera_s *cam) {
+void background_render(const Background *self, const Camera_s *cam) {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
         ro_batch_render(&self->L.ro[i], &cam->matrices_background[i].vp);
 }

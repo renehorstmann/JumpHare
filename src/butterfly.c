@@ -6,7 +6,6 @@
 #include "mathc/utils/color.h"
 #include "rhc/error.h"
 #include "rhc/alloc.h"
-#include "camera.h"
 #include "butterfly.h"
 
 #define CHILL_FPS 6.0
@@ -131,7 +130,7 @@ void butterfly_update(Butterfly *self, float dtime) {
    
 }
 
-void butterfly_render(Butterfly *self, const mat4 *cam_mat) {
+void butterfly_render(const Butterfly *self, const mat4 *cam_mat) {
     ro_particle_render(&self->L.ro, self->L.time, cam_mat);
 }
 

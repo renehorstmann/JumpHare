@@ -33,7 +33,7 @@ void carrot_kill(Carrot **self_ptr);
 
 void carrot_update(Carrot *self, float dtime);
 
-void carrot_render(Carrot *self, const mat4 *cam_mat);
+void carrot_render(const Carrot *self, const mat4 *cam_mat);
 
 bool carrot_collect(Carrot *self, vec2 position);
 

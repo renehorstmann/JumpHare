@@ -23,9 +23,9 @@ void tilemap_kill(Tilemap **self_ptr);
 
 void tilemap_update(Tilemap *self, float dtime);
 
-void tilemap_render_back(Tilemap *self, const mat4 *cam_mat);
+void tilemap_render_back(const Tilemap *self, const mat4 *cam_mat);
 
-void tilemap_render_front(Tilemap *self, const mat4 *cam_mat);
+void tilemap_render_front(const Tilemap *self, const mat4 *cam_mat);
 
 // searches for positions of the tile code in the given layer
 // positions returned are in the axis aligned format (top left)

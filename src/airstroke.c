@@ -3,8 +3,6 @@
 #include "u/pose.h"
 #include "mathc/float.h"
 #include "mathc/utils/random.h"
-#include "camera.h"
-#include "tilemap.h"
 #include "airstroke.h"
 
 
@@ -91,7 +89,7 @@ void airstroke_update(Airstroke *self, const Tilemap *tilemap, float dtime) {
     ro_batch_update(&self->L.ro);
 }
 
-void airstroke_render(Airstroke *self, const mat4 *cam_mat) {
+void airstroke_render(const Airstroke *self, const mat4 *cam_mat) {
     ro_batch_render(&self->L.ro, cam_mat);
 }
 

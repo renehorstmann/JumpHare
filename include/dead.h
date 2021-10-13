@@ -24,7 +24,7 @@ void dead_kill(Dead **self_ptr);
 
 void dead_update(Dead *self, float dtime);
 
-void dead_render(Dead *self, const mat4 *cam_mat, const mat4 *hudcam_mat);
+void dead_render(const Dead *self, const mat4 *cam_mat, const mat4 *hudcam_mat);
 
 void dead_set_dead(Dead *self, float x, float y);
 

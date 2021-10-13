@@ -1,7 +1,5 @@
 #include <assert.h>
 #include "mathc/float.h"
-#include "tilemap.h"
-#include "tiles.h"
 #include "collision.h"
 
 

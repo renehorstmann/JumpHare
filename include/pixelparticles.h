@@ -20,7 +20,7 @@ void pixelparticles_kill(PixelParticles **self_ptr);
 
 void pixelparticles_update(PixelParticles *self, float dtime);
 
-void pixelparticles_render(PixelParticles *self, const mat4 *cam_mat);
+void pixelparticles_render(const PixelParticles *self, const mat4 *cam_mat);
 
 void pixelparticles_add(PixelParticles *self, const rParticleRect_s *particles, int n);
 

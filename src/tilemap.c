@@ -5,8 +5,6 @@
 #include "mathc/sca/int.h"
 #include "mathc/sca/float.h"
 #include "rhc/error.h"
-
-#include "camera.h"
 #include "tilemap.h"
 
 
@@ -193,7 +191,7 @@ void tilemap_update(Tilemap *self, float dtime) {
 
 }
 
-void tilemap_render_back(Tilemap *self, const mat4 *cam_mat) {
+void tilemap_render_back(const Tilemap *self, const mat4 *cam_mat) {
     for (int i = 0; i < self->tiles_ref->size; i++) {
         if(self->L.ro_back_active[i])
             ro_batch_render(&self->L.ro_back[i], cam_mat);
@@ -204,7 +202,7 @@ void tilemap_render_back(Tilemap *self, const mat4 *cam_mat) {
     }
 }
 
-void tilemap_render_front(Tilemap *self, const mat4 *cam_mat) {
+void tilemap_render_front(const Tilemap *self, const mat4 *cam_mat) {
     for (int i = 0; i < self->tiles_ref->size; i++) {
 //        ro_batch_render(&self->L.ro_front[i]);
     }

@@ -5,9 +5,6 @@
 #include "mathc/float.h"
 #include "mathc/int.h"
 #include "mathc/utils/random.h"
-#include "camera.h"
-#include "tilemap.h"
-#include "pixelparticles.h"
 #include "hare.h"
 
 
@@ -477,7 +474,7 @@ void hare_update(Hare *self, float dtime) {
     check_state_change(self, dtime);
 }
 
-void hare_render(Hare *self, const mat4 *cam_mat) {
+void hare_render(const Hare *self, const mat4 *cam_mat) {
     ro_single_render(&self->L.ro, cam_mat);
     ro_particle_render(&self->L.sleep_zzz_ro, self->L.sleep_ro_time, cam_mat);
 }

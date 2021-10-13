@@ -202,7 +202,7 @@ void flag_update(Flag *self, const Hare *hare, float dtime) {
     ro_batch_update(&self->L.btn_ro);
 }
 
-void flag_render(Flag *self, const mat4 *cam_mat) {
+void flag_render(const Flag *self, const mat4 *cam_mat) {
     ro_batch_render(&self->L.flag_ro, cam_mat);
     ro_batch_render(&self->L.btn_ro, cam_mat);
 }

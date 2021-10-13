@@ -27,7 +27,7 @@ void butterfly_kill(Butterfly **self_ptr);
 
 void butterfly_update(Butterfly *self, float dtime);
 
-void butterfly_render(Butterfly *self, const mat4 *cam_mat);
+void butterfly_render(const Butterfly *self, const mat4 *cam_mat);
 
 bool butterfly_collect(Butterfly *self, vec2 position);
 

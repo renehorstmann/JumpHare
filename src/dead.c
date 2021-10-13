@@ -4,8 +4,6 @@
 #include "mathc/sca/float.h"
 #include "mathc/utils/random.h"
 #include "rhc/log.h"
-#include "camera.h"
-#include "hudcamera.h"
 #include "dead.h"
 
 #define TIME 0.75
@@ -80,7 +78,7 @@ void dead_update(Dead *self, float dtime) {
     self->L.blend_ro.rect.color.a = sca_clamp(alpha, 0, 1);
 }
 
-void dead_render(Dead *self, const mat4 *cam_mat, const mat4 *hudcam_mat) {
+void dead_render(const Dead *self, const mat4 *cam_mat, const mat4 *hudcam_mat) {
     if (self->L.time < 0)
         return;
     if (self->L.time <= TIME)

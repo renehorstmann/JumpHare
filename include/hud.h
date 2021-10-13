@@ -27,7 +27,7 @@ const Carrot *carrot,
 const Butterfly *butterfly,
 float dtime);
 
-void hud_render(Hud *self, const mat4 *hudcam_mat);
+void hud_render(const Hud *self, const mat4 *hudcam_mat);
 
 
 #endif //JUMPHARE_HUD_H

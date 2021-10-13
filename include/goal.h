@@ -20,7 +20,7 @@ void goal_kill(Goal **self_ptr);
 
 void goal_update(Goal *self, float dtime);
 
-void goal_render(Goal *self, const mat4 *cam_mat);
+void goal_render(const Goal *self, const mat4 *cam_mat);
 
 bool goal_reached(const Goal *self);
 

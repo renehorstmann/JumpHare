@@ -66,7 +66,7 @@ void level_kill(Level **self_ptr);
 
 void level_update(Level *self, float dtime);
 
-void level_render(Level *self, const Camera_s *cam, const mat4 *hudcam_mat);
+void level_render(const Level *self, const Camera_s *cam, const mat4 *hudcam_mat);
 
 
 #endif //JUMPHARE_LEVEL_H

@@ -26,7 +26,7 @@ void airstroke_kill(Airstroke **self_ptr);
 
 void airstroke_update(Airstroke *self, const Tilemap *tilemap, float dtime);
 
-void airstroke_render(Airstroke *self, const mat4 *cam_mat);
+void airstroke_render(const Airstroke *self, const mat4 *cam_mat);
 
 // used by hare
 void airstroke_add(Airstroke *self, float x, float y);

@@ -15,6 +15,6 @@ void speechbubble_kill(SpeechBubble *self);
 
 void speechbubble_update(SpeechBubble *self, float dtime, vec2 blend_pos);
 
-void speechbubble_render(SpeechBubble *self, const mat4 *cam_mat);
+void speechbubble_render(const SpeechBubble *self, const mat4 *cam_mat);
 
 #endif //JUMPHARE_SPEECHBUBBLE_H

@@ -72,7 +72,7 @@ void hare_kill(Hare **self_ptr);
 
 void hare_update(Hare *self, float dtime);
 
-void hare_render(Hare *self, const mat4 *cam_mat);
+void hare_render(const Hare *self, const mat4 *cam_mat);
 
 void hare_set_sleep(Hare *self, bool instant);
 

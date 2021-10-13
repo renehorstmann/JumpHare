@@ -93,7 +93,7 @@ void goal_update(Goal *self, float dtime) {
     self->L.goal_ro.rect.sprite.x = frame;    
 }
 
-void goal_render(Goal *self, const mat4 *cam_mat) {
+void goal_render(const Goal *self, const mat4 *cam_mat) {
     ro_single_render(&self->L.goal_ro, cam_mat);
 }
 

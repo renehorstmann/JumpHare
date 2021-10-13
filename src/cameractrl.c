@@ -1,7 +1,5 @@
 #include "rhc/alloc.h"
 #include "mathc/float.h"
-#include "camera.h"
-#include "tilemap.h"
 #include "cameractrl.h"
 
 

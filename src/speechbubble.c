@@ -3,7 +3,6 @@
 #include "r/texture.h"
 #include "u/pose.h"
 #include "mathc/float.h"
-#include "camera.h"
 #include "speechbubble.h"
 
 
@@ -163,7 +162,7 @@ void speechbubble_update(SpeechBubble *self, float dtime, vec2 blend_pos) {
     ro_batch_update(&self->bubble);
 }
 
-void speechbubble_render(SpeechBubble *self, const mat4 *cam_mat) {
+void speechbubble_render(const SpeechBubble *self, const mat4 *cam_mat) {
     ro_batch_render(&self->bubble, cam_mat);
     ro_text_render(&self->text, cam_mat);
 }

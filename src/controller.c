@@ -5,8 +5,6 @@
 #include "mathc/float.h"
 #include "mathc/bool.h"
 #include "mathc/sca/int.h"
-#include "camera.h"
-#include "hudcamera.h"
 #include "controller.h"
 
 #define UP_TIME 0.125
@@ -220,6 +218,6 @@ void controller_update(Controller *self, float dtime) {
     ro_batch_update(&self->L.background_ro);
 }
 
-void controller_render(Controller *self, const mat4 *hudcam_mat) {
+void controller_render(const Controller *self, const mat4 *hudcam_mat) {
     ro_batch_render(&self->L.background_ro, hudcam_mat);
 }

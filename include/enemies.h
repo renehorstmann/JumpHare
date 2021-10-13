@@ -37,7 +37,7 @@ void enemies_kill(Enemies **self_ptr);
 
 void enemies_update(Enemies *self, float dtime);
 
-void enemies_render(Enemies *self, const mat4 *cam_mat);
+void enemies_render(const Enemies *self, const mat4 *cam_mat);
 
 void enemies_add_hedgehogs(Enemies *self, const vec2 *positions, int n);
 

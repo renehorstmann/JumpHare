@@ -49,7 +49,7 @@ void enemies_update(Enemies *self, float dtime) {
     }
 }
 
-void enemies_render(Enemies *self, const mat4 *cam_mat) {
+void enemies_render(const Enemies *self, const mat4 *cam_mat) {
     for(int i=0; i<self->L.types_num; i++) {
         ro_batch_render(&self->L.types[i].ro, cam_mat);
     }

@@ -101,7 +101,7 @@ void carrot_update(Carrot *self, float dtime) {
     ro_batch_update(&self->L.carrot_ro);
 }
 
-void carrot_render(Carrot *self, const mat4 *cam_mat) {
+void carrot_render(const Carrot *self, const mat4 *cam_mat) {
     ro_batch_render(&self->L.carrot_ro, cam_mat);
 }
 

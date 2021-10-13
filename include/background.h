@@ -21,6 +21,6 @@ void background_kill(Background **self_ptr);
 
 void background_update(Background *self, float dtime);
 
-void background_render(Background *self, const Camera_s *cam);
+void background_render(const Background *self, const Camera_s *cam);
 
 #endif //JUMPHARE_BACKGROUND_H

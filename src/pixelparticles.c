@@ -4,7 +4,6 @@
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
 #include "mathc/utils/random.h"
-#include "camera.h"
 #include "pixelparticles.h"
 
 
@@ -47,7 +46,7 @@ void pixelparticles_update(PixelParticles *self, float dtime) {
     self->time += dtime;
 }
 
-void pixelparticles_render(PixelParticles *self, const mat4 *cam_mat) {
+void pixelparticles_render(const PixelParticles *self, const mat4 *cam_mat) {
     ro_particle_render(&self->L.ro, self->time, cam_mat);
 }
 
