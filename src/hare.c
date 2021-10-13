@@ -406,7 +406,7 @@ Hare *hare_new(float pos_x, float pos_y, const Collision *collision, PixelPartic
 
     self->L.emit_dirt_add = sca_random_noise(6, 2);
 
-    self->L.ro = ro_single_new(r_texture_new_file(8, 6, "res/self->png"));
+    self->L.ro = ro_single_new(r_texture_new_file(8, 6, "res/hare.png"));
 
     u_pose_set_size(&self->L.ro.rect.pose, 32, 32);
 
