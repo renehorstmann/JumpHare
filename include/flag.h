@@ -6,6 +6,7 @@
 #include "r/ro_types.h"
 #include "camera.h"
 #include "carrot.h"
+#include "hare.h"
 
 #define FLAG_MAX_CALLBACKS 8
 
@@ -17,10 +18,13 @@ typedef struct {
     Carrot *carrot_ref;
     
     struct {
+        vec2 active_pos;
+    } RO;  // read only
+    
+    struct {
         RoBatch flag_ro;
         RoBatch btn_ro;
         float time;
-        vec2 active_pos;
     
         struct {
             flag_activated_callback_fn cb;
@@ -34,7 +38,7 @@ Flag *flag_new(const vec2 *positions, int num, const Camera_s *cam, Carrot *carr
 
 void flag_kill(Flag **self_ptr);
 
-void flag_update(Flag *self, float dtime);
+void flag_update(Flag *self, const Hare *hare, float dtime);
 
 void flag_render(Flag *self, const mat4 *cam_mat);
 

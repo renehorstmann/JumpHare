@@ -14,66 +14,64 @@
 #define DIRT_SIZE 2.0
 #define DIRT_ALPHA 1.0
 
-struct PixelParticlesGlobals_s pixelparticles;
-
-//
-// private
-//
-
-static struct {
-    RoParticle ro;
-    int next;
-} L;
-
 
 //
 // public
 //
 
-void pixelparticles_init() {
-    L.ro = ro_particle_new(MAX_PARTCLES, r_texture_new_white_pixel());
+PixelParticles *pixelparticles_new() {
+    PixelParticles *self = rhc_calloc(sizeof *self);
+    
+    self->L.ro = ro_particle_new(MAX_PARTCLES, r_texture_new_white_pixel());
 
-    for (int i = 0; i < L.ro.num; i++) {
-        L.ro.rects[i].pose = u_pose_new_hidden();
-        L.ro.rects[i].color = vec4_set(0);
+    for (int i = 0; i < self->L.ro.num; i++) {
+        self->L.ro.rects[i].pose = u_pose_new_hidden();
+        self->L.ro.rects[i].color = vec4_set(0);
     }
-    ro_particle_update(&L.ro);
+    ro_particle_update(&self->L.ro);
+    
+    return self;
 }
 
-void pixelparticles_kill() {
-    ro_particle_kill(&L.ro);
-    memset(&L, 0, sizeof(L));
+void pixelparticles_kill(PixelParticles **self_ptr) {
+    PixelParticles *self = *self_ptr;
+    if(!self)
+        return;
+    ro_particle_kill(&self->L.ro);
+    
+    rhc_free(self);
+    *self_ptr = NULL;
 }
 
-void pixelparticles_update(float dtime) {
-    pixelparticles.time += dtime;
+void pixelparticles_update(PixelParticles *self, float dtime) {
+    self->time += dtime;
 }
 
-void pixelparticles_render() {
-    ro_particle_render(&L.ro, pixelparticles.time, camera.gl_main);
+void pixelparticles_render(PixelParticles *self, const mat4 *cam_mat) {
+    ro_particle_render(&self->L.ro, self->time, cam_mat);
 }
 
-void pixelparticles_add(const rParticleRect_s *particles, int n) {
-    int start_idx = L.next;
-    n = isca_min(n, L.ro.num);
+void pixelparticles_add(PixelParticles *self, const rParticleRect_s *particles, int n) {
+    int start_idx = self->L.next;
+    n = isca_min(n, self->L.ro.num);
 
-    if(L.next + n <= L.ro.num) {
-        memcpy(&L.ro.rects[L.next], particles, n * sizeof(rParticleRect_s));
-        L.next += n;
+    if(self->L.next + n <= self->L.ro.num) {
+        memcpy(&self->L.ro.rects[self->L.next], particles, n * sizeof(rParticleRect_s));
+        self->L.next += n;
     } else {
-        int n_b = L.next + n - L.ro.num;
+        int n_b = self->L.next + n - self->L.ro.num;
         int n_a = n - n_b;
-        memcpy(&L.ro.rects[L.next], particles, n_a * sizeof(rParticleRect_s));
-        memcpy(L.ro.rects, particles+n_a, n_b * sizeof(rParticleRect_s));
-        L.next = n_b;
+        memcpy(&self->L.ro.rects[self->L.next], particles, n_a * sizeof(rParticleRect_s));
+        memcpy(self->L.ro.rects, particles+n_a, n_b * sizeof(rParticleRect_s));
+        self->L.next = n_b;
     }
-    if (L.next >= L.ro.num)
-        L.next = 0;
+    if (self->L.next >= self->L.ro.num)
+        self->L.next = 0;
 
-    ro_particle_update_sub(&L.ro, start_idx, n);
+    ro_particle_update_sub(&self->L.ro, start_idx, n);
 }
 
-void pixelparticles_add_dirt(vec2 pos, vec2 dir, uColor_s color, int n) {
+void pixelparticles_add_dirt(PixelParticles *self, vec2 pos, vec2 dir, uColor_s color, int n) {
     rParticleRect_s rects[n];
 
     vec4 col = vec4_cast_from_uchar_1(color.v);
@@ -92,8 +90,8 @@ void pixelparticles_add_dirt(vec2 pos, vec2 dir, uColor_s color, int n) {
         rects[i].color = vec4_random_noise_vec(col, vec4_set(0.1));
         rects[i].color.a *= DIRT_ALPHA;
 
-        rects[i].start_time = pixelparticles.time;
+        rects[i].start_time = self->time;
     }
 
-    pixelparticles_add(rects, n);
+    pixelparticles_add(self, rects, n);
 }

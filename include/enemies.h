@@ -3,6 +3,7 @@
 
 #include "r/ro_types.h"
 #include "collision.h"
+#include "hare.h"
 
 #define ENEMIES_MAX_TYPES 32
 
@@ -21,6 +22,8 @@ struct Enemies_Type {
 
 typedef struct Enemies {
     const Collision *collision_ref;
+    const Hare *hare_ref;
+    
     struct {
         struct Enemies_Type types[ENEMIES_MAX_TYPES];
         int types_num;
@@ -28,7 +31,7 @@ typedef struct Enemies {
 } Enemies;
 
 
-Enemies *enemies_new(const Collision *collision);
+Enemies *enemies_new(const Collision *collision, const Hare *hare);
 
 void enemies_kill(Enemies **self_ptr);
 

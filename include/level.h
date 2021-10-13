@@ -7,6 +7,7 @@
 #include "r/render.h"
 
 #include "camera.h"
+#include "cameractrl.h"
 #include "background.h"
 #include "speechbubble.h"
 #include "tilemap.h"
@@ -17,11 +18,19 @@
 #include "dead.h"
 #include "controller.h"
 #include "hud.h"
-#include "scripts.h"
+#include "collision.h"
+#include "enemies.h"
+#include "hare.h"
+#include "airstroke.h"
+#include "pixelparticles.h"
 
 typedef struct {
+    eWindow *window_ref;
+    Camera_s *camera_ref;
+    
     Background *background;
     Tilemap *tilemap;
+    PixelParticles *pixelparticles;
     Goal *goal;
     Carrot *carrot;
     Butterfly *butterfly;
@@ -29,10 +38,17 @@ typedef struct {
     Dead *dead;
     Controller *controller;
     Hud *hud;
-    Scripts *scripts;
+    Collision *collision;
+    
     
     struct {
-        eWindow *window_ref;
+        Enemies *enemies;
+        Hare *hare;
+        Airstroke *airstroke;
+        CameraControl_s *camctrl;
+    } game;
+    
+    struct {
         RoBatch borders_ro;
         int current_lvl;
         SpeechBubble bubbles[3];
@@ -44,7 +60,7 @@ typedef struct {
     } L;
 } Level;
 
-Level *level_new(int lvl, const Camera_s *cam, const HudCamera_s *hudcam, const Tiles *tiles, eWindow *window, eInput *input, rRender *render);
+Level *level_new(int lvl, Camera_s *cam, const HudCamera_s *hudcam, const Tiles *tiles, eWindow *window, eInput *input, rRender *render);
 
 void level_kill(Level **self_ptr);
 

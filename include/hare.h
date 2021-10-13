@@ -3,7 +3,9 @@
 
 #include <stdbool.h>
 #include "e/window.h"
-#include "mathc/types/float.h"
+#include "r/ro_types.h"
+#include "collision.h"
+#include "pixelparticles.h"
 
 enum hare_state {
     HARE_GROUNDED,
@@ -15,7 +17,11 @@ enum hare_state {
     HARE_NUM_STATES
 };
 
-struct HareGlobals_s {
+typedef struct {
+    eWindow *window_ref;
+    const Collision *collision_ref;
+    PixelParticles *particles_ref;
+    
     enum hare_state state;
     vec2 pos;
     vec2 speed;
@@ -29,17 +35,45 @@ struct HareGlobals_s {
     struct {
         bool jump_action;
     } out;
-};
-extern struct HareGlobals_s hare;
+    
+    struct {
+        RoSingle ro;
+        RoParticle sleep_zzz_ro;
 
-void hare_init(float pos_x, float pos_y, eWindow *window);
+        enum hare_state prev_state;
 
-void hare_kill();
+        float last_input_time;
 
-void hare_update(float dtime);
+        float jump_time;
 
-void hare_render();
+        float set_speed_x;
+        float set_jump_time;
 
-void hare_set_sleep(bool instant);
+        float freeze_time;
+
+        float animate_time;
+
+        float emit_dirt_add;
+        int emit_dirt_next_add;
+
+        float add_airstroke_time;
+
+        float sleep_time;
+        float sleep_ro_time;
+        int sleep_zzz_id;
+        float sleep_zzz_next;
+        int wake_up_cnt;
+    } L;
+} Hare;
+
+Hare *hare_new(float pos_x, float pos_y, const Collision *collision, PixelParticles *particles, eWindow *window);
+
+void hare_kill(Hare **self_ptr);
+
+void hare_update(Hare *self, float dtime);
+
+void hare_render(Hare *self, const mat4 *cam_mat);
+
+void hare_set_sleep(Hare *self, bool instant);
 
 #endif //JUMPHARE_HARE_H

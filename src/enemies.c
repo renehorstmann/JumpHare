@@ -4,9 +4,6 @@
 #include "mathc/float.h"
 #include "rhc/error.h"
 #include "rhc/log.h"
-#include "hare.h"
-#include "collision.h"
-#include "camera.h"
 #include "enemies.h"
 
 
@@ -28,9 +25,10 @@ static void add_type(Enemies *self, Type add) {
 //
 
 
-Enemies *enemies_new(const Collision *collision) {
+Enemies *enemies_new(const Collision *collision, const Hare *hare) {
     Enemies *self = rhc_calloc(sizeof *self);
     self->collision_ref = collision;
+    self->hare_ref = hare;
     return self;
 }
 
@@ -91,7 +89,7 @@ static void hedgehog_update(Type *self, float dtime) {
     for(int i=0; i<self->ro.num; i++) {
         vec2 pos = u_pose_get_xy(self->ro.rects[i].pose);
         float distance = vec2_distance(
-                hare.pos, 
+                self->enemies_ref->hare_ref->pos, 
                 pos);
         if(distance < 45) {
             int roll_frame = 0;

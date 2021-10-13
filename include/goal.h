@@ -3,15 +3,18 @@
 
 #include <stdbool.h>
 #include "r/ro_types.h"
+#include "pixelparticles.h"
 
 typedef struct {
+    PixelParticles *particles_ref;
+    
     struct {
         RoSingle goal_ro;
         float time;
     } L;
 } Goal;
 
-Goal *goal_new(vec2 position);
+Goal *goal_new(PixelParticles *particles, vec2 position);
 
 void goal_kill(Goal **self_ptr);
 

@@ -53,50 +53,53 @@ static void on_flag_activated_cb(vec2 pos, void *ud) {
     butterfly_save(self->butterfly);
 }
 
-static void add_enemies() {
+static void add_enemies(Level *self) {
     vec2 hedgehogs[64];
-    int hedgehogs_num = tilemap_get_positions(hedgehogs, 64, ENEMY_HEDGHEHOG_CODE, CODE_LAYER);
+    int hedgehogs_num = tilemap_get_positions(self->tilemap, hedgehogs, 64, ENEMY_HEDGHEHOG_CODE, CODE_LAYER);
     
-    enemies_add_hedgehogs(hedgehogs, hedgehogs_num);
+    enemies_add_hedgehogs(self->game.enemies, hedgehogs, hedgehogs_num);
 }
 
-static void load_game() {
-    enemies_init();
-    add_enemies();
+static void load_game(Level *self) {
+    self->game.enemies = enemies_new(self->collision, self->game.hare);
+    add_enemies(self);
     
     vec2 start_pos;
-    assume(tilemap_get_positions(&start_pos, 1, START_CODE, CODE_LAYER) == 1, "start not found");
+    assume(tilemap_get_positions(self->tilemap, &start_pos, 1, START_CODE, CODE_LAYER) == 1, "start not found");
     
-    vec2 flag_pos = flag_active_position();
+    vec2 flag_pos = self->flag->RO.active_pos;
     if(!sca_isnan(flag_pos.x))
         start_pos = flag_pos;
     
-    hare_init(start_pos.x, start_pos.y, L.window);
-    airstroke_init();
-    pixelparticles_init();
-    cameractrl_init();
-}
-
-static void unload_game() {
-    enemies_kill();
-    hare_kill();
-    airstroke_kill();
-    pixelparticles_kill();
-    cameractrl_kill();
-}
-
-static void reset() {
-    int state = L.state;
-    unload_game();
-    L.state = state;
-    load_game();
+    self->game.hare = hare_new(start_pos.x, start_pos.y, 
+    self->collision,
+    self->pixelparticles,
+    self->window_ref);
     
-    carrot_load();
-    butterfly_load();
+    
+    self->game.airstroke = airstroke_new();
+    
+    self->game.camctrl = cameractrl_new();
+}
+
+static void unload_game(Level *self) {
+    enemies_kill(&self->game.enemies);
+    hare_kill(&self->game.hare);
+    airstroke_kill(&self->game.airstroke);
+    cameractrl_kill(&self->game.camctrl);
+}
+
+static void reset(Level *self) {
+    unload_game(self);
+    load_game(self);
+    
+    carrot_load(self->carrot);
+    butterfly_load(self->butterfly);
 }
 
 static void dead_callback(void *ud) {
-    reset();
+    Level *self = ud;
+    reset(self);
 }
 
 
@@ -105,10 +108,12 @@ static void dead_callback(void *ud) {
 // public
 //
 
-Level *level_new(int lvl, const Camera_s *cam, const HudCamera_s *hudcam, const Tiles *tiles, eWindow *window, eInput *input, rRender *render) {
+Level *level_new(int lvl, Camera_s *cam, const HudCamera_s *hudcam, const Tiles *tiles, eWindow *window, eInput *input, rRender *render) {
     Level *self = rhc_calloc(sizeof *self);
     
-    self->L.window_ref = window;
+    self->window_ref = window;
+    self->camera_ref = cam;
+    
     log_info("level: init lvl %i", lvl);
     assume(lvl == 1, "...");
 
@@ -124,14 +129,16 @@ Level *level_new(int lvl, const Camera_s *cam, const HudCamera_s *hudcam, const 
             //true, true,
             //"res/backgrounds/blueblocks.png"
             );
-            
+    
+    self->pixelparticles = pixelparticles_new();        
+    
     vec2 goal_pos;
     assume(tilemap_get_positions(self->tilemap, &goal_pos, 1, GOAL_CODE, CODE_LAYER) == 1, "level needs 1 goal");
-    self->goal = goal_new(goal_pos);
+    self->goal = goal_new(self->pixelparticles, goal_pos);
 
     vec2 carrot_pos[3];
     assume(tilemap_get_positions(self->tilemap, carrot_pos, 3, CARROT_CODE, CODE_LAYER) == 3, "level needs 3 carrots");
-    self->carrot = carrot_new(carrot_pos);
+    self->carrot = carrot_new(self->pixelparticles, carrot_pos);
     
     vec2 butterfly_pos[512];
     int butterflies = tilemap_get_positions(self->tilemap, butterfly_pos, 512, BUTTERFLY_CODE, CODE_LAYER);
@@ -154,22 +161,16 @@ Level *level_new(int lvl, const Camera_s *cam, const HudCamera_s *hudcam, const 
         self->L.bubbles[self->L.bubbles_size++] = speechbubble_new(bubble_pos, "TBZ");
     }
 
-    self->dead = dead_new(dead_callback, NULL);
+    self->dead = dead_new(dead_callback, self);
     self->controller = controller_new(input, cam, hudcam);
     self->hud = hud_new();
-    self->scripts = scripts_new(
-    self->controller,
-    cam,
-    self->camctrl,
-    self->airstroke,
-    self->butterfly,
-    self->carrot
-    );
+    self->collision = collision_new(self->tilemap);
+    
 
-    load_game();
+    load_game(self);
     
     // level 1?
-    hare_set_sleep(true);
+    hare_set_sleep(self->game.hare, true);
 
     // ro
     self->L.borders_ro = ro_batch_new(4, r_texture_new_white_pixel());
@@ -199,37 +200,6 @@ Level *level_new(int lvl, const Camera_s *cam, const HudCamera_s *hudcam, const 
     }
     ro_batch_update(&self->L.borders_ro);
 
-
-    // test
-    /*
-    uImage img;
-    rTexture tex_main, tex_refract;
-    img = u_image_new_file(2, "res/ice_block.png");
-    assume(u_image_valid(img), "wtf");
-    tex_main = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 0));
-    tex_refract = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 1));
-    u_image_kill(&img);
-    self->L.ice = ro_batchrefract_new(1, camera.gl_scale, tex_main, tex_refract);
-    L.ice.view_aabb = camera.gl_view_aabb;
-    for(int i=0; i<L.ice.num; i++) {
-        self->L.ice.rects[i].pose = u_pose_new(260+16*i, 100, 32, 64);
-        self->L.ice.rects[i].color.a=0.8;
-    }
-    ro_batchrefract_update(&self->L.ice);
-
-
-    img = u_image_new_file(2, "res/mirror.png");
-    assume(u_image_valid(img), "wtf");
-    tex_main = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 0));
-    tex_refract = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, 1));
-    u_image_kill(&img);
-    self->L.mirror = ro_batchrefract_new(1, camera.gl_scale, tex_main, tex_refract);
-    L.mirror.view_aabb = camera.gl_view_aabb;
-    for(int i=0; i<self->L.mirror.num; i++) {
-        self->L.mirror.rects[i].pose = u_pose_new(120+32*i, 100, 32, 64);
-    }
-    ro_batchrefract_update(&self->L.mirror);
-    */
     
     return self;
 }
@@ -240,54 +210,52 @@ void level_kill(Level **self_ptr) {
         return;
         
     background_kill(&self->background);
-    tilemap_kill();
-    goal_kill();
-    carrot_kill();
-    butterfly_kill();
-    flag_kill();
-    for(int i=0; i<L.bubbles_size; i++) {
+    tilemap_kill(&self->tilemap);
+    pixelparticles_kill(&self->pixelparticles);
+    goal_kill(&self->goal);
+    carrot_kill(&self->carrot);
+    butterfly_kill(&self->butterfly);
+    flag_kill(&self->flag);
+    for(int i=0; i<self->L.bubbles_size; i++) {
         speechbubble_kill(&self->L.bubbles[i]);
     }
-    dead_kill();
-    controller_kill();
-    hud_kill();
-    scripts_kill();
+    dead_kill(&self->dead);
+    controller_kill(&self->controller);
+    hud_kill(&self->hud);
     
-    unload_game();
+    
+    unload_game(self);
 
     ro_batch_kill(&self->L.borders_ro);
-
-    // test
-    /*
-    ro_batchrefract_kill(&L.ice);
-    ro_batchrefract_kill(&L.mirror);
-    */
     
     rhc_free(self);
     *self_ptr = NULL;
 }
 
 void level_update(Level *self, float dtime) {  
-    goal_update(dtime);
-    dead_update(dtime);
-    hud_update(dtime);
-    if (!dead_is_dead()) {
+    goal_update(self->goal, dtime);
+    dead_update(self->dead, dtime);
+    hud_update(self->hud, 
+    self->camera_ref, self->carrot, self->butterfly,
+    dtime);
+    
+    if (!dead_is_dead(self->dead)) {
         
         // module linkage
-        scripts_update(dtime);
+        scripts_update(self, dtime);
         
         background_update(self->background, dtime);
-        tilemap_update(dtime);
-        carrot_update(dtime);
-        flag_update(dtime);
+        tilemap_update(self->tilemap, dtime);
+        carrot_update(self->carrot, dtime);
+        flag_update(self->flag, self->game.hare, dtime);
         for(int i=0; i<self->L.bubbles_size; i++) {
-            speechbubble_update(&self->L.bubbles[i], dtime, hare.pos);
+            speechbubble_update(&self->L.bubbles[i], dtime, self->game.hare->pos);
         }
-        enemies_update(dtime);
+        enemies_update(self->game.enemies, dtime);
         
-        airstroke_update(dtime);
-        butterfly_update(dtime);
-        pixelparticles_update(dtime);
+        airstroke_update(self->game.airstroke, self->tilemap, dtime);
+        butterfly_update(self->butterfly, dtime);
+        pixelparticles_update(self->pixelparticles, dtime);
         
     }
 }
@@ -296,30 +264,27 @@ void level_render(Level *self, const Camera_s *cam, const mat4 *hudcam_mat) {
     const mat4 *cam_main_mat = &cam->matrices_main.vp;
     
     background_render(self->background, cam);
-    flag_render();
-    goal_render();
-    tilemap_render_back();
+    flag_render(self->flag, cam_main_mat);
+    goal_render(self->goal, cam_main_mat);
+    tilemap_render_back(self->tilemap, cam_main_mat);
 
-    // test
-    //ro_batchrefract_render(&L.ice, camera.gl_main);
-    //ro_batchrefract_render(&L.mirror, camera.gl_main);
 
     for(int i=0; i<self->L.bubbles_size; i++) {
-        speechbubble_render(&self->L.bubbles[i]);
+        speechbubble_render(&self->L.bubbles[i], cam_main_mat);
     }
-    carrot_render();
-    pixelparticles_render();
-    airstroke_render();
+    carrot_render(self->carrot, cam_main_mat);
+    pixelparticles_render(self->pixelparticles, cam_main_mat);
+    airstroke_render(self->game.airstroke, cam_main_mat);
     //enemies_render();
-    hare_render();
-    butterfly_render();
-    tilemap_render_front();
-    hud_render();
-    dead_render();
+    hare_render(self->game.hare, cam_main_mat);
+    butterfly_render(self->butterfly, cam_main_mat);
+    tilemap_render_front(self->tilemap, cam_main_mat);
+    hud_render(self->hud, hudcam_mat);
+    dead_render(self->dead, cam_main_mat, hudcam_mat);
 
     ro_batch_render(&self->L.borders_ro, cam_main_mat);
 
-    controller_render();
+    controller_render(self->controller, hudcam_mat);
     
 }
 

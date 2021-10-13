@@ -1,4 +1,3 @@
-#include "e/input.h"
 #include "r/ro_batch.h"
 #include "r/texture.h"
 #include "u/pose.h"
@@ -6,10 +5,6 @@
 #include "mathc/utils/random.h"
 #include "rhc/error.h"
 #include "rhc/log.h"
-#include "pixelparticles.h"
-#include "camera.h"
-#include "hare.h"
-#include "carrot.h"
 #include "button.h"
 #include "flag.h"
 
@@ -52,9 +47,9 @@ static void emit_particles(Flag *self, float x, float y) {
         rects[i].color.rgb = vec3_set(sca_random_noise(0.9, 0.1));
         rects[i].color.a = PARTICLE_ALPHA;
         rects[i].color_speed.a = (float)-PARTICLE_ALPHA/PARTICLE_TIME;
-        rects[i].start_time = pixelparticles.time;
+        rects[i].start_time = self->carrot_ref->particles_ref->time;
     }
-    pixelparticles_add(rects, NUM_PARTICLES);
+    pixelparticles_add(self->carrot_ref->particles_ref, rects, NUM_PARTICLES);
 }
 
 static void activate(Flag *self, int flag_index) {
@@ -64,14 +59,14 @@ static void activate(Flag *self, int flag_index) {
     vec2 pos = u_pose_get_xy(self->L.flag_ro.rects[flag_index].pose);
 
     pos.y -= FLAG_OFFSET_Y;
-    self->L.active_pos = pos;
+    self->RO.active_pos = pos;
 
     pos.y += 8 + FLAG_OFFSET_Y;
     emit_particles(self, pos.x, pos.y);
 
     carrot_eat(self->carrot_ref);
     for(int i=0; i<self->L.callbacks_size; i++) {
-        self->L.callbacks[i].cb(self->L.active_pos, self->L.callbacks[i].ud);
+        self->L.callbacks[i].cb(self->RO.active_pos, self->L.callbacks[i].ud);
     }
 }
 
@@ -127,7 +122,7 @@ Flag *flag_new(const vec2 *positions, int num, const Camera_s *cam, Carrot *carr
 
     e_input_register_pointer_event(input, pointer_callback, NULL);
 
-    self->L.active_pos = (vec2) {{NAN, NAN}};
+    self->RO.active_pos = (vec2) {{NAN, NAN}};
 
     self->L.flag_ro = ro_batch_new(num,
                     r_texture_new_file(4, 2, "res/flag.png"));
@@ -170,7 +165,7 @@ void flag_kill(Flag **self_ptr) {
     *self_ptr = NULL;
 }
 
-void flag_update(Flag *self, float dtime) {
+void flag_update(Flag *self, const Hare *hare, float dtime) {
     self->L.time += dtime;
 
     check_key_click(self);
@@ -183,7 +178,7 @@ void flag_update(Flag *self, float dtime) {
     ro_batch_update(&self->L.flag_ro);
     
     
-    vec2 hare_pos = hare.pos;
+    vec2 hare_pos = hare->pos;
     for(int i=0; i<self->L.flag_ro.num; i++) {
         if(flag_reached(self, i) || self->carrot_ref->RO.collected == 0) {
             self->L.btn_ro.rects[i].color.a = 0;

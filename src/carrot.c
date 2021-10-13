@@ -5,8 +5,6 @@
 #include "mathc/utils/random.h"
 #include "rhc/log.h"
 #include "rhc/error.h"
-#include "pixelparticles.h"
-#include "camera.h"
 #include "carrot.h"
 
 #define FPS 3.0
@@ -27,7 +25,7 @@ static const vec3 PARTICLE_COLOR = {{1, 0.65, 0}};
 // private
 //
 
-static void emit_particles(float x, float y) {
+static void emit_particles(Carrot *self, float x, float y) {
     rParticleRect_s rects[NUM_PARTICLES];
     for(int i=0; i<NUM_PARTICLES; i++) {
         rects[i] = r_particlerect_new();
@@ -42,9 +40,9 @@ static void emit_particles(float x, float y) {
                 (vec3) {{0.2, 0.2, 0.2}});
         rects[i].color.a = PARTICLE_ALPHA;
         rects[i].color_speed.a = (float) -PARTICLE_ALPHA / PARTICLE_TIME;
-        rects[i].start_time = pixelparticles.time;
+        rects[i].start_time = self->particles_ref->time;
     }
-    pixelparticles_add(rects, NUM_PARTICLES);
+    pixelparticles_add(self->particles_ref, rects, NUM_PARTICLES);
 }
 
 
@@ -53,8 +51,10 @@ static void emit_particles(float x, float y) {
 // public
 //
 
-Carrot *carrot_new(const vec2 *positions_3) {
+Carrot *carrot_new(PixelParticles *particles, const vec2 *positions_3) {
     Carrot *self = rhc_calloc(sizeof *self);
+    
+    self->particles_ref = particles;
     
     // in game carrots
     self->L.carrot_ro = ro_batch_new(3,
@@ -114,7 +114,7 @@ bool carrot_collect(Carrot *self, vec2 position) {
             log_info("carrot: collected %i", i);
             self->L.collected[i] = true;
             vec2 cxy = u_pose_get_xy(self->L.carrot_ro.rects[i].pose);
-            emit_particles(cxy.x, cxy.y);
+            emit_particles(self, cxy.x, cxy.y);
             self->RO.collected++;
             return true;
         }

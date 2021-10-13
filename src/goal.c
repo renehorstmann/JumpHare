@@ -5,8 +5,6 @@
 #include "mathc/utils/random.h"
 #include "rhc/error.h"
 #include "rhc/log.h"
-#include "pixelparticles.h"
-#include "camera.h"
 #include "goal.h"
 
 #define GOAL_OFFSET_Y 8.0
@@ -25,7 +23,7 @@
 // private
 //
 
-static void emit_particles(float x, float y) {
+static void emit_particles(Goal *self, float x, float y) {
     rParticleRect_s rects[NUM_PARTICLES];
     for(int i=0; i<NUM_PARTICLES; i++) {
         rects[i] = r_particlerect_new();
@@ -45,9 +43,9 @@ static void emit_particles(float x, float y) {
         }
         rects[i].color.a = PARTICLE_ALPHA;
         rects[i].color_speed.a = (float)-PARTICLE_ALPHA/PARTICLE_TIME;
-        rects[i].start_time = pixelparticles.time;
+        rects[i].start_time = self->particles_ref->time;
     }
-    pixelparticles_add(rects, NUM_PARTICLES);
+    pixelparticles_add(self->particles_ref, rects, NUM_PARTICLES);
 }
 
 static void activate() {
@@ -59,8 +57,10 @@ static void activate() {
 // public
 //
 
-Goal *goal_new(vec2 position) {
+Goal *goal_new(PixelParticles *particles, vec2 position) {
     Goal *self = rhc_calloc(sizeof *self);
+    
+    self->particles_ref = particles;
     
     self->L.goal_ro = ro_single_new(
                     r_texture_new_file(4, 2, "res/goal_flag.png"));
@@ -118,5 +118,5 @@ void goal_activate(Goal *self) {
     pos.y -= GOAL_OFFSET_Y;
 
     pos.y += 8 + GOAL_OFFSET_Y;
-    emit_particles(pos.x, pos.y);
+    emit_particles(self, pos.x, pos.y);
 }

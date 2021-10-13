@@ -2,9 +2,12 @@
 #define JUMPHARE_CARROT_H
 
 #include "r/ro_types.h"
+#include "pixelparticles.h"
 
 
 typedef struct {
+    PixelParticles *particles_ref;
+    
     struct {
         int collected;  // eaten + available
         int eaten;
@@ -24,7 +27,7 @@ typedef struct {
     } L;
 } Carrot;
 
-Carrot *carrot_new(const vec2 *positions_3);
+Carrot *carrot_new(PixelParticles *particles, const vec2 *positions_3);
 
 void carrot_kill(Carrot **self_ptr);
 
