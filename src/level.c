@@ -61,8 +61,6 @@ static void add_enemies(Level *self) {
 }
 
 static void load_game(Level *self) {
-    self->game.enemies = enemies_new(self->collision, self->game.hare);
-    add_enemies(self);
     
     vec2 start_pos;
     assume(tilemap_get_positions(self->tilemap, &start_pos, 1, START_CODE, CODE_LAYER) == 1, "start not found");
@@ -75,7 +73,9 @@ static void load_game(Level *self) {
     self->collision,
     self->pixelparticles,
     self->window_ref);
-    
+
+    self->game.enemies = enemies_new(self->collision, self->game.hare);
+    add_enemies(self);
     
     self->game.airstroke = airstroke_new();
     

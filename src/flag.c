@@ -120,7 +120,7 @@ Flag *flag_new(const vec2 *positions, int num, const Camera_s *cam, Carrot *carr
     self->cam_ref = cam;
     self->carrot_ref = carrot;
 
-    e_input_register_pointer_event(input, pointer_callback, NULL);
+    e_input_register_pointer_event(input, pointer_callback, self);
 
     self->RO.active_pos = (vec2) {{NAN, NAN}};
 
