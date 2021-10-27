@@ -1,8 +1,8 @@
 #include <SDL2/SDL_image.h>
 #include "rhc/error.h"
 #include "rhc/log.h"
+#include "mathc/sca/int.h"
 #include "u/image.h"
-
 
 //
 // private
@@ -35,7 +35,7 @@ static SDL_Surface *load_buffer(void *data, int cols, int rows) {
 // public
 //
 
-uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a) {
+uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_i a) {
     size_t data_size = cols * rows * layers * sizeof(uColor_s);
 
     if (data_size <= 0) {
@@ -53,7 +53,7 @@ uImage u_image_new_empty_a(int cols, int rows, int layers, Allocator_s a) {
     return self;
 }
 
-uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a) {
+uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_i a) {
     uImage self = u_image_new_empty_a(cols, rows, layers, a);
     if (!u_image_valid(self))
         return self;
@@ -61,7 +61,7 @@ uImage u_image_new_zeros_a(int cols, int rows, int layers, Allocator_s a) {
     return self;
 }
 
-uImage u_image_new_clone_a(uImage from, Allocator_s a) {
+uImage u_image_new_clone_a(uImage from, Allocator_i a) {
     uImage self = u_image_new_empty_a(from.cols, from.rows, from.layers, a);
     if (!u_image_valid(self))
         return u_image_new_invalid();
@@ -69,7 +69,7 @@ uImage u_image_new_clone_a(uImage from, Allocator_s a) {
     return self;
 }
 
-uImage u_image_new_file_a(int layers, const char *file, Allocator_s a) {
+uImage u_image_new_file_a(int layers, const char *file, Allocator_i a) {
     assume(layers > 0, "A single layer needed");
     uImage self = u_image_new_invalid_a(a);
     SDL_Surface *img = IMG_Load(file);
@@ -142,6 +142,25 @@ bool u_image_copy(uImage self, uImage from) {
     size_t size = u_image_data_size(self);
     memcpy(self.data, from.data, size);
     return true;
+}
+
+void u_image_copy_top_left(uImage self, uImage from) {
+    if(!u_image_valid(self) || !u_image_valid(from)) {
+        log_warn("u_image_copy_top_left failed");
+        return;
+    }
+    int layers = isca_min(self.layers, from.layers);
+    int rows = isca_min(self.rows, from.rows);
+    int cols = isca_min(self.cols, from.cols);
+    
+    for(int l=0; l<layers; l++) {
+        for(int r=0; r<rows; r++) {
+            for(int c=0; c<cols; c++) {
+                *u_image_pixel(self, c, r, l) = 
+                        *u_image_pixel(from, c, r, l);
+            }
+        }
+    }
 }
 
 bool u_image_equals(uImage self, uImage from) {
