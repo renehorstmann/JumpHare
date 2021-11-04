@@ -121,7 +121,7 @@ May / will not work on Apple, because of their poor WebGL2 support.
 
 ## Without Cmake
 
-Instead of cmake, the following call to gcc should work, too.
+Instead of cmake, the following call to gcc may work, too.
 
 ```sh
 mkdir build && cd build
