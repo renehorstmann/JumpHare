@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     log_info("JumpHare");
 
     // init e (environment)
-    L.window = e_window_new("JumpHare");
+    L.window = e_window_new("JumpHare", "Horsimann");
     L.input = e_input_new(L.window);
     L.gui = e_gui_new(L.window);       // nuklear debug windows
 

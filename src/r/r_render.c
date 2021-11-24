@@ -50,14 +50,14 @@ rRender *r_render_new(SDL_Window *window) {
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_vertex_attributes);
     if (max_vertex_attributes < 16) {
         log_warn("r_render_new: OpenGL failed: only has %d/16 vertex attributes", max_vertex_attributes);
-        //exit(EXIT_FAILURE);
+        r_exit_failure();
     }
 
     int max_texture_units;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
     if (max_texture_units < 3) {
         log_warn("r_render_new: OpenGL failed: only has %d/3 framebuffer texture units", max_texture_units);
-        //exit(EXIT_FAILURE);
+        r_exit_failure();
     }
 
     // startup "empty" texture
@@ -146,14 +146,11 @@ void r_render_blit_framebuffer(const rRender *self, int cols, int rows) {
     r_render_error_check("r_render_blit_framebuffer");
 }
 
-void r_render_error_check_impl_(const char *opt_tag) {
-#ifdef NDEBUG
-    return
-#endif
-
+bool r_render_error_check_impl_(const char *opt_tag) {
     static GLenum errs[32];
     int errs_size = 0;
     GLenum err;
+    bool unexpected_error = false;
     while ((err = glGetError()) != GL_NO_ERROR) {
         for (int i = 0; i < errs_size; i++) {
             if (err == errs[i])
@@ -202,5 +199,9 @@ void r_render_error_check_impl_(const char *opt_tag) {
 
         if (errs_size < 32)
             errs[errs_size++] = err;
+
+        unexpected_error = true;
     }
+
+    return unexpected_error;
 }
