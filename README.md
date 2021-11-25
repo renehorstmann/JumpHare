@@ -114,10 +114,37 @@ Using Emscripten:
 ```sh
 mkdir web && cd web
 
-emcc -I../include/ -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_TTF=2 -s FULL_ES3=1 -s SDL2_IMAGE_FORMATS='["png"]' --preload-file ../res -s ALLOW_MEMORY_GROWTH=1 -DOPTION_GLES -DOPTION_SDL -DOPTION_TTF ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -o index.html
+emcc -I../include/ -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s FULL_ES3=1 -s SDL2_IMAGE_FORMATS='["png"]' --preload-file ../res -s ALLOW_MEMORY_GROWTH=1 -s ASYNCIFY=1 -s EXIT_RUNTIME=1 -DOPTION_GLES -DOPTION_SDL ../src/e/*.c ../src/p/*.c ../src/r/*.c ../src/u/*.c ../src/*.c -o index.html
+
 ```
 
 May / will not work on Apple, because of their poor WebGL2 support.
+
+Add the following changes to the generated index.html:
+```html
+<style>
+  #canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: block;
+  }
+</style>
+<script>
+    function set_error_img() {
+  var newContent = '<html><body"><h1>Potato Browsers are not supported!</h1><p>WebGL2.0 is needed, sorry Apple Fans...</p></body></html>';
+        document.open();
+        document.write(newContent);
+        document.close();
+    }
+</script>
+```
+This will let Emscripten run in fullscreen and display the image "error.png" if an error occurs.
+(So create an error.png image for your http server)
 
 ## Without Cmake
 
