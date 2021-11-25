@@ -136,7 +136,7 @@ Add the following changes to the generated index.html:
 </style>
 <script>
     function set_error_img() {
-  var newContent = '<html><body"><h1>Potato Browsers are not supported!</h1><p>WebGL2.0 is needed, sorry Apple Fans...</p></body></html>';
+  var newContent = '<!DOCTYPE html><html><body style="background-color:black;"><h1 style="color:white;">Potato Browsers are not supported!</h1><p style="color:silver;">WebGL2.0 is needed!</p><p style="color:grey">Sorry Apple Fans...</p></body></html>';
         document.open();
         document.write(newContent);
         document.close();
