@@ -18,7 +18,6 @@ Runs really well on touch screens.
 
 On Desktop, use arrow keys to move, space to jump and enter to press a button.
 
-Doesn't run on Apple, because... Apple... (poor WebGL2 support)
 
 ## Warning
 In active developmemt
@@ -118,8 +117,6 @@ emcc -I../include/ -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s FULL_ES3=1 -s SDL2_IMAGE_F
 
 ```
 
-May / will not work on Apple, because of their poor WebGL2 support.
-
 Add the following changes to the generated index.html:
 ```html
 <style>
@@ -136,7 +133,7 @@ Add the following changes to the generated index.html:
 </style>
 <script>
     function set_error_img() {
-  var newContent = '<!DOCTYPE html><html><body style="background-color:black;"><h1 style="color:white;">Potato Browsers are not supported!</h1><p style="color:silver;">WebGL2.0 is needed!</p><p style="color:grey">Sorry Apple Fans...</p></body></html>';
+  var newContent = '<!DOCTYPE html><html><body style="background-color:black;"><h1 style="color:white;">Potato Browsers are not supported!</h1><p style="color:silver;">WebGL2.0 is needed!</p></body></html>';
         document.open();
         document.write(newContent);
         document.close();
