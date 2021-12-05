@@ -4,6 +4,7 @@
 #include "mathc/float.h"
 #include "mathc/sca/int.h"
 #include "mathc/utils/random.h"
+#include "rhc/alloc.h"
 #include "pixelparticles.h"
 
 

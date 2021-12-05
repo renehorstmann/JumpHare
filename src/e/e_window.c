@@ -15,6 +15,7 @@
 //
 // protected
 //
+
 void e_window_handle_window_event_(const SDL_Event *event);
 
 
@@ -131,8 +132,11 @@ void e_window_handle_window_event_(const SDL_Event *event) {
 //
 
 eWindow *e_window_new(const char *title) {
+    log_info("e_window_new");
+
     assume(!singleton_created, "e_window_new should be called only onve");
     singleton_created = true;
+
     
 #ifdef NDEBUG
     rhc_log_set_min_level(RHC_LOG_WARN);
@@ -198,7 +202,6 @@ eWindow *e_window_new(const char *title) {
         log_error("e_window_new: SDL_GL_CreateContext failed: %s", SDL_GetError());
         e_exit_failure();
     }
-    SDL_GL_SetSwapInterval(1);  // (0=off, 1=V-Sync, -1=addaptive V-Sync)
 
 #ifdef OPTION_GLEW
     GLenum err = glewInit();
@@ -246,11 +249,6 @@ SDL_GLContext e_window_get_sdl_gl_context(const eWindow *self) {
     return singleton.gl_context;
 }
 
-ivec2 e_window_get_size(const eWindow *self) {
-    assume(self == &singleton, "singleton?");
-    return singleton.size;
-}
-
 void e_window_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
     assume(self == &singleton, "singleton?");
     singleton.main_loop_fn = main_loop;
@@ -276,6 +274,43 @@ void e_window_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
     memset(&singleton, 0, sizeof(singleton));
     singleton_created = false;
     log_info("e_window_kill: killed");
+}
+
+void e_window_reset_main_loop(eWindow *self, e_window_main_loop_fn main_loop) {
+    assume(self == &singleton, "singleton?");
+    assume(singleton.main_loop_fn, "main_loop not started yet?");
+    log_info("e_window_reset_main_loop");
+    singleton.main_loop_fn = main_loop;
+}
+
+ivec2 e_window_get_size(const eWindow *self) {
+    assume(self == &singleton, "singleton?");
+    return singleton.size;
+}
+
+void e_window_set_vsync(const eWindow *self, bool activate) {
+    int ret;
+    if(!activate) {
+        ret = SDL_GL_SetSwapInterval(0);
+        if(ret == 0) {
+            log_info("e_window_set_vsync: turned off", activate);
+            return;
+        }
+        log_error("e_window_set_vsync: failed to turn off vsync");
+        return;
+    }
+    // try adaptive vsync
+    ret = SDL_GL_SetSwapInterval(-1);
+    if(ret == 0) {
+        log_info("e_window_set_vsync: applied adaptive-vsync");
+        return;
+    }
+    ret = SDL_GL_SetSwapInterval(1);
+    if(ret == 0) {
+        log_info("e_window_set_vsync: applied vsync");
+        return;
+    }
+    log_error("e_window_set_vsync: failed to turn on vsync");
 }
 
 void e_window_set_screen_mode(const eWindow *self, enum e_window_screen_modes mode) {

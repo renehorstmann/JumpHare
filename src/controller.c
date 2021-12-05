@@ -5,6 +5,7 @@
 #include "mathc/float.h"
 #include "mathc/bool.h"
 #include "mathc/sca/int.h"
+#include "rhc/alloc.h"
 #include "controller.h"
 
 #define UP_TIME 0.125

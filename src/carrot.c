@@ -5,6 +5,7 @@
 #include "mathc/utils/random.h"
 #include "rhc/log.h"
 #include "rhc/error.h"
+#include "rhc/alloc.h"
 #include "carrot.h"
 
 #define FPS 3.0
