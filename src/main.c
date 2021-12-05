@@ -30,7 +30,7 @@ static void init(eSimple *simple, ivec2 window_size) {
                         simple->window, simple->input, simple->render);
 
 #ifdef OPTION_GLES
-    e_window_set_screen_mode(L.window, E_WINDOW_MODE_FULLSCREEN);
+    e_window_set_screen_mode(simple->window, E_WINDOW_MODE_FULLSCREEN);
 #endif
 }
 
