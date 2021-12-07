@@ -40,8 +40,8 @@ static void update(eSimple *simple, ivec2 window_size, float delta_time) {
 }
 
 
-// this function is calles each frame to render stuff
-static void render(eSimple *simple, ivec2 window_size) {
+// this function is calles each frame to render stuff, dtime is the time between frames
+static void render(eSimple *simple, ivec2 window_size, float dtime) {
     // camera only needs to be updated before rendering
     camera_update(L.camera, window_size.x, window_size.y);
     hudcamera_update(L.hudcam, window_size.x, window_size.y);
