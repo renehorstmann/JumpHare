@@ -161,3 +161,4 @@ René Horstmann
 ## Licence
 - The game and its assets are licenced under GPLv3, see LICENCE.
 - The [some](https://github.com/renehorstmann/some) framework is under MIT licence, see someLICENCE.
+- Have a look at [some_examples](https://github.com/renehorstmann/some_examples) for some shared modules, under the MIT licence
