@@ -47,8 +47,9 @@ Camera_s *camera_new() {
     return self;
 }
 
-void camera_update(Camera_s *self, int wnd_width, int wnd_height) {
-
+void camera_update(Camera_s *self, ivec2 window_size) {
+    int wnd_width = window_size.x;
+    int wnd_height = window_size.y;
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     
     self->RO.scale = smaller_size / CAMERA_SIZE;

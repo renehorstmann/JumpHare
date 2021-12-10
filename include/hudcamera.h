@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include "mathc/types/float.h"
+#include "mathc/types/int.h"
 
 
 #define HUDCAMERA_SIZE 180 // *4=720; *6=1080; *8=1440
@@ -20,14 +21,14 @@ struct HudCameraMatrices_s {
 typedef struct {
     struct HudCameraMatrices_s matrices;
     struct {
-        float real_pixel_per_pixel;
+        float scale;
         float left, right, bottom, top;
     } RO;   // read only
 } HudCamera_s;
 
 HudCamera_s *hudcamera_new();
 
-void hudcamera_update(HudCamera_s *self, int wnd_width, int wnd_height);
+void hudcamera_update(HudCamera_s *self, ivec2 window_size);
 
 
 static float hudcamera_width(const HudCamera_s *self) {

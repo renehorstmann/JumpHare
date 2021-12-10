@@ -6,7 +6,6 @@
 #include "mathc/utils/camera.h"
 #include "hudcamera.h"
 
-#define MIN_PIXEL_SIZE 2
 
 
 //
@@ -21,20 +20,20 @@ HudCamera_s *hudcamera_new() {
     return self;
 }
 
-void hudcamera_update(HudCamera_s *self, int wnd_width, int wnd_height) {
-
-
+void hudcamera_update(HudCamera_s *self, ivec2 window_size) {
+    int wnd_width = window_size.x;
+    int wnd_height = window_size.y;
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     
-    self->RO.real_pixel_per_pixel = smaller_size / HUDCAMERA_SIZE;
+    self->RO.scale = smaller_size / HUDCAMERA_SIZE;
     
     // pixel perfect:
-    self->RO.real_pixel_per_pixel = sca_floor(self->RO.real_pixel_per_pixel);
-    
-    self->RO.real_pixel_per_pixel = sca_max(MIN_PIXEL_SIZE, self->RO.real_pixel_per_pixel);
+    if(self->RO.scale > 1) {
+        self->RO.scale = sca_floor(self->RO.scale);
+    }
 
-    float width_2 = wnd_width / (2 * self->RO.real_pixel_per_pixel);
-    float height_2 = wnd_height / (2 * self->RO.real_pixel_per_pixel);
+    float width_2 = wnd_width / (2 * self->RO.scale);
+    float height_2 = wnd_height / (2 * self->RO.scale);
 
     // begin: (top, left) with a full pixel
     // end: (bottom, right) with a maybe splitted pixel
