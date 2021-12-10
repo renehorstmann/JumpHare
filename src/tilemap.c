@@ -194,11 +194,11 @@ void tilemap_update(Tilemap *self, float dtime) {
 void tilemap_render_back(const Tilemap *self, const mat4 *cam_mat) {
     for (int i = 0; i < self->tiles_ref->size; i++) {
         if(self->L.ro_back_active[i])
-            ro_batch_render(&self->L.ro_back[i], cam_mat);
+            ro_batch_render(&self->L.ro_back[i], cam_mat, false);
     }
     for (int i = 0; i < self->tiles_ref->size; i++) {
         if(self->L.ro_main_active[i])
-            ro_batch_render(&self->L.ro_main[i], cam_mat);
+            ro_batch_render(&self->L.ro_main[i], cam_mat, false);
     }
 }
 

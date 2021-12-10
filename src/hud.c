@@ -108,7 +108,7 @@ float dtime) {
 }
 
 void hud_render(const Hud *self, const mat4 *hudcam_mat) {
-    ro_batch_render(&self->L.carrots, hudcam_mat);
+    ro_batch_render(&self->L.carrots, hudcam_mat, false);
     ro_single_render(&self->L.butterfly_icon, hudcam_mat);
     ro_text_render(&self->L.butterfly_cnt, hudcam_mat);
 }

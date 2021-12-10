@@ -86,11 +86,10 @@ void airstroke_update(Airstroke *self, const Tilemap *tilemap, float dtime) {
         }
     }
 
-    ro_batch_update(&self->L.ro);
 }
 
 void airstroke_render(const Airstroke *self, const mat4 *cam_mat) {
-    ro_batch_render(&self->L.ro, cam_mat);
+    ro_batch_render(&self->L.ro, cam_mat, true);
 }
 
 void airstroke_add(Airstroke *self, float x, float y) {

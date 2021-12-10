@@ -72,6 +72,6 @@ void background_update(Background *self, float dtime) {
 
 void background_render(const Background *self, const Camera_s *cam) {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
-        ro_batch_render(&self->L.ro[i], &cam->matrices_background[i].vp);
+        ro_batch_render(&self->L.ro[i], &cam->matrices_background[i].vp, false);
 }
 

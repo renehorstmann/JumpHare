@@ -266,7 +266,7 @@ void level_render(const Level *self, const Camera_s *cam, const mat4 *hudcam_mat
     hud_render(self->hud, hudcam_mat);
     dead_render(self->dead, cam_main_mat, hudcam_mat);
 
-    ro_batch_render(&self->L.borders_ro, cam_main_mat);
+    ro_batch_render(&self->L.borders_ro, cam_main_mat, false);
 
     controller_render(self->controller, hudcam_mat);
     

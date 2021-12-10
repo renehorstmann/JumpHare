@@ -6,7 +6,6 @@
 #include "mathc/utils/camera.h"
 #include "camera.h"
 
-#define MIN_PIXEL_SIZE 2
 #define BACKGROUND_SPEED_FACTOR 0.2
 
 
@@ -52,18 +51,18 @@ void camera_update(Camera_s *self, int wnd_width, int wnd_height) {
 
     float smaller_size = wnd_width < wnd_height ? wnd_width : wnd_height;
     
-    self->RO.real_pixel_per_pixel = smaller_size / CAMERA_SIZE;
+    self->RO.scale = smaller_size / CAMERA_SIZE;
     
     // pixel perfect:
-    self->RO.real_pixel_per_pixel = sca_floor(self->RO.real_pixel_per_pixel);
-    
-    self->RO.real_pixel_per_pixel = sca_max(MIN_PIXEL_SIZE, self->RO.real_pixel_per_pixel);
+    if(self->RO.scale > 1) {
+        self->RO.scale = sca_floor(self->RO.scale);
+    }
     
     // test
-    //L.real_pixel_per_pixel = 7.5;
+    //L.scale = 7.5;
 
-    float cam_width = (float)wnd_width / self->RO.real_pixel_per_pixel;
-    float cam_height = (float)wnd_height / self->RO.real_pixel_per_pixel;
+    float cam_width = (float)wnd_width / self->RO.scale;
+    float cam_height = (float)wnd_height / self->RO.scale;
 
     float cam_width_2 = cam_width / 2;
     float cam_height_2 = cam_height / 2;
@@ -121,8 +120,8 @@ void camera_set_pos(Camera_s *self, float x, float y) {
     float cx = x + self->RO.left;
     float cy = y + self->RO.bottom;
     
-    x = floorf(x * self->RO.real_pixel_per_pixel) / self->RO.real_pixel_per_pixel;
-    y = floorf(y * self->RO.real_pixel_per_pixel) / self->RO.real_pixel_per_pixel;
+    x = floorf(x * self->RO.scale) / self->RO.scale;
+    y = floorf(y * self->RO.scale) / self->RO.scale;
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
         float t = (float)i / CAMERA_BACKGROUNDS;

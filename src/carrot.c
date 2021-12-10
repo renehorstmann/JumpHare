@@ -98,12 +98,11 @@ void carrot_update(Carrot *self, float dtime) {
         
         u_pose_set_size(&self->L.carrot_ro.rects[i].pose, h/2, h);
     }
-    
-    ro_batch_update(&self->L.carrot_ro);
+
 }
 
 void carrot_render(const Carrot *self, const mat4 *cam_mat) {
-    ro_batch_render(&self->L.carrot_ro, cam_mat);
+    ro_batch_render(&self->L.carrot_ro, cam_mat, true);
 }
 
 

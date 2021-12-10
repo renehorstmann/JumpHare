@@ -215,10 +215,8 @@ void controller_update(Controller *self, float dtime) {
         u_pose_set_x(&pose, self->camera_ref->RO.right + BACKGROUND_SIZE/2);
         self->L.background_ro.rects[1].pose = pose;
     }
-    
-    ro_batch_update(&self->L.background_ro);
 }
 
 void controller_render(const Controller *self, const mat4 *hudcam_mat) {
-    ro_batch_render(&self->L.background_ro, hudcam_mat);
+    ro_batch_render(&self->L.background_ro, hudcam_mat, true);
 }

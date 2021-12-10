@@ -174,9 +174,7 @@ void flag_update(Flag *self, const Hare *hare, float dtime) {
     int frame = animate_time * FPS;
     for(int i=0; i<self->L.flag_ro.num; i++)
         self->L.flag_ro.rects[i].sprite.x = frame;
-    
-    ro_batch_update(&self->L.flag_ro);
-    
+
     
     vec2 hare_pos = hare->pos;
     for(int i=0; i<self->L.flag_ro.num; i++) {
@@ -198,13 +196,12 @@ void flag_update(Flag *self, const Hare *hare, float dtime) {
             button_set_pressed(&self->L.btn_ro.rects[i], false);
         }
     }
-    
-    ro_batch_update(&self->L.btn_ro);
+
 }
 
 void flag_render(const Flag *self, const mat4 *cam_mat) {
-    ro_batch_render(&self->L.flag_ro, cam_mat);
-    ro_batch_render(&self->L.btn_ro, cam_mat);
+    ro_batch_render(&self->L.flag_ro, cam_mat, true);
+    ro_batch_render(&self->L.btn_ro, cam_mat, true);
 }
 
 

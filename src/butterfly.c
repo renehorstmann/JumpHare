@@ -131,7 +131,7 @@ void butterfly_update(Butterfly *self, float dtime) {
 }
 
 void butterfly_render(const Butterfly *self, const mat4 *cam_mat) {
-    ro_particle_render(&self->L.ro, self->L.time, cam_mat);
+    ro_particle_render(&self->L.ro, self->L.time, cam_mat, false);
 }
 
 bool butterfly_collect(Butterfly *self, vec2 position) {

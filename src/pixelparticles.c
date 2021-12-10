@@ -48,7 +48,7 @@ void pixelparticles_update(PixelParticles *self, float dtime) {
 }
 
 void pixelparticles_render(const PixelParticles *self, const mat4 *cam_mat) {
-    ro_particle_render(&self->L.ro, self->time, cam_mat);
+    ro_particle_render(&self->L.ro, self->time, cam_mat, false);
 }
 
 void pixelparticles_add(PixelParticles *self, const rParticleRect_s *particles, int n) {

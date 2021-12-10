@@ -476,7 +476,7 @@ void hare_update(Hare *self, float dtime) {
 
 void hare_render(const Hare *self, const mat4 *cam_mat) {
     ro_single_render(&self->L.ro, cam_mat);
-    ro_particle_render(&self->L.sleep_zzz_ro, self->L.sleep_ro_time, cam_mat);
+    ro_particle_render(&self->L.sleep_zzz_ro, self->L.sleep_ro_time, cam_mat, false);
 }
 
 

@@ -156,13 +156,12 @@ void speechbubble_update(SpeechBubble *self, float dtime, vec2 blend_pos) {
     for(int i=0;i<self->bubble.num;i++) {
         self->bubble.rects[i].color.a = alpha;
     }
-    
-    
+
+    // manual text changes need an batch update of the underlying render object
     ro_batch_update(&self->text.ro);
-    ro_batch_update(&self->bubble);
 }
 
 void speechbubble_render(const SpeechBubble *self, const mat4 *cam_mat) {
-    ro_batch_render(&self->bubble, cam_mat);
+    ro_batch_render(&self->bubble, cam_mat, true);
     ro_text_render(&self->text, cam_mat);
 }
