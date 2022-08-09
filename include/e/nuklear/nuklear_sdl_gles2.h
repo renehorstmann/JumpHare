@@ -16,25 +16,32 @@
 #define NK_SDL_GLES2_H_
 
 // added to enable scaling
-#ifdef NUKLEAR_SCALE
-#define NK_SCALE NUKLEAR_SCALE
-#else
-#define NK_SCALE 1.0
-#endif
+#include "../gui.h"
 
 
 #include <SDL2/SDL.h>
+#ifdef PLATFORM_ANDROID
+#include <SDL2/SDL_opengles.h>
+#else
 #include <SDL2/SDL_opengles2.h>
+#endif
 
 
-NK_API struct nk_context*   nk_sdl_init(SDL_Window *win);
-NK_API void                 nk_sdl_font_stash_begin(struct nk_font_atlas **atlas);
-NK_API void                 nk_sdl_font_stash_end(void);
-NK_API int                  nk_sdl_handle_event(SDL_Event *evt);
-NK_API void                 nk_sdl_render(enum nk_anti_aliasing , int max_vertex_buffer, int max_element_buffer);
-NK_API void                 nk_sdl_shutdown(void);
-NK_API void                 nk_sdl_device_destroy(void);
-NK_API void                 nk_sdl_device_create(void);
+NK_API struct nk_context *nk_sdl_init(SDL_Window *win);
+
+NK_API void nk_sdl_font_stash_begin(struct nk_font_atlas **atlas);
+
+NK_API void nk_sdl_font_stash_end(void);
+
+NK_API int nk_sdl_handle_event(SDL_Event *evt);
+
+NK_API void nk_sdl_render(enum nk_anti_aliasing, int max_vertex_buffer, int max_element_buffer);
+
+NK_API void nk_sdl_shutdown(void);
+
+NK_API void nk_sdl_device_destroy(void);
+
+NK_API void nk_sdl_device_create(void);
 
 #endif
 
@@ -193,8 +200,8 @@ nk_sdl_render(enum nk_anti_aliasing AA, int max_vertex_buffer, int max_element_b
     };
     SDL_GetWindowSize(sdl.win, &width, &height);
     SDL_GL_GetDrawableSize(sdl.win, &display_width, &display_height);
-    width /= NK_SCALE;
-    height /= NK_SCALE;
+    width /= e_gui.scale;
+    height /= e_gui.scale;
     ortho[0][0] /= (GLfloat)width;
     ortho[1][1] /= (GLfloat)height;
 
@@ -411,7 +418,7 @@ nk_sdl_handle_event(SDL_Event *evt)
     } else if (evt->type == SDL_MOUSEBUTTONDOWN || evt->type == SDL_MOUSEBUTTONUP) {
         /* mouse button */
         int down = evt->type == SDL_MOUSEBUTTONDOWN;
-        const int x = evt->button.x / NK_SCALE , y = evt->button.y / NK_SCALE ;
+        const int x = evt->button.x / e_gui.scale , y = evt->button.y / e_gui.scale ;
         if (evt->button.button == SDL_BUTTON_LEFT) {
             if (evt->button.clicks > 1)
                 nk_input_button(ctx, NK_BUTTON_DOUBLE, x, y, down);
@@ -425,8 +432,8 @@ nk_sdl_handle_event(SDL_Event *evt)
         /* mouse motion */
         if (ctx->input.mouse.grabbed) {
             int x = (int)ctx->input.mouse.prev.x, y = (int)ctx->input.mouse.prev.y;
-            nk_input_motion(ctx, x + evt->motion.xrel/NK_SCALE , y + evt->motion.yrel/NK_SCALE);
-        } else nk_input_motion(ctx, evt->motion.x/NK_SCALE , evt->motion.y/NK_SCALE );
+            nk_input_motion(ctx, x + evt->motion.xrel/e_gui.scale , y + evt->motion.yrel/e_gui.scale);
+        } else nk_input_motion(ctx, evt->motion.x/e_gui.scale , evt->motion.y/e_gui.scale );
         return 1;
     } else if (evt->type == SDL_TEXTINPUT) {
         /* text input */

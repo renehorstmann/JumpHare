@@ -1,18 +1,16 @@
 #include "u/image.h"
-#include "rhc/error.h"
+#include "s/error.h"
 #include "tiles.h"
 
-
+struct Tiles_Globals tiles;
 
 //
 // public
 //
 
-Tiles *tiles_new() {
-    Tiles *self = rhc_calloc(sizeof *self);
-    
+void tiles_init() {
     int tile_id = 1;
-    self->size = 0;
+    tiles.size = 0;
     for (;;) {
         char file[128];
         sprintf(file, "res/tiles/tile_%02i.png", tile_id);
@@ -21,37 +19,34 @@ Tiles *tiles_new() {
         if (!u_image_valid(img))
             break;
 
-        assume(img.cols == TILES_COLS * TILES_SIZE
+        s_assume(img.cols == TILES_COLS * TILES_SIZE
                && img.rows == TILES_ROWS * TILES_SIZE,
                "wrong tiles size");
 
         rTexture tex = r_texture_new(img.cols, img.rows, TILES_COLS, TILES_ROWS, u_image_layer(img, 0));
 
-        self->imgs[self->size] = img;
-        self->textures[self->size] = tex;
-        self->ids[self->size] = tile_id;
+        tiles.imgs[tiles.size] = img;
+        tiles.textures[tiles.size] = tex;
+        tiles.ids[tiles.size] = tile_id;
 
         tile_id++;
-        self->size++;
+        tiles.size++;
     }
-    log_info("tiles: loaded: %i", self->size);
-    if (self->size == 0)
-        log_error("tiles: failed! 0 tiles loaded! Put some into tiles/tile_xx.png, starting with xx=01");
-        
-    return self;
+    s_log_info("tiles: loaded: %i", tiles.size);
+    if (tiles.size == 0)
+        s_log_error("tiles: failed! 0 tiles loaded! Put some into tiles/tile_xx.png, starting with xx=01");
 }
 
-uColor_s tiles_pixel(const Tiles *self, uColor_s code, int pixel_c, int pixel_r, int layer) {
-    int tile_id = code.b;
-    int tile = code.a;
+uColor_s tiles_pixel(uColor_s code, int pixel_c, int pixel_r, int layer) {
+    int tile_id = code.r;
+    int tile_col = code.g;
+    int tile_row = code.b;
 
     if (tile_id == 0)
         return U_COLOR_TRANSPARENT;
 
-    uImage img = self->imgs[tile_id - 1];
+    uImage img = tiles.imgs[tile_id - 1];
 
-    int tile_col = tile % TILES_COLS;
-    int tile_row = tile / TILES_COLS;
 
     return *u_image_pixel(img,
                         pixel_c + tile_col * TILES_SIZE,
@@ -59,7 +54,7 @@ uColor_s tiles_pixel(const Tiles *self, uColor_s code, int pixel_c, int pixel_r,
                         layer);
 }
 
-enum tiles_pixel_state tiles_get_state(const Tiles *self, uColor_s id) {
+enum tiles_pixel_state tiles_get_state(uColor_s id) {
     if (u_color_equals(id, U_COLOR_TRANSPARENT))
         return TILES_PIXEL_EMPTY;
 

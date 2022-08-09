@@ -1,26 +1,18 @@
 #ifndef JUMPHARE_BACKGROUND_H
 #define JUMPHARE_BACKGROUND_H
 
-#include <stdbool.h>
-#include "r/ro_types.h"
-#include "r/render.h"
-#include "camera.h"
+#include "s/s.h"
+#include "m/types/float.h"
 
-typedef struct {
-    struct {
-        RoBatch ro[CAMERA_BACKGROUNDS];
-    } L;
-} Background;
 
-Background *background_new(float level_width, float level_height, 
+void background_init(float level_width, float level_height,
         bool repeat_h, bool repeat_v,
-        rRender *render,
         const char *file);
 
-void background_kill(Background **self_ptr);
+void background_kill();
 
-void background_update(Background *self, float dtime);
+void background_update(float dtime);
 
-void background_render(const Background *self, const Camera_s *cam);
+void background_render();
 
 #endif //JUMPHARE_BACKGROUND_H

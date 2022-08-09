@@ -10,5 +10,9 @@
 #include "pose.h"
 #include "prandom.h"
 #include "fetch.h"
+#include "json.h"
+#include "timer.h"
+#include "animator.h"
+#include "button.h"
 
 #endif //U_U_H

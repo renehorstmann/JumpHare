@@ -1,38 +1,29 @@
 #ifndef JUMPHARE_BUTTERFLY_H
 #define JUMPHARE_BUTTERFLY_H
 
-#include "r/ro_types.h"
+#include "s/s.h"
+#include "m/types/float.h"
 
-typedef struct {
+struct Butterfly_Globals {
     struct {
         int collected;
         vec3 last_color;
     } RO; // read only
-    
-    struct {
-        RoParticle ro;
-        float time;
-        float reset_time;
-        float collected_time;
-    
-        struct {
-            bool *collected;
-        } save;
-    } L;
-} Butterfly;
+};
+extern struct Butterfly_Globals butterfly;
 
-Butterfly *butterfly_new(const vec2 *positions, int num);
+void butterfly_init(const vec2 *positions, int num);
 
-void butterfly_kill(Butterfly **self_ptr);
+void butterfly_kill();
 
-void butterfly_update(Butterfly *self, float dtime);
+void butterfly_update(float dtime);
 
-void butterfly_render(const Butterfly *self, const mat4 *cam_mat);
+void butterfly_render(const mat4 *cam_mat);
 
-bool butterfly_collect(Butterfly *self, vec2 position);
+bool butterfly_collect(vec2 position);
 
-void butterfly_save(Butterfly *self);
+void butterfly_save();
 
-void butterfly_load(Butterfly *self);
+void butterfly_load();
 
 #endif //JUMPHARE_BUTTERFLY_H

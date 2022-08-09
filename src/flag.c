@@ -1,11 +1,12 @@
 #include "r/ro_batch.h"
-#include "r/texture.h"
 #include "u/pose.h"
-#include "mathc/float.h"
-#include "mathc/utils/random.h"
-#include "rhc/error.h"
-#include "rhc/log.h"
-#include "button.h"
+#include "u/button.h"
+#include "m/float.h"
+#include "m/utils/random.h"
+#include "pixelparticles.h"
+#include "hare.h"
+#include "carrot.h"
+#include "camera.h"
 #include "flag.h"
 
 #define FLAG_OFFSET_Y 8.0
@@ -23,15 +24,26 @@
 #define PARTICLE_ALPHA 2.0
 
 
-//
-// private
-//
+struct Flag_Globals flag;
 
-static bool flag_reached(const Flag *self, int index) {
-    return self->L.flag_ro.rects[index].sprite.y < 0.5;
+
+static struct {
+    RoBatch flag_ro;
+    RoBatch btn_ro;
+    float time;
+
+    struct {
+        flag_activated_callback_fn cb;
+        void *ud;
+    } callbacks[FLAG_MAX_CALLBACKS];
+    int callbacks_size;
+} L;
+
+static bool flag_reached(int index) {
+    return L.flag_ro.rects[index].sprite.y < 0.5;
 }
 
-static void emit_particles(Flag *self, float x, float y) {
+static void emit_particles(float x, float y) {
     rParticleRect_s rects[NUM_PARTICLES];
     for(int i=0; i<NUM_PARTICLES; i++) {
         rects[i] = r_particlerect_new();
@@ -47,60 +59,59 @@ static void emit_particles(Flag *self, float x, float y) {
         rects[i].color.rgb = vec3_set(sca_random_noise(0.9, 0.1));
         rects[i].color.a = PARTICLE_ALPHA;
         rects[i].color_speed.a = (float)-PARTICLE_ALPHA/PARTICLE_TIME;
-        rects[i].start_time = self->carrot_ref->particles_ref->time;
+        rects[i].start_time_ms = pixelparticles.time;
     }
-    pixelparticles_add(self->carrot_ref->particles_ref, rects, NUM_PARTICLES);
+    pixelparticles_add(rects, NUM_PARTICLES);
 }
 
-static void activate(Flag *self, int flag_index) {
-    log_info("flag: activated %i", flag_index);
-    self->L.flag_ro.rects[flag_index].sprite.y = 0;
+static void activate(int flag_index) {
+    s_log_info("flag: activated %i", flag_index);
+    L.flag_ro.rects[flag_index].sprite.y = 0;
 
-    vec2 pos = u_pose_get_xy(self->L.flag_ro.rects[flag_index].pose);
+    vec2 pos = u_pose_get_xy(L.flag_ro.rects[flag_index].pose);
 
     pos.y -= FLAG_OFFSET_Y;
-    self->RO.active_pos = pos;
+    flag.RO.active_pos = pos;
 
     pos.y += 8 + FLAG_OFFSET_Y;
-    emit_particles(self, pos.x, pos.y);
+    emit_particles(pos.x, pos.y);
 
-    carrot_eat(self->carrot_ref);
-    for(int i=0; i<self->L.callbacks_size; i++) {
-        self->L.callbacks[i].cb(self->RO.active_pos, self->L.callbacks[i].ud);
+    carrot_eat();
+    for(int i=0; i<L.callbacks_size; i++) {
+        L.callbacks[i].cb(flag.RO.active_pos, L.callbacks[i].ud);
     }
 }
 
 static void pointer_callback(ePointer_s pointer, void *user_data) {
-    Flag *self = user_data;
-    pointer.pos = mat4_mul_vec(self->cam_ref->matrices_main.v_p_inv, pointer.pos);
+    pointer.pos = mat4_mul_vec(camera.matrices_main.v_p_inv, pointer.pos);
     
-    for(int i=0; i<self->L.btn_ro.num; i++) {
-        if(self->L.btn_ro.rects[i].color.a<0.99)
+    for(int i=0; i<L.btn_ro.num; i++) {
+        if(L.btn_ro.rects[i].color.a<0.99)
             continue;
         
-        if(button_clicked(&self->L.btn_ro.rects[i], pointer)) {
-            activate(self, i);
+        if(u_button_clicked(&L.btn_ro.rects[i], pointer)) {
+            activate(i);
         }
     }
 }
 
-static void check_key_click(Flag *self) {
+static void check_key_click() {
     static bool key_was_pressed = false;
     
-    for(int i=0; i<self->L.btn_ro.num; i++) {
-        if(self->L.btn_ro.rects[i].color.a<0.99)
+    for(int i=0; i<L.btn_ro.num; i++) {
+        if(L.btn_ro.rects[i].color.a<0.99)
             continue;
 
-        eInputKeys keys = e_input_get_keys(self->input_ref);
+        eInputKeys keys = e_input.keys;
         if(keys.enter) {
-            button_set_pressed(&self->L.btn_ro.rects[i], true);
+            u_button_set_pressed(&L.btn_ro.rects[i], true);
             key_was_pressed = true;
         }
         
         if(key_was_pressed && !keys.enter) {
             key_was_pressed = false;
-            if(button_is_pressed(&self->L.btn_ro.rects[i])) {
-                activate(self, i);
+            if(u_button_is_pressed(&L.btn_ro.rects[i])) {
+                activate(i);
             }
         }
     }
@@ -111,102 +122,89 @@ static void check_key_click(Flag *self) {
 // public
 //
 
-Flag *flag_new(const vec2 *positions, int num, const Camera_s *cam, Carrot *carrot,  eInput *input) {
-    assume(num>=1, "a level needs at least one flag");
-    
-    Flag *self = rhc_calloc(sizeof *self);
-    
-    self->input_ref = input;
-    self->cam_ref = cam;
-    self->carrot_ref = carrot;
+void flag_init(const vec2 *positions, int num) {
+    s_assume(num>=1, "a level needs at least one flag");
 
-    e_input_register_pointer_event(input, pointer_callback, self);
+    e_input_register_pointer_event( pointer_callback, NULL);
 
-    self->RO.active_pos = (vec2) {{NAN, NAN}};
+    flag.RO.active_pos = (vec2) {{NAN, NAN}};
 
-    self->L.flag_ro = ro_batch_new(num,
+    L.flag_ro = ro_batch_new(num,
                     r_texture_new_file(4, 2, "res/flag.png"));
     for(int i=0; i<num; i++) {
-        self->L.flag_ro.rects[i].pose = u_pose_new(
+        L.flag_ro.rects[i].pose = u_pose_new(
                 positions[i].x,
                 positions[i].y+FLAG_OFFSET_Y,
                 32, 48);
 
-        self->L.flag_ro.rects[i].sprite.y = 1;
+        L.flag_ro.rects[i].sprite.y = 1;
     }
-    ro_batch_update(&self->L.flag_ro);
+    ro_batch_update(&L.flag_ro);
     
     
-    self->L.btn_ro = ro_batch_new(num,
+    L.btn_ro = ro_batch_new(num,
                     r_texture_new_file(2, 1, "res/carrot_btn.png"));
     for(int i=0; i<num; i++) {
         
-        self->L.btn_ro.rects[i].pose = u_pose_new(
+        L.btn_ro.rects[i].pose = u_pose_new(
                 positions[i].x,
                 positions[i].y+56,
                 32, 32);
-        self->L.btn_ro.rects[i].color.a = 1;
+        L.btn_ro.rects[i].color.a = 1;
     }
-    ro_batch_update(&self->L.btn_ro);
-    
-    return self;
+    ro_batch_update(&L.btn_ro);
 }
 
-void flag_kill(Flag **self_ptr) {
-    Flag *self = *self_ptr;
-    if(!self)
-        return;
-    e_input_unregister_pointer_event(self->input_ref,
-            pointer_callback);
-    ro_batch_kill(&self->L.flag_ro);
-    ro_batch_kill(&self->L.btn_ro);
-    
-    rhc_free(self);
-    *self_ptr = NULL;
+void flag_kill() {
+    e_input_unregister_pointer_event(pointer_callback);
+    ro_batch_kill(&L.flag_ro);
+    ro_batch_kill(&L.btn_ro);
+    memset(&L, 0, sizeof L);
+    memset(&flag, 0, sizeof flag);
 }
 
-void flag_update(Flag *self, const Hare *hare, float dtime) {
-    self->L.time += dtime;
+void flag_update(float dtime) {
+    L.time += dtime;
 
-    check_key_click(self);
+    check_key_click();
 
-    float animate_time = sca_mod(self->L.time, FRAMES / FPS);
+    float animate_time = sca_mod(L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
-    for(int i=0; i<self->L.flag_ro.num; i++)
-        self->L.flag_ro.rects[i].sprite.x = frame;
+    for(int i=0; i<L.flag_ro.num; i++)
+        L.flag_ro.rects[i].sprite.x = frame;
 
     
-    vec2 hare_pos = hare->pos;
-    for(int i=0; i<self->L.flag_ro.num; i++) {
-        if(flag_reached(self, i) || self->carrot_ref->RO.collected == 0) {
-            self->L.btn_ro.rects[i].color.a = 0;
+    vec2 hare_pos = hare.pos;
+    for(int i=0; i<L.flag_ro.num; i++) {
+        if(flag_reached(i) || carrot.RO.collected == 0) {
+            L.btn_ro.rects[i].color.a = 0;
             continue;
         }
         
         
-        vec2 center = u_pose_get_xy(self->L.flag_ro.rects[i].pose);
+        vec2 center = u_pose_get_xy(L.flag_ro.rects[i].pose);
         center.y -= FLAG_OFFSET_Y;
         float dist = vec2_distance(hare_pos, center);
         if(dist < MIN_DIST) {
-            self->L.btn_ro.rects[i].color.a = 1;
+            L.btn_ro.rects[i].color.a = 1;
         } else {
             float t = dist / MAX_DIST;
-            self->L.btn_ro.rects[i].color.a = sca_clamp(sca_mix(1, 0, t), 0, 1);
+            L.btn_ro.rects[i].color.a = sca_clamp(sca_mix(1, 0, t), 0, 1);
 
-            button_set_pressed(&self->L.btn_ro.rects[i], false);
+            u_button_set_pressed(&L.btn_ro.rects[i], false);
         }
     }
 
 }
 
-void flag_render(const Flag *self, const mat4 *cam_mat) {
-    ro_batch_render(&self->L.flag_ro, cam_mat, true);
-    ro_batch_render(&self->L.btn_ro, cam_mat, true);
+void flag_render(const mat4 *cam_mat) {
+    ro_batch_render(&L.flag_ro, cam_mat, true);
+    ro_batch_render(&L.btn_ro, cam_mat, true);
 }
 
 
-void flag_register_callback(Flag *self, flag_activated_callback_fn cb, void *ud) {
-    assume(self->L.callbacks_size < FLAG_MAX_CALLBACKS, "too many");
-    self->L.callbacks[self->L.callbacks_size].cb = cb;
-    self->L.callbacks[self->L.callbacks_size++].ud = ud;
+void flag_register_callback(flag_activated_callback_fn cb, void *ud) {
+    s_assume(L.callbacks_size < FLAG_MAX_CALLBACKS, "too many");
+    L.callbacks[L.callbacks_size].cb = cb;
+    L.callbacks[L.callbacks_size++].ud = ud;
 }

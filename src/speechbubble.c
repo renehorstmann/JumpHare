@@ -1,8 +1,6 @@
-#include <string.h>
 #include "r/ro_batch.h"
-#include "r/texture.h"
 #include "u/pose.h"
-#include "mathc/float.h"
+#include "m/float.h"
 #include "speechbubble.h"
 
 

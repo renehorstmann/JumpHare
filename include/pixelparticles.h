@@ -1,29 +1,25 @@
 #ifndef JUMPHARE_PIXELPARTICLES_H
 #define JUMPHARE_PIXELPARTICLES_H
 
-#include "r/rect.h"
+#include "s/s.h"
 #include "u/color.h"
-#include "r/ro_types.h"
+#include "m/types/float.h"
 
-typedef struct {
-    float time;
-    
-    struct {
-        RoParticle ro;
-        int next;
-    } L;
-} PixelParticles;
+struct PixelParticles_Globals {
+    su32 time;
+};
+extern struct PixelParticles_Globals pixelparticles;
 
-PixelParticles *pixelparticles_new();
+void pixelparticles_init();
 
-void pixelparticles_kill(PixelParticles **self_ptr);
+void pixelparticles_kill();
 
-void pixelparticles_update(PixelParticles *self, float dtime);
+void pixelparticles_update(float dtime);
 
-void pixelparticles_render(const PixelParticles *self, const mat4 *cam_mat);
+void pixelparticles_render(const mat4 *cam_mat);
 
-void pixelparticles_add(PixelParticles *self, const rParticleRect_s *particles, int n);
+void pixelparticles_add(const rParticleRect_s *particles, int n);
 
-void pixelparticles_add_dirt(PixelParticles *self, vec2 pos, vec2 dir, uColor_s color, int n);
+void pixelparticles_add_dirt(vec2 pos, vec2 dir, uColor_s color, int n);
 
 #endif //JUMPHARE_PIXELPARTICLES_H

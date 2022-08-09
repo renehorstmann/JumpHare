@@ -1,10 +1,10 @@
 #ifndef JUMPHARE_CAMERACTRL_H
 #define JUMPHARE_CAMERACTRL_H
 
-#include "camera.h"
-#include "tilemap.h"
+#include "s/s.h"
+#include "m/types/float.h"
 
-typedef struct {
+struct CameraControl_Globals{
     vec2 pos;
     vec2 max_diff;
     vec2 diff_offset;
@@ -12,16 +12,13 @@ typedef struct {
     struct {
         vec2 dst;
     } in;
-    
-    struct {
-        vec2 pos;
-    } L;
-} CameraControl_s;
+};
+extern struct CameraControl_Globals cameractrl;
 
-CameraControl_s *cameractrl_new();
+void cameractrl_init();
 
-void cameractrl_kill(CameraControl_s **self_ptr);
+void cameractrl_kill();
 
-void cameractrl_update(CameraControl_s *self, Camera_s *camera, const Tilemap *tilemap, float dtime);
+void cameractrl_update(float dtime);
 
 #endif //JUMPHARE_CAMERACTRL_H

@@ -5,15 +5,18 @@
 // load and setup textures as simple 2D textures
 //
 
-#include <stdint.h>
-#include <stdbool.h>
 #include "core.h"
-#include "mathc/types/int.h"
-#include "types.h"
+#include "m/types/int.h"
+
+// Simple Texture, without a sprite grid
+typedef struct {
+    GLuint tex;    // GL_TEXTURE_2D
+    ivec2 size;
+} rTexture2D;
 
 static bool r_texture2d_valid(rTexture2D self) {
     return self.tex > 0
-            && self.size.x > 0 && self.size.y > 0;
+           && self.size.x > 0 && self.size.y > 0;
 }
 
 static rTexture2D r_texture2d_new_invalid() {
@@ -49,5 +52,11 @@ void r_texture2d_filter_linear(rTexture2D self);
 
 // sets the rendering interpolation to nearest (pixelart)
 void r_texture2d_filter_nearest(rTexture2D self);
+
+// sets the texture wrap mode to repeat, so that the texture will be repeated, if uv is reset
+void r_texture2d_wrap_repeat(rTexture2D self);
+
+// sets the texture wrap mode to clamp, so that the border pixels will be repeated, if uv is reset (default)
+void r_texture2d_wrap_clamp(rTexture2D self);
 
 #endif //R_TEXTURE2D_H

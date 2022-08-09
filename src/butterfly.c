@@ -1,11 +1,9 @@
+#include "e/window.h"
 #include "r/ro_particle.h"
-#include "r/texture.h"
 #include "u/pose.h"
-#include "mathc/float.h"
-#include "mathc/utils/random.h"
-#include "mathc/utils/color.h"
-#include "rhc/error.h"
-#include "rhc/alloc.h"
+#include "m/float.h"
+#include "m/utils/random.h"
+#include "m/utils/color.h"
 #include "butterfly.h"
 
 #define CHILL_FPS 6.0
@@ -18,51 +16,62 @@
 static const float RESET_TIME = 5.0 * FRAMES / CHILL_FPS;
 
 
-//
-// private
-//
+struct Butterfly_Globals butterfly;
 
-static bool is_flying(const Butterfly *self, int i) {
-    return self->L.ro.rects[i].sprite.y > 0.5;
+
+static struct {
+    RoParticle ro;
+    float reset_time;
+    float collected_time;
+
+    struct {
+        bool *collected;
+    } save;
+} L;
+
+
+static bool is_flying(int i) {
+    return L.ro.rects[i].sprite.y > 0.5;
 }
 
-static void init_stay(Butterfly *self, int i) {
-    self->L.ro.rects[i].sprite.y = 0;
-    self->L.ro.rects[i].sprite_speed.x = CHILL_FPS;
+static void init_stay(int i) {
+    L.ro.rects[i].sprite.y = 0;
+    L.ro.rects[i].sprite_speed.x = CHILL_FPS;
     int flip = rand()%2;
-    float uv_w = -1;
+    float w_flip = 1;
     if(flip) {
-        uv_w = 1;
+        w_flip = -1;
     }
-    self->L.ro.rects[i].uv = u_pose_new(0, 0, uv_w, 1);
-    self->L.ro.rects[i].speed.x = 0;
-    self->L.ro.rects[i].speed.y = 0;
-    self->L.ro.rects[i].acc.y = 0;
-    self->L.ro.rects[i].start_time = self->L.time;
+    // m00 := width for an aa pose
+    L.ro.rects[i].pose.m00 = sca_abs(L.ro.rects[i].pose.m00) * w_flip;
+    L.ro.rects[i].speed.x = 0;
+    L.ro.rects[i].speed.y = 0;
+    L.ro.rects[i].acc.y = 0;
+    L.ro.rects[i].start_time_ms = e_window.time_ms;
 }
 
-static void init_fly(Butterfly *self, int i) {
-    self->L.ro.rects[i].sprite.y = 1;
-    self->L.ro.rects[i].sprite_speed.x = FLY_FPS;
+static void init_fly(int i) {
+    L.ro.rects[i].sprite.y = 1;
+    L.ro.rects[i].sprite_speed.x = FLY_FPS;
     float angle = sca_random_range(15, 60);
     int flip = rand()%2;
-    float uv_w = -1;
+    float w_flip = -1;
     if(flip) {
+        w_flip = 1;
         angle = 180 - angle;
-        uv_w = 1;
     }
-    self->L.ro.rects[i].uv = u_pose_new(0, 0, uv_w, 1);
-    self->L.ro.rects[i].speed.x = sca_cos(sca_radians(angle)) * FLY_SPEED;
-    self->L.ro.rects[i].speed.y = sca_sin(sca_radians(angle)) * FLY_SPEED;
+    // m00 := width for an aa pose
+    L.ro.rects[i].pose.m00 = sca_abs(L.ro.rects[i].pose.m00) * w_flip;
+    L.ro.rects[i].speed.x = sca_cos(sca_radians(angle)) * FLY_SPEED;
+    L.ro.rects[i].speed.y = sca_sin(sca_radians(angle)) * FLY_SPEED;
     
-    self->L.ro.rects[i].acc.y = sca_random_range(0, FLY_ACC_Y);
-    
-    self->L.ro.rects[i].start_time = self->L.time;
+    L.ro.rects[i].acc.y = sca_random_range(0, FLY_ACC_Y);
+
+    L.ro.rects[i].start_time_ms = e_window.time_ms;
 }
 
-static void fly_away(Butterfly *self, int i) {
-    init_fly(self, i);
-    ro_particle_update_sub(&self->L.ro, i, 1);
+static void fly_away(int i) {
+    init_fly(i);
 }
 
 
@@ -70,16 +79,14 @@ static void fly_away(Butterfly *self, int i) {
 // public
 //
 
-Butterfly *butterfly_new(const vec2 *positions, int num) {
-    assume(num>0, "atleast one butterfly in a level?");
-    
-    Butterfly *self = rhc_calloc(sizeof *self);
-    
-    self->L.ro = ro_particle_new(num,
+void butterfly_init(const vec2 *positions, int num) {
+    s_assume(num>0, "atleast one butterfly in a level?");
+
+    L.ro = ro_particle_new(num,
             r_texture_new_file(12, 2, "res/butterfly.png"));
             
     for(int i=0; i<num; i++) {
-        self->L.ro.rects[i].pose = u_pose_new(
+        L.ro.rects[i].pose = u_pose_new(
                 sca_random_noise(positions[i].x, 4),
                 sca_random_noise(positions[i].y, 4),
                 16, 16);
@@ -88,86 +95,70 @@ Butterfly *butterfly_new(const vec2 *positions, int num) {
             sca_random_range(0.25, 0.75),
             sca_random_range(0.75, 1)
         }};
-        self->L.ro.rects[i].color.rgb = vec3_hsv2rgb(hsv);
-        init_stay(self, i);
+        L.ro.rects[i].color.rgb = vec3_hsv2rgb(hsv);
+        init_stay(i);
     }
     
-    ro_particle_update(&self->L.ro);
-    
-    self->RO.last_color = vec3_set(0.75);
+    butterfly.RO.last_color = vec3_set(0.75);
    
-    self->L.save.collected = rhc_calloc(num * sizeof(bool));
-    
-    return self;
+    L.save.collected = s_new0(bool, num);
 }
 
-void butterfly_kill(Butterfly **self_ptr) {
-    Butterfly *self = *self_ptr;
-    if(!self)
-        return;
-    ro_particle_kill(&self->L.ro);
-    rhc_free(self->L.save.collected);
-    
-    rhc_free(self);
-    *self_ptr = NULL;
+void butterfly_kill() {
+    ro_particle_kill(&L.ro);
+    s_free(L.save.collected);
+    memset(&L, 0, sizeof L);
+    memset(&butterfly, 0, sizeof butterfly);
 }
 
-void butterfly_update(Butterfly *self, float dtime) {
-    self->L.time += dtime;
-    self->L.reset_time += dtime;
+void butterfly_update(float dtime) {
+    L.reset_time += dtime;
     
-    if(self->L.reset_time >= RESET_TIME) {
-        self->L.reset_time -= RESET_TIME;
-        for(int i=0; i<self->L.ro.num; i++) {
-            if(is_flying(self, i))
+    if(L.reset_time >= RESET_TIME) {
+        L.reset_time -= RESET_TIME;
+        for(int i=0; i<L.ro.num; i++) {
+            if(is_flying(i))
                 continue;
-            self->L.ro.rects[i].start_time = self->L.time;
+            L.ro.rects[i].start_time_ms = e_window.time_ms;
         }
-        ro_particle_update(&self->L.ro);
     }
-    
-    
-   
 }
 
-void butterfly_render(const Butterfly *self, const mat4 *cam_mat) {
-    ro_particle_render(&self->L.ro, self->L.time, cam_mat, false);
+void butterfly_render(const mat4 *cam_mat) {
+    ro_particle_render(&L.ro, e_window.time_ms, cam_mat);
 }
 
-bool butterfly_collect(Butterfly *self, vec2 position) {
-    for(int i=0; i<self->L.ro.num; i++) {
-        if(is_flying(self, i))
+bool butterfly_collect(vec2 position) {
+    for(int i=0; i<L.ro.num; i++) {
+        if(is_flying(i))
             continue;
-        if(vec2_distance(position, u_pose_get_xy(self->L.ro.rects[i].pose)) <= COLLECT_DISTANCE) {
-            fly_away(self, i);
-            self->RO.collected++;
-            self->RO.last_color = self->L.ro.rects[i].color.rgb;
+        if(vec2_distance(position, u_pose_get_xy(L.ro.rects[i].pose)) <= COLLECT_DISTANCE) {
+            fly_away(i);
+            butterfly.RO.collected++;
+            butterfly.RO.last_color = L.ro.rects[i].color.rgb;
             return true;
         }
     }
     return false;
 }
 
-void butterfly_save(Butterfly *self) {
-    for(int i=0; i<self->L.ro.num; i++) {
-        self->L.save.collected[i] = is_flying(self, i);
+void butterfly_save() {
+    for(int i=0; i<L.ro.num; i++) {
+        L.save.collected[i] = is_flying(i);
     }
 }
 
-void butterfly_load(Butterfly *self) {
-    self->RO.collected = 0;
-    self->L.time = -1000;
-    for(int i=0; i<self->L.ro.num; i++) {
-        if(self->L.save.collected[i]) {
-            self->RO.collected++;
-            init_fly(self, i);
+void butterfly_load() {
+    butterfly.RO.collected = 0;
+    for(int i=0; i<L.ro.num; i++) {
+        if(L.save.collected[i]) {
+            butterfly.RO.collected++;
+            init_fly(i);
         } else {
-            init_stay(self, i);
+            init_stay(i);
         }
     }
-    self->L.time = 0;
-    self->L.reset_time = 0;
-    ro_particle_update(&self->L.ro);
-    self->RO.last_color = vec3_set(0.75);
+    L.reset_time = 0;
+    butterfly.RO.last_color = vec3_set(0.75);
 }
 

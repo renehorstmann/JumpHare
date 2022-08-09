@@ -1,8 +1,7 @@
 #include "r/ro_batch.h"
-#include "r/texture.h"
 #include "u/pose.h"
-#include "mathc/float.h"
-#include "mathc/utils/random.h"
+#include "m/utils/random.h"
+#include "tilemap.h"
 #include "airstroke.h"
 
 
@@ -10,45 +9,43 @@
 #define FRAMES 4
 #define FPS 18
 
-//
-// private
-//
+typedef struct {
+    rRect_s *rect;
+    float time;
+    bool hit;
+    vec2 prev_pos;
+} Stroke;
 
-typedef struct Airstroke_Stroke Stroke;
+
+static struct {
+    RoBatch ro;
+    Stroke strokes[AIRSTROKE_MAX];
+} L;
 
 
 //
 // public
 //
 
-Airstroke *airstroke_new() {
-    Airstroke *self = rhc_calloc(sizeof *self);
-    
-    self->L.ro = ro_batch_new(AIRSTROKE_MAX, r_texture_new_file(1, 1, "res/airstroke.png"));
+void airstroke_init() {
+    L.ro = ro_batch_new(AIRSTROKE_MAX, r_texture_new_file(1, 1, "res/airstroke.png"));
 
     for (int i = 0; i < AIRSTROKE_MAX; i++) {
-        self->L.ro.rects[i].pose = u_pose_new_hidden();
-        self->L.strokes[i].rect = &self->L.ro.rects[i];
-        self->L.strokes[i].time = -1;
+        L.ro.rects[i].pose = u_pose_new_hidden();
+        L.strokes[i].rect = &L.ro.rects[i];
+        L.strokes[i].time = -1;
     }
-    ro_batch_update(&self->L.ro);
-    
-    return self;
+    ro_batch_update(&L.ro);
 }
 
-void airstroke_kill(Airstroke **self_ptr) {
-    Airstroke *self = *self_ptr;
-    if(!self)
-        return;
-        
-    ro_batch_kill(&self->L.ro);
-    rhc_free(self);
-    *self_ptr = NULL;
+void airstroke_kill() {
+    ro_batch_kill(&L.ro);
+    memset(&L, 0, sizeof L);
 }
 
-void airstroke_update(Airstroke *self, const Tilemap *tilemap, float dtime) {
+void airstroke_update(float dtime) {
     for (int i = 0; i < AIRSTROKE_MAX; i++) {
-        Stroke *s = &self->L.strokes[i];
+        Stroke *s = &L.strokes[i];
        
         // check dead
         if (s->time < 0) {
@@ -60,7 +57,7 @@ void airstroke_update(Airstroke *self, const Tilemap *tilemap, float dtime) {
 
         if (!s->hit) {
             vec2 pos = u_pose_get_xy(s->rect->pose);
-            float ground = tilemap_ground(tilemap, pos.x, pos.y, NULL);
+            float ground = tilemap_ground(pos.x, pos.y, NULL);
 
             pos.y += SPEED * dtime;
             if (pos.y <= ground + 12) {
@@ -88,14 +85,14 @@ void airstroke_update(Airstroke *self, const Tilemap *tilemap, float dtime) {
 
 }
 
-void airstroke_render(const Airstroke *self, const mat4 *cam_mat) {
-    ro_batch_render(&self->L.ro, cam_mat, true);
+void airstroke_render(const mat4 *cam_mat) {
+    ro_batch_render(&L.ro, cam_mat, true);
 }
 
-void airstroke_add(Airstroke *self, float x, float y) {
+void airstroke_add(float x, float y) {
     static int next = 0;
 
-    Stroke *s = &self->L.strokes[next];
+    Stroke *s = &L.strokes[next];
     s->rect->pose = u_pose_new(x, y, 32, 32);
     s->rect->uv = u_pose_new(0, 0, 1.0 / FRAMES, 1.0 / 2.0);
     s->rect->color = vec4_random_range(0.9, 1.0);
@@ -105,24 +102,24 @@ void airstroke_add(Airstroke *self, float x, float y) {
     next = (next + 1) % AIRSTROKE_MAX;
 }
 
-int airstroke_positions(const Airstroke *self, vec2 *out_positions, int max_positions) {
+int airstroke_positions(vec2 *out_positions, int max_positions) {
     int idx = 0;
     for(int i=0; i<AIRSTROKE_MAX; i++) {
-        if(self->L.strokes[i].time < 0)
+        if(L.strokes[i].time < 0)
             continue;
-        out_positions[idx] = u_pose_get_xy(self->L.ro.rects[i].pose);
+        out_positions[idx] = u_pose_get_xy(L.ro.rects[i].pose);
         if(++idx >= max_positions)
             return idx;
     }
     return idx;
 }
 
-int airstroke_prev_positions(const Airstroke *self, vec2 *out_prev_positions, int max_positions) {
+int airstroke_prev_positions(vec2 *out_prev_positions, int max_positions) {
     int idx = 0;
     for(int i=0; i<AIRSTROKE_MAX; i++) {
-        if(self->L.strokes[i].time < 0)
+        if(L.strokes[i].time < 0)
             continue;
-        out_prev_positions[idx] = self->L.strokes[i].prev_pos;
+        out_prev_positions[idx] = L.strokes[i].prev_pos;
         if(++idx >= max_positions)
             return idx;
     }

@@ -3,28 +3,31 @@
 
 //
 // debug gui, nuklear based
-// is a singleton / module
-// window functions dont need the eGui handle
 //
 
-#include "mathc/types/float.h"
+#include "core.h"
+#include "m/types/float.h"
 
 struct nk_context;
-struct eWindow;
-typedef struct eGui eGui;
 
-// creates the singleton
-eGui *e_gui_new(const struct eWindow *window);
 
-void e_gui_kill(eGui **self_ptr);
+struct eGui_Globals {
+    bool init;
+    struct nk_context *ctx;
+
+    // added to the nuklear render to scale the whole nuklear gui
+    // reset this f. e. in the camera
+    float scale;
+};
+extern struct eGui_Globals e_gui;
+
+
+void e_gui_init();
+
+void e_gui_kill();
 
 // renders every window, created between the calls
-// safe to pass NULL
-void e_gui_render(const eGui *self);
-
-// returns the nuklear context for self made windows
-// if gui is not created, NULL is returned
-struct nk_context *e_gui_get_nk_context();
+void e_gui_render();
 
 // creates a nuklear window to set the float attribute
 // safe to call if gui is not created

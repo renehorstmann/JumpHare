@@ -1,31 +1,30 @@
 #include "r/render.h"
-#include "r/ro_single.h"
 #include "r/ro_batch.h"
-#include "r/texture.h"
 #include "u/pose.h"
 #include "u/image.h"
-#include "mathc/float.h"
+#include "m/float.h"
+#include "camera.h"
 #include "background.h"
 
 #define PIXEL_SIZE 2.0
 
 
+static struct {
+    RoBatch ro[CAMERA_BACKGROUNDS];
+} L;
 
 //
 // public
 //
 
-Background *background_new(float level_width, float level_height, 
+void background_init(float level_width, float level_height,
         bool repeat_h, bool repeat_v,
-        rRender *render,
         const char *file) {
-    Background *self = rhc_calloc(sizeof *self);
-            
     uImage img = u_image_new_file(CAMERA_BACKGROUNDS, file);
 
     // top left pixel will be clear color
-    r_render_clear_color(render)->rgb = vec3_cast_from_uchar_1(u_image_pixel(img, 0, 0, 0)->v);
-
+    r_render.clear_color.rgb = vec3_cast_from_uchar_1(u_image_pixel(img, 0, 0, 0)->v);
+    
     float rows = img.rows * PIXEL_SIZE;
     float cols = img.cols * PIXEL_SIZE;
 
@@ -34,44 +33,37 @@ Background *background_new(float level_width, float level_height,
 
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
         rTexture tex = r_texture_new(img.cols, img.rows, 1, 1, u_image_layer(img, i));
-        self->L.ro[i] = ro_batch_new(size_h*size_v, tex);
+        L.ro[i] = ro_batch_new(size_h*size_v, tex);
 
         for (int v = 0; v < size_v; v++) {
             for(int h = 0; h < size_h; h++) {
-                self->L.ro[i].rects[v*size_h+h].pose = 
+                L.ro[i].rects[v*size_h+h].pose = 
                         u_pose_new_aa(
                         cols * h, rows *(v+1), 
                         cols, rows);
             }
         }
-        ro_batch_update(&self->L.ro[i]);
+        ro_batch_update(&L.ro[i]);
     }
 
     u_image_kill(&img);
-    return self;
 }
 
 
-void background_kill(Background **self_ptr) {
-    Background *self = *self_ptr;
-    if(!self)
-        return;
-        
+void background_kill() {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++) {
-        ro_batch_kill(&self->L.ro[i]);
+        ro_batch_kill(&L.ro[i]);
     }
-    
-    rhc_free(self);
-    *self_ptr = NULL;
+    memset(&L, 0, sizeof L);
 }
 
 
-void background_update(Background *self, float dtime) {
+void background_update(float dtime) {
 
 }
 
-void background_render(const Background *self, const Camera_s *cam) {
+void background_render() {
     for (int i = 0; i < CAMERA_BACKGROUNDS; i++)
-        ro_batch_render(&self->L.ro[i], &cam->matrices_background[i].vp, false);
+        ro_batch_render(&L.ro[i], &camera.matrices_background[i].vp, false);
 }
 

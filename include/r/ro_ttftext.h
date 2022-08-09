@@ -6,7 +6,15 @@
 // renders text, prerendered by SDL_TTF, only available if OPTION_TTF is set
 //
 
-#include "ro_types.h"
+#include "ro_single.h"
+#include <SDL2/SDL_ttf.h>
+
+// Renders ttf text
+typedef struct {
+    RoSingle ro;
+    TTF_Font *font;
+    float ratio;    // width / height
+} RoTtfText;
 
 struct RoTtfTextGlobals_s {
     TTF_Font *default_font;
@@ -17,7 +25,7 @@ rTexture ro_ttftext_create_texture(TTF_Font *font, vec4 color, const char *text,
 
 
 
-// creates a new ttf text with tge ro.ttftext.default_font as init
+// creates a new ttf text with the ro.ttftext.default_font as init
 RoTtfText ro_ttftext_new(vec4 color, const char *text);
 
 void ro_ttftext_kill(RoTtfText *self);

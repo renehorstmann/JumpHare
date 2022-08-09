@@ -1,46 +1,32 @@
 #ifndef JUMPHARE_CARROT_H
 #define JUMPHARE_CARROT_H
 
-#include "r/ro_types.h"
-#include "pixelparticles.h"
+#include "s/s.h"
+#include "m/types/float.h"
 
 
-typedef struct {
-    PixelParticles *particles_ref;
-    
+struct Carrot_Globals{
     struct {
         int collected;  // eaten + available
         int eaten;
     } RO; // read only
-    
-    struct {
-        RoBatch carrot_ro;
-        bool collected[3];
-        
-        float time;
+};
+extern struct Carrot_Globals carrot;
 
-        struct {
-            bool collected[3];
-            int collected_cnt;
-            int eaten_cnt;
-        } save;
-    } L;
-} Carrot;
+void carrot_init(const vec2 *positions_3);
 
-Carrot *carrot_new(PixelParticles *particles, const vec2 *positions_3);
+void carrot_kill();
 
-void carrot_kill(Carrot **self_ptr);
+void carrot_update(float dtime);
 
-void carrot_update(Carrot *self, float dtime);
+void carrot_render(const mat4 *cam_mat);
 
-void carrot_render(const Carrot *self, const mat4 *cam_mat);
+bool carrot_collect(vec2 position);
 
-bool carrot_collect(Carrot *self, vec2 position);
+void carrot_eat();
 
-void carrot_eat(Carrot *self);
+void carrot_save();
 
-void carrot_save(Carrot *self);
-
-void carrot_load(Carrot *self);
+void carrot_load();
 
 #endif //JUMPHARE_CARROT_H

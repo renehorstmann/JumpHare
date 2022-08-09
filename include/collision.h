@@ -1,13 +1,9 @@
 #ifndef JUMPHARE_COLLISION_H
 #define JUMPHARE_COLLISION_H
 
-#include <stdbool.h>
-#include "tilemap.h"
+#include "s/s.h"
+#include "m/types/float.h"
 
-
-typedef struct {
-    const Tilemap *tilemap_ref;
-} Collision;
 
 enum collision_state {
   COLLISION_BOTTOM,
@@ -27,13 +23,13 @@ typedef struct {
 } CollisionCallback_s;
 
 
-Collision *collision_new(const Tilemap *tilemap);
+void collision_init();
 
-void collision_kill(Collision **self_ptr);
+void collision_kill();
 
-void collision_tilemap_grounded(const Collision *self, CollisionCallback_s callback, vec2 center, vec2 radius, vec2 speed);
+void collision_tilemap_grounded(CollisionCallback_s callback, vec2 center, vec2 radius, vec2 speed);
 
-void collision_tilemap_falling(const Collision *self, CollisionCallback_s callback, vec2 center, vec2 radius, vec2 speed);
+void collision_tilemap_falling(CollisionCallback_s callback, vec2 center, vec2 radius, vec2 speed);
 
 
 #endif //JUMPHARE_COLLISION_H

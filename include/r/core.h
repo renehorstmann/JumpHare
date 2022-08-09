@@ -5,12 +5,14 @@
 // as e/core.h, this file includes headers of sdl and opengl and has some color constants
 //
 
-#include <stdbool.h>
+#include "s/s.h"
 
 #define GL_GLEXT_PROTOTYPES
 
 #ifdef OPTION_GLEW
+
 #include <GL/glew.h>
+
 #endif
 
 #include <SDL2/SDL.h>
@@ -19,10 +21,10 @@
 #include <SDL2/SDL_opengl.h>
 #endif
 
-#include "mathc/types/float.h"
+#include "m/types/float.h"
 
 
-#ifdef __EMSCRIPTEN__
+#ifdef PLATFORM_EMSCRIPTEN
 #include <emscripten.h>
 // #include <emscripten/html5.h>
 #endif
@@ -30,11 +32,15 @@
 
 // exit the app, on emscripten an error message will be shown
 static void r_exit_failure() {
-#ifdef __EMSCRIPTEN__
+#ifdef PLATFORM_EMSCRIPTEN
     emscripten_cancel_main_loop();
     EM_ASM(
             set_exit_failure_error_msg();
             );
+#endif
+#ifdef PLATFORM_ANDROID
+    SDL_AndroidShowToast("Sorry! Potato devices are not supported", 1, -1, 0, 0);
+    SDL_Delay(4000);
 #endif
     exit(EXIT_FAILURE);
 }

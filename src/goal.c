@@ -1,10 +1,8 @@
 #include "r/ro_single.h"
-#include "r/texture.h"
 #include "u/pose.h"
-#include "mathc/float.h"
-#include "mathc/utils/random.h"
-#include "rhc/error.h"
-#include "rhc/log.h"
+#include "m/float.h"
+#include "m/utils/random.h"
+#include "pixelparticles.h"
 #include "goal.h"
 
 #define GOAL_OFFSET_Y 8.0
@@ -19,11 +17,13 @@
 #define PARTICLE_ALPHA 2.0
 
 
-//
-// private
-//
+static struct {
+    RoSingle goal_ro;
+    float time;
+} L;
 
-static void emit_particles(Goal *self, float x, float y) {
+
+static void emit_particles(float x, float y) {
     rParticleRect_s rects[NUM_PARTICLES];
     for(int i=0; i<NUM_PARTICLES; i++) {
         rects[i] = r_particlerect_new();
@@ -43,9 +43,9 @@ static void emit_particles(Goal *self, float x, float y) {
         }
         rects[i].color.a = PARTICLE_ALPHA;
         rects[i].color_speed.a = (float)-PARTICLE_ALPHA/PARTICLE_TIME;
-        rects[i].start_time = self->particles_ref->time;
+        rects[i].start_time_ms = pixelparticles.time;
     }
-    pixelparticles_add(self->particles_ref, rects, NUM_PARTICLES);
+    pixelparticles_add(rects, NUM_PARTICLES);
 }
 
 static void activate() {
@@ -57,66 +57,55 @@ static void activate() {
 // public
 //
 
-Goal *goal_new(PixelParticles *particles, vec2 position) {
-    Goal *self = rhc_calloc(sizeof *self);
-    
-    self->particles_ref = particles;
-    
-    self->L.goal_ro = ro_single_new(
+void goal_init(vec2 position) {
+    L.goal_ro = ro_single_new(
                     r_texture_new_file(4, 2, "res/goal_flag.png"));
-    self->L.goal_ro.rect.pose = u_pose_new(
+    L.goal_ro.rect.pose = u_pose_new(
             position.x,
             position.y+GOAL_OFFSET_Y,
             32, 48);
 
-    self->L.goal_ro.rect.sprite.y = 1;
-    
-    return self;
+    L.goal_ro.rect.sprite.y = 1;
 }
 
-void goal_kill(Goal **self_ptr) {
-    Goal *self = *self_ptr;
-    if(!self)
-        return;
-    ro_single_kill(&self->L.goal_ro);
-    
-    rhc_free(self);
-    *self_ptr = NULL;
+void goal_kill() {
+    ro_single_kill(&L.goal_ro);
+    memset(&L, 0, sizeof L);
 }
 
-void goal_update(Goal *self, float dtime) {
-    self->L.time += dtime;
+void goal_update(float dtime) {
+    L.time += dtime;
 
 
-    float animate_time = sca_mod(self->L.time, FRAMES / FPS);
+    float animate_time = sca_mod(L.time, FRAMES / FPS);
     int frame = animate_time * FPS;
-    self->L.goal_ro.rect.sprite.x = frame;    
+    L.goal_ro.rect.sprite.x = frame;    
 }
 
-void goal_render(const Goal *self, const mat4 *cam_mat) {
-    ro_single_render(&self->L.goal_ro, cam_mat);
+void goal_render(const mat4 *cam_mat) {
+    ro_single_render(&L.goal_ro, cam_mat);
 }
 
-bool goal_reached(const Goal *self) {
-    return self->L.goal_ro.rect.sprite.y < 0.5;
+bool goal_reached() {
+    return L.goal_ro.rect.sprite.y < 0.5;
 }
 
-vec2 goal_position(const Goal *self) {
-    vec2 center = u_pose_get_xy(self->L.goal_ro.rect.pose);
+vec2 goal_position() {
+    vec2 center = u_pose_get_xy(L.goal_ro.rect.pose);
     center.y -= GOAL_OFFSET_Y;
     return center;
 }
 
-void goal_activate(Goal *self) {
-    if(goal_reached(self))
+void goal_activate() {
+    if(goal_reached())
         return;
-    log_info("goal_activate");
-    self->L.goal_ro.rect.sprite.y = 0;
+    s_log_info("goal_activate");
+    L.goal_ro.rect.sprite.y = 0;
 
-    vec2 pos = u_pose_get_xy(self->L.goal_ro.rect.pose);
+    vec2 pos = u_pose_get_xy(L.goal_ro.rect.pose);
 
     pos.y -= GOAL_OFFSET_Y;
 
     pos.y += 8 + GOAL_OFFSET_Y;
-    emit_particles(self, pos.x, pos.y);
+    emit_particles(pos.x, pos.y);
 }

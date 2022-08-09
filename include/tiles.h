@@ -19,17 +19,18 @@ enum tiles_pixel_state {
     TILES_PIXEL_NUM_STATES
 };
 
-typedef struct {
+struct Tiles_Globals {
     uImage imgs[MAX_TILES];
     rTexture textures[MAX_TILES];
     int ids[MAX_TILES];
     int size;
-} Tiles;
+};
+extern struct Tiles_Globals tiles;
 
-Tiles *tiles_new();
+void tiles_init();
 
-uColor_s tiles_pixel(const Tiles *self, uColor_s code, int pixel_c, int pixel_r, int layer);
+uColor_s tiles_pixel(uColor_s code, int pixel_c, int pixel_r, int layer);
 
-enum tiles_pixel_state tiles_get_state(const Tiles *self, uColor_s id);
+enum tiles_pixel_state tiles_get_state(uColor_s id);
 
 #endif //JUMPHARE_TILES_H

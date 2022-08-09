@@ -1,33 +1,16 @@
 #ifndef JUMPHARE_HUD_H
 #define JUMPHARE_HUD_H
 
+#include "s/s.h"
+#include "m/types/float.h"
 
-#include "r/ro_types.h"
-#include "camera.h"
-#include "butterfly.h"
-#include "carrot.h"
+void hud_init();
 
-typedef struct {
-    struct {
-        RoBatch carrots;
-        RoSingle butterfly_icon;
-        RoText butterfly_cnt;
-        float butterfly_time;
-        int butterfly_collected;
-    } L;
-} Hud;
+void hud_kill();
 
-Hud *hud_new();
+void hud_update(float dtime);
 
-void hud_kill(Hud **self_ptr);
-
-void hud_update(Hud *self, 
-const Camera_s *cam, 
-const Carrot *carrot, 
-const Butterfly *butterfly,
-float dtime);
-
-void hud_render(const Hud *self, const mat4 *hudcam_mat);
+void hud_render(const mat4 *hudcam_mat);
 
 
 #endif //JUMPHARE_HUD_H

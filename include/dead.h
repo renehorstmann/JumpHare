@@ -1,34 +1,23 @@
 #ifndef JUMPHARE_DEAD_H
 #define JUMPHARE_DEAD_H
 
-#include <stdbool.h>
-#include "r/ro_types.h"
+#include "s/s.h"
+#include "m/types/float.h"
 
 
 typedef void (*DeadFinishedFn)(void *user_data);
 
-typedef struct {
-    struct {
-        RoSingle strike_ro, blend_ro;
-        float time;
-        DeadFinishedFn callback;
-        void *callback_user_data;
-        bool callback_called;
-    } L;
-} Dead;
+void dead_init(DeadFinishedFn callback, void *callback_user_data);
 
+void dead_kill();
 
-Dead *dead_new(DeadFinishedFn callback, void *callback_user_data);
+void dead_update(float dtime);
 
-void dead_kill(Dead **self_ptr);
+void dead_render(const mat4 *cam_mat, const mat4 *hudcam_mat);
 
-void dead_update(Dead *self, float dtime);
+void dead_set_dead(float x, float y);
 
-void dead_render(const Dead *self, const mat4 *cam_mat, const mat4 *hudcam_mat);
-
-void dead_set_dead(Dead *self, float x, float y);
-
-bool dead_is_dead(const Dead *self);
+bool dead_is_dead();
 
 
 #endif //JUMPHARE_DEAD_H

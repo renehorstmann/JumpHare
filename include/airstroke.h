@@ -1,39 +1,26 @@
 #ifndef JUMPHARE_AIRSTROKE_H
 #define JUMPHARE_AIRSTROKE_H
 
-#include "r/ro_types.h"
-#include "tilemap.h"
+#include "s/s.h"
+#include "m/types/float.h"
+
 
 #define AIRSTROKE_MAX 8
 
-struct Airstroke_Stroke {
-    rRect_s *rect;
-    float time;
-    bool hit;
-    vec2 prev_pos;
-} ;
+void airstroke_init();
 
-typedef struct {
-    struct {
-        RoBatch ro;
-        struct Airstroke_Stroke strokes[AIRSTROKE_MAX];
-    } L;
-} Airstroke;
+void airstroke_kill();
 
-Airstroke *airstroke_new();
+void airstroke_update(float dtime);
 
-void airstroke_kill(Airstroke **self_ptr);
-
-void airstroke_update(Airstroke *self, const Tilemap *tilemap, float dtime);
-
-void airstroke_render(const Airstroke *self, const mat4 *cam_mat);
+void airstroke_render(const mat4 *cam_mat);
 
 // used by hare
-void airstroke_add(Airstroke *self, float x, float y);
+void airstroke_add(float x, float y);
 
-int airstroke_positions(const Airstroke *self, vec2 *out_positions, int max_positions);
+int airstroke_positions(vec2 *out_positions, int max_positions);
 
-int airstroke_prev_positions(const Airstroke *self, vec2 *out_prev_positions, int max_positions);
+int airstroke_prev_positions(vec2 *out_prev_positions, int max_positions);
 
 
 #endif //JUMPHARE_AIRSTROKE_H

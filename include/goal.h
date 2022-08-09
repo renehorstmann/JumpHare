@@ -1,31 +1,22 @@
 #ifndef JUMPHARE_GOAL_H
 #define JUMPHARE_GOAL_H
 
-#include <stdbool.h>
-#include "r/ro_types.h"
-#include "pixelparticles.h"
+#include "s/s.h"
+#include "m/types/float.h"
 
-typedef struct {
-    PixelParticles *particles_ref;
-    
-    struct {
-        RoSingle goal_ro;
-        float time;
-    } L;
-} Goal;
 
-Goal *goal_new(PixelParticles *particles, vec2 position);
+void goal_init(vec2 position);
 
-void goal_kill(Goal **self_ptr);
+void goal_kill();
 
-void goal_update(Goal *self, float dtime);
+void goal_update(float dtime);
 
-void goal_render(const Goal *self, const mat4 *cam_mat);
+void goal_render(const mat4 *cam_mat);
 
-bool goal_reached(const Goal *self);
+bool goal_reached();
 
-vec2 goal_position(const Goal *self);
+vec2 goal_position();
 
-void goal_activate(Goal *self);
+void goal_activate();
 
 #endif //JUMPHARE_GOAL_H
