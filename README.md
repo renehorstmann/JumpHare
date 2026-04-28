@@ -2,7 +2,10 @@
 An SDL2 OpenGL game written in C, also working on Web and Android.
 Based on [some](https://github.com/renehorstmann/some) framework.
 
-
+> This is another game that I did not finished on my journey to get to know SDL and OpenGL|ES.
+> It acted a bit as a playground to test inputs for a mobile jump and run.
+> Along JumpHare my pixel art editor Pixelc came to live.
+> Ill left it here at github to show what I once coded.
 
 ## Art
 Pixelart was made with my [Pixelc](https://github.com/renehorstmann/pixelc) App.
@@ -18,9 +21,6 @@ Runs really well on touch screens.
 
 On Desktop, use arrow keys to move, space to jump and enter to press a button.
 
-
-## Warning
-In active developmemt
 
 ## Status
 ![example](example.jpg)
