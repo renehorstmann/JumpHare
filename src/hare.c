@@ -19,7 +19,7 @@
 #define RUN_SPEED_X 90
 #define MAX_SPEED_X 100
 #define MAX_SPEED_Y 250
-#define JUMP_SPEED 225
+#define JUMP_SPEED 300
 #define DOUBLE_JUMP_SPEED_Y 175
 #define DOUBLE_JUMP_SPEED_X_FACTOR 0.5
 #define ACC 160
